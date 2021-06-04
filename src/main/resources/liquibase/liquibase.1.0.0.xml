@@ -1,0 +1,247 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="create-table-app_user" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="app_user"/>
+            </not>
+        </preConditions>
+
+        <comment>Create table for recording all the users of the system</comment>
+
+        <createTable tableName="app_user">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="first_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_of_birth" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_verified" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="org_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="true"
+                             foreignKeyName="01062021_FK_created_by_user_id"
+                             references="app_user(id)"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="true"
+                             foreignKeyName="01062021_FK_modified_by_user_id"
+                             references="app_user(id)"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-organization" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="organization"/>
+            </not>
+        </preConditions>
+
+        <comment>Create table for recording all organizations/companies registered to used the system</comment>
+
+        <createTable tableName="organization">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="registration_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="registration_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="org_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="true"
+                             foreignKeyName="01062021_FK_organization_creator"
+                             references="app_user(id)"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="true"
+                             foreignKeyName="01062021_FK_organization_modifier"
+                             references="app_user(id)"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="create-table-user_activity_log" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="user_activity_log"/>
+            </not>
+        </preConditions>
+
+        <comment>Create table for logging all user POST, UPDATE and DELETE actions</comment>
+
+        <createTable tableName="user_activity_log">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="request_url" type="varchar(3000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="request_method" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="request_headers" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="request_body" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_body" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_headers" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_status" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_status_code" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="stack_trace" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="entity_type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="entity_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="action_type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="remote_ip_address" type="varchar(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="platform_type" type="varchar(1000)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="create-table-http_call_log" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="http_call_log"/>
+            </not>
+        </preConditions>
+
+        <comment>Create table for logging all external HTTP request from the systems</comment>
+
+        <createTable tableName="http_call_log">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="request_url" type="varchar(3000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="request_method" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="request_headers" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="request_body" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_body" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_headers" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_status" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_status_code" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="stack_trace" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="action_type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration" type="int">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
