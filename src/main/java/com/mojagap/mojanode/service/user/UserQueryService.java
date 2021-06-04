@@ -2,15 +2,16 @@ package com.mojagap.mojanode.service.user;
 
 
 import com.mojagap.mojanode.controller.user.contract.UserSummary;
-import com.mojagap.mojanode.helper.ApplicationConstants;
 import com.mojagap.mojanode.helper.AppContext;
+import com.mojagap.mojanode.helper.ApplicationConstants;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
-import com.mojagap.mojanode.service.httpgateway.WebclientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +24,6 @@ public class UserQueryService {
     private AppUserRepository appUserRepository;
 
     @Autowired
-    WebclientService webclientService;
-
-    @Autowired
     private RestTemplateService restTemplateService;
 
     public List<UserSummary> getUsers() {
@@ -35,8 +33,8 @@ public class UserQueryService {
     }
 
     public ExternalUser getExternalUserById(Integer id) {
-        return restTemplateService.doHttpGet(ApplicationConstants.BANK_TRANSFER_BASE_URL + "/users/" + id, new HashMap<>(), ExternalUser.class);
-//        return webclientService.getExternalUserById(id);
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        return restTemplateService.doHttpGet(ApplicationConstants.BANK_TRANSFER_BASE_URL + "/users/" + id, queryParams, ExternalUser.class);
     }
 
 }

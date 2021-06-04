@@ -1,6 +1,6 @@
 package com.mojagap.mojanode.helper.filter;
 
-import com.mojagap.mojanode.helper.AppContextAware;
+import com.mojagap.mojanode.helper.AppContext;
 import com.mojagap.mojanode.helper.utility.CommonUtils;
 import com.mojagap.mojanode.helper.utility.DateUtils;
 import com.mojagap.mojanode.model.ActionTypeEnum;
@@ -8,7 +8,6 @@ import com.mojagap.mojanode.model.http.HttpCallLog;
 import com.mojagap.mojanode.model.http.HttpResponseStatusEnum;
 import com.mojagap.mojanode.repository.http.HttpCallLogRepository;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -16,6 +15,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -28,21 +28,23 @@ public class HttpRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final Logger LOG = Logger.getLogger(HttpRequestInterceptor.class.getName());
 
-    @Autowired
-    private HttpCallLogRepository httpCallLogRepository;
-
-
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         Long startTime = System.currentTimeMillis();
         HttpCallLog httpCallLog = logHttpRequest(request, body);
+        HttpServletRequest httpServletRequest = AppContext.getBean(HttpServletRequest.class);
+        httpServletRequest.setAttribute(HttpCallLog.class.getName(), httpCallLog);
         ClientHttpResponse response = execution.execute(request, body);
         logHttpResponse(response, httpCallLog);
         Long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
         httpCallLog.setDuration((int) duration);
-        httpCallLogRepository = AppContextAware.getBean(HttpCallLogRepository.class);
-        httpCallLogRepository.saveAndFlush(httpCallLog);
+
+
+//        ActionTypeEnum actionTypeEnum = (ActionTypeEnum) httpServletRequest.getAttribute(ActionTypeEnum.class.getName());
+//        HttpCallLogRepository httpCallLogRepository = AppContext.getBean(HttpCallLogRepository.class);
+//        httpCallLog.setActionType(actionTypeEnum);
+//        httpCallLogRepository.saveAndFlush(httpCallLog);
         return response;
     }
 

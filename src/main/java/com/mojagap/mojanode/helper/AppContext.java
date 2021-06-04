@@ -1,23 +1,46 @@
 package com.mojagap.mojanode.helper;
 
-import com.mojagap.mojanode.helper.exception.BadRequestException;
-import com.mojagap.mojanode.helper.exception.RecordNotFoundException;
 import com.mojagap.mojanode.helper.utility.DateUtils;
 import com.mojagap.mojanode.model.AuditEntity;
 import com.mojagap.mojanode.model.user.AppUser;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
-public class AppContext {
+@Component
+public class AppContext implements ApplicationContextAware {
+
+    private static ApplicationContext context;
+
+    private static AppUser loggedInUser;
+
+    public static final Map<String, Object> properties = new HashMap<>();
+
+    public static <T> T getBean(Class<T> beanClass) {
+        return context.getBean(beanClass);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext context) throws BeansException {
+        AppContext.context = context;
+    }
 
     public static AppUser getLoggedInUser() {
-        return null;
-//        throw new RecordNotFoundException("The DB is empty!!!!");
+        return loggedInUser;
+    }
+
+    public static void setLoggedInUser(AppUser loggedInUser) {
+        AppContext.loggedInUser = loggedInUser;
     }
 
     public static <T extends AuditEntity> T stamp(T entity) {
-        AppUser appUser = getLoggedInUser();
+        AppUser appUser = loggedInUser;
         Date now = DateUtils.now();
         entity.setModifiedBy(appUser);
         entity.setModifiedOn(now);

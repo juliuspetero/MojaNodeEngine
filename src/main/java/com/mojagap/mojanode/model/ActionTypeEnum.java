@@ -10,5 +10,7 @@ public enum ActionTypeEnum {
     UNSUBSCRIBE,
     CLOSE,
     REJECT,
-    ACTIVATE;
+    ACTIVATE,
+    API_POLL_REQUEST,
+    API_POST_REQUEST;
 }

@@ -1,14 +1,13 @@
 package com.mojagap.mojanode.service.user;
 
 import com.mojagap.mojanode.controller.user.contract.UserSummary;
-import com.mojagap.mojanode.helper.ApplicationConstants;
 import com.mojagap.mojanode.helper.AppContext;
+import com.mojagap.mojanode.helper.ApplicationConstants;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.repository.user.OrganizationRepository;
 import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
-import com.mojagap.mojanode.service.httpgateway.WebclientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +19,6 @@ public class UserCommandService {
 
     @Autowired
     private AppUserRepository appUserRepository;
-
-    @Autowired
-    private WebclientService webclientService;
 
     @Autowired
     private RestTemplateService restTemplateService;
@@ -51,7 +47,7 @@ public class UserCommandService {
     }
 
     public ExternalUser createExternalUser(ExternalUser externalUser) {
-        return restTemplateService.doHttpPost(ApplicationConstants.BANK_TRANSFER_BASE_URL + "/husers", externalUser, ExternalUser.class);
+        return restTemplateService.doHttpPost(ApplicationConstants.BANK_TRANSFER_BASE_URL + "/users", externalUser, ExternalUser.class);
 
     }
 }
