@@ -9,7 +9,9 @@ import com.mojagap.mojanode.model.EntityTypeEnum;
 import com.mojagap.mojanode.model.http.HttpResponseStatusEnum;
 import com.mojagap.mojanode.model.user.PlatformTypeEnum;
 import com.mojagap.mojanode.model.user.UserActivityLog;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.annotations.SortNatural;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,7 +65,8 @@ public abstract class BaseController {
         }
     }
 
-    protected <R> R executeHttpGet(Callable<R> callable) throws Exception {
+    @SneakyThrows
+    protected <R> R executeHttpGet(Callable<R> callable) {
         try {
             return callable.call();
         } catch (Exception ex) {
@@ -73,14 +76,14 @@ public abstract class BaseController {
         }
     }
 
-    private void logHttpGetUserActivity(Throwable ex) throws JsonProcessingException {
+    @SneakyThrows(JsonProcessingException.class)
+    private void logHttpGetUserActivity(Throwable ex) {
         UserActivityLog userActivityLog = getUserActivityLog();
         if (userActivityLog == null) {
             userActivityLog = new UserActivityLog();
         }
         Integer platformType = Integer.valueOf(httpServletRequest.getHeader(ApplicationConstants.PLATFORM_TYPE_HEADER_KEY));
         PlatformTypeEnum platformTypeEnum = PlatformTypeEnum.fromInt(platformType);
-
         String fullUrl = httpServletRequest.getRequestURI();
         String queryString = httpServletRequest.getQueryString();
         if (queryString != null) {

@@ -3,6 +3,7 @@ package com.mojagap.mojanode.helper;
 import com.mojagap.mojanode.helper.utility.DateUtils;
 import com.mojagap.mojanode.model.AuditEntity;
 import com.mojagap.mojanode.model.user.AppUser;
+import com.mojagap.mojanode.repository.user.AppUserRepository;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -31,8 +32,9 @@ public class AppContext implements ApplicationContextAware {
         AppContext.context = context;
     }
 
+
     public static AppUser getLoggedInUser() {
-        return loggedInUser;
+        return loggedInUser = AppContext.getBean(AppUserRepository.class).getById(1);
     }
 
     public static void setLoggedInUser(AppUser loggedInUser) {
@@ -40,7 +42,7 @@ public class AppContext implements ApplicationContextAware {
     }
 
     public static <T extends AuditEntity> T stamp(T entity) {
-        AppUser appUser = loggedInUser;
+        AppUser appUser = AppContext.getLoggedInUser();
         Date now = DateUtils.now();
         entity.setModifiedBy(appUser);
         entity.setModifiedOn(now);

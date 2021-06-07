@@ -16,4 +16,5 @@ public class ExternalUser {
     private String username;
     private String phone;
     private String website;
+    private String email;
 }

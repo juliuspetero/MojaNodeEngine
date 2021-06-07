@@ -1,5 +1,7 @@
 package com.mojagap.mojanode.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.mojagap.mojanode.controller.user.contract.UserSummary;
 import com.mojagap.mojanode.model.AuditEntity;
 import com.mojagap.mojanode.helper.AppContext;
@@ -13,6 +15,7 @@ import java.util.Date;
 @Setter
 @Entity(name = "app_user")
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 public class AppUser extends AuditEntity {
     private String firstName;
     private String lastName;
@@ -22,7 +25,7 @@ public class AppUser extends AuditEntity {
     private String email;
     private String phoneNumber;
     private String password;
-    private Boolean verified;
+    private Boolean verified = Boolean.FALSE;
     private Organization organization;
 
     public AppUser(UserSummary userSummary, Organization organization) {
