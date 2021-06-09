@@ -2,9 +2,9 @@ package com.mojagap.mojanode.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.mojagap.mojanode.controller.user.contract.UserSummary;
-import com.mojagap.mojanode.model.AuditEntity;
+import com.mojagap.mojanode.controller.user.contract.AppUserContract;
 import com.mojagap.mojanode.helper.AppContext;
+import com.mojagap.mojanode.model.AuditEntity;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
@@ -28,14 +28,14 @@ public class AppUser extends AuditEntity {
     private Boolean verified = Boolean.FALSE;
     private Organization organization;
 
-    public AppUser(UserSummary userSummary, Organization organization) {
-        BeanUtils.copyProperties(userSummary, this);
+    public AppUser(AppUserContract appUserContract, Organization organization) {
+        BeanUtils.copyProperties(appUserContract, this);
         this.organization = organization;
         AppContext.stamp(this);
     }
 
-    public AppUser(UserSummary userSummary) {
-        BeanUtils.copyProperties(userSummary, this);
+    public AppUser(AppUserContract appUserContract) {
+        BeanUtils.copyProperties(appUserContract, this);
         AppContext.stamp(this);
     }
 

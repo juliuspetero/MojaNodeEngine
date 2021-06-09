@@ -2,7 +2,7 @@ package com.mojagap.mojanode.service.organization;
 
 
 import com.mojagap.mojanode.controller.organization.contract.OrganizationSummary;
-import com.mojagap.mojanode.controller.user.contract.UserSummary;
+import com.mojagap.mojanode.controller.user.contract.AppUserContract;
 import com.mojagap.mojanode.helper.ErrorMessages;
 import com.mojagap.mojanode.helper.exception.BadRequestException;
 import com.mojagap.mojanode.model.user.AppUser;
@@ -26,7 +26,7 @@ public class OrganizationCommandService {
     private UserCommandService userCommandService;
 
     public OrganizationSummary createOrganization(OrganizationSummary organizationSummary) {
-        List<UserSummary> userSummaries = organizationSummary.getUserSummaries();
+        List<AppUserContract> userSummaries = organizationSummary.getUserSummaries();
         if (CollectionUtils.isEmpty(userSummaries)) {
             throw new BadRequestException(ErrorMessages.USER_REQUIRED_WHEN_CREATING_ORGANIZATION);
         }

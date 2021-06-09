@@ -15,7 +15,7 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor
-public class UserSummary {
+public class AppUserContract {
     private Integer id;
     private String firstName;
     private String lastName;
@@ -32,7 +32,7 @@ public class UserSummary {
     private Integer roleId;
     private String roleName;
 
-    public UserSummary(AppUser appUser) {
+    public AppUserContract(AppUser appUser) {
         BeanUtils.copyProperties(appUser, this);
         this.organizationId = appUser.getOrganization() != null ? appUser.getOrganization().getId() : null;
     }

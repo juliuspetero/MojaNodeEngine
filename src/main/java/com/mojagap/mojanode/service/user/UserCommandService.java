@@ -1,6 +1,6 @@
 package com.mojagap.mojanode.service.user;
 
-import com.mojagap.mojanode.controller.user.contract.UserSummary;
+import com.mojagap.mojanode.controller.user.contract.AppUserContract;
 import com.mojagap.mojanode.helper.AppContext;
 import com.mojagap.mojanode.helper.ApplicationConstants;
 import com.mojagap.mojanode.model.http.ExternalUser;
@@ -24,9 +24,9 @@ public class UserCommandService {
     private RestTemplateService restTemplateService;
 
 
-    public UserSummary createUser(UserSummary userSummary) {
+    public AppUserContract createUser(AppUserContract appUserContract) {
         AppUser loggedInUser = AppContext.getLoggedInUser();
-        AppUser appUser = new AppUser(userSummary);
+        AppUser appUser = new AppUser(appUserContract);
         if (loggedInUser != null) {
             appUser.setOrganization(loggedInUser.getOrganization());
         } else {
@@ -34,16 +34,16 @@ public class UserCommandService {
             appUser.setModifiedBy(appUser);
         }
         appUser = appUserRepository.saveAndFlush(appUser);
-        userSummary.setId(appUser.getId());
-        return userSummary;
+        appUserContract.setId(appUser.getId());
+        return appUserContract;
     }
 
-    public UserSummary updateUser(UserSummary userSummary) {
-        return userSummary;
+    public AppUserContract updateUser(AppUserContract appUserContract) {
+        return appUserContract;
     }
 
-    public UserSummary removeUser(Integer userId) {
-        return new UserSummary();
+    public AppUserContract removeUser(Integer userId) {
+        return new AppUserContract();
     }
 
     public ExternalUser createExternalUser(ExternalUser externalUser) {
