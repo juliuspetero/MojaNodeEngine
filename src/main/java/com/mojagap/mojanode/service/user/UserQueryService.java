@@ -70,7 +70,7 @@ public class UserQueryService implements UserDetailsService {
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         AppUser appUser = appUserRepository.findOneByEmail(s);
         List<GrantedAuthority> authorities = new ArrayList<>();
-        appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);
+//        appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);
         return new AppUserDetails(appUser, authorities);
     }
 
@@ -95,7 +95,7 @@ public class UserQueryService implements UserDetailsService {
             appUser.setPassword("PASSWORD");
             appUser.setVerified(Boolean.FALSE);
             appUser.setDateOfBirth(DateUtils.now());
-            appUser.setId_number(IdentificationEnum.NATIONAL_ID.name());
+            appUser.setIdNumber(IdentificationEnum.NATIONAL_ID.name());
             AppContext.stamp(appUser);
             return appUser;
         }).collect(Collectors.toList());

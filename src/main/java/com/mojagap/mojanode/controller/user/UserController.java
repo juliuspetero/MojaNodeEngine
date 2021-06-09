@@ -32,7 +32,7 @@ public class UserController extends BaseController {
         return executeHttpGet(() -> userQueryService.getAppUsersByQueryParams(queryParams));
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public AppUserContract createAppUser(@RequestBody AppUserContract appUserContract) {
         return logUserActivity(EntityTypeEnum.USER, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             AppUserContract response = userCommandService.createUser(appUserContract);
@@ -41,9 +41,9 @@ public class UserController extends BaseController {
         });
     }
 
-    @GetMapping("/authenticate")
+    @PostMapping("/authenticate")
     public AppUserContract authenticate(@RequestBody AppUserContract appUserContract) {
-        return appUserContract;
+        return userCommandService.authenticateUser(appUserContract);
     }
 
     @GetMapping("/external/{id}")

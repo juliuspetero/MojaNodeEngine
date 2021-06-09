@@ -20,7 +20,7 @@ public class AppUser extends AuditEntity {
     private String firstName;
     private String lastName;
     private Date dateOfBirth;
-    private String id_number;
+    private String idNumber;
     private String address;
     private String email;
     private String phoneNumber;
@@ -57,8 +57,8 @@ public class AppUser extends AuditEntity {
     }
 
     @Column(name = "id_number")
-    public String getId_number() {
-        return id_number;
+    public String getIdNumber() {
+        return idNumber;
     }
 
     @Column(name = "address")

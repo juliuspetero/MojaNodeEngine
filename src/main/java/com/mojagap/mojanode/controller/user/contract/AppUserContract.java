@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
-import com.mojagap.mojanode.model.user.AppUser;
+import com.mojagap.mojanode.model.user.UserPermission;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.BeanUtils;
 
 import java.util.Date;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -17,11 +17,13 @@ import java.util.Date;
 @NoArgsConstructor
 public class AppUserContract {
     private Integer id;
+    private String authentication;
     private String firstName;
     private String lastName;
     @JsonFormat(pattern = ApplicationConstants.DD_MMM_YYY)
     private Date dateOfBirth;
-    private String id_number;
+    private String idNumber;
+    private String idType;
     private String address;
     private String email;
     private String phoneNumber;
@@ -30,10 +32,6 @@ public class AppUserContract {
     private Integer organizationId;
     private String organizationName;
     private Integer roleId;
-
-    public AppUserContract(AppUser appUser) {
-        BeanUtils.copyProperties(appUser, this);
-        this.organizationId = appUser.getOrganization() != null ? appUser.getOrganization().getId() : null;
-    }
-
+    private String roleName;
+    private List<UserPermission> permissions;
 }
