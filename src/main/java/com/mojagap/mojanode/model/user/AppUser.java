@@ -3,7 +3,7 @@ package com.mojagap.mojanode.model.user;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.mojagap.mojanode.controller.user.contract.AppUserContract;
-import com.mojagap.mojanode.helper.AppContext;
+import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.model.AuditEntity;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,11 +11,11 @@ import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Setter
 @Entity(name = "app_user")
 @NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 public class AppUser extends AuditEntity {
     private String firstName;
     private String lastName;
@@ -27,6 +27,7 @@ public class AppUser extends AuditEntity {
     private String password;
     private Boolean verified = Boolean.FALSE;
     private Organization organization;
+    private UserRole role;
 
     public AppUser(AppUserContract appUserContract, Organization organization) {
         BeanUtils.copyProperties(appUserContract, this);
@@ -89,5 +90,11 @@ public class AppUser extends AuditEntity {
     @JoinColumn(name = "org_id")
     public Organization getOrganization() {
         return organization;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    public UserRole getRole() {
+        return role;
     }
 }

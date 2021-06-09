@@ -41,6 +41,11 @@ public class UserController extends BaseController {
         });
     }
 
+    @GetMapping("/authenticate")
+    public AppUserContract authenticate(@RequestBody AppUserContract appUserContract) {
+        return appUserContract;
+    }
+
     @GetMapping("/external/{id}")
     public ExternalUser getExternalUser(@PathVariable Integer id) {
         return executeHttpGet(() -> userQueryService.getExternalUserById(id));

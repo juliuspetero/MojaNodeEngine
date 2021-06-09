@@ -1,9 +1,10 @@
 package com.mojagap.mojanode.service.user;
 
 
-import com.mojagap.mojanode.helper.AppContext;
-import com.mojagap.mojanode.helper.ApplicationConstants;
-import com.mojagap.mojanode.helper.utility.DateUtils;
+import com.mojagap.mojanode.infrastructure.AppContext;
+import com.mojagap.mojanode.infrastructure.ApplicationConstants;
+import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
+import com.mojagap.mojanode.infrastructure.utility.DateUtils;
 import com.mojagap.mojanode.model.RecordHolder;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
@@ -17,6 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -24,13 +30,14 @@ import org.springframework.util.MultiValueMap;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class UserQueryService {
+public class UserQueryService implements UserDetailsService {
 
     @Autowired
     private AppUserRepository appUserRepository;
@@ -57,6 +64,14 @@ public class UserQueryService {
         mapSqlParameterSource.addValue(AppUserQueryParams.OFFSET.getValue(), offset, Types.INTEGER);
         List<AppUserDTO> appUserDTOS = jdbcTemplate.query(appUserQuery(), mapSqlParameterSource, new AppUserMapper());
         return new RecordHolder<>(appUserDTOS.size(), appUserDTOS);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        AppUser appUser = appUserRepository.findOneByEmail(s);
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);
+        return new AppUserDetails(appUser, authorities);
     }
 
     public ExternalUser getExternalUserById(Integer id) {
@@ -87,6 +102,7 @@ public class UserQueryService {
         appUserRepository.saveAllAndFlush(appUsers);
         return appUsers;
     }
+
 
     private static final class AppUserMapper implements RowMapper<AppUserDTO> {
 

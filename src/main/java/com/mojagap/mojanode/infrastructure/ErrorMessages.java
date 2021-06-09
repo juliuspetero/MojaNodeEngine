@@ -1,4 +1,4 @@
-package com.mojagap.mojanode.helper;
+package com.mojagap.mojanode.infrastructure;
 
 public class ErrorMessages {
     public static final String USER_REQUIRED_WHEN_CREATING_ORGANIZATION = "One super user is required when creating a organization/company";

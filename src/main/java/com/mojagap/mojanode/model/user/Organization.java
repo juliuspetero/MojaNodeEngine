@@ -2,7 +2,7 @@ package com.mojagap.mojanode.model.user;
 
 import com.mojagap.mojanode.controller.organization.contract.OrganizationSummary;
 import com.mojagap.mojanode.model.AuditEntity;
-import com.mojagap.mojanode.helper.AppContext;
+import com.mojagap.mojanode.infrastructure.AppContext;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;

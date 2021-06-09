@@ -1,4 +1,4 @@
-package com.mojagap.mojanode.helper;
+package com.mojagap.mojanode.infrastructure;
 
 public class ApplicationConstants {
     public static final String DD_MMM_YYY = "dd/MMM/yyyy";

@@ -1,6 +1,6 @@
 package com.mojagap.mojanode.service.httpgateway;
 
-import com.mojagap.mojanode.helper.filter.HttpRequestInterceptor;
+import com.mojagap.mojanode.infrastructure.logger.HttpRequestInterceptor;
 import com.mojagap.mojanode.model.ActionTypeEnum;
 import com.mojagap.mojanode.model.http.HttpCallLog;
 import com.mojagap.mojanode.repository.http.HttpCallLogRepository;
@@ -20,7 +20,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;

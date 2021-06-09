@@ -3,8 +3,8 @@ package com.mojagap.mojanode.service.organization;
 
 import com.mojagap.mojanode.controller.organization.contract.OrganizationSummary;
 import com.mojagap.mojanode.controller.user.contract.AppUserContract;
-import com.mojagap.mojanode.helper.ErrorMessages;
-import com.mojagap.mojanode.helper.exception.BadRequestException;
+import com.mojagap.mojanode.infrastructure.ErrorMessages;
+import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.user.Organization;
 import com.mojagap.mojanode.repository.user.OrganizationRepository;

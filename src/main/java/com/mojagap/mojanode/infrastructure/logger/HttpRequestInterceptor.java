@@ -1,12 +1,11 @@
-package com.mojagap.mojanode.helper.filter;
+package com.mojagap.mojanode.infrastructure.logger;
 
-import com.mojagap.mojanode.helper.AppContext;
-import com.mojagap.mojanode.helper.utility.CommonUtils;
-import com.mojagap.mojanode.helper.utility.DateUtils;
+import com.mojagap.mojanode.infrastructure.AppContext;
+import com.mojagap.mojanode.infrastructure.utility.CommonUtils;
+import com.mojagap.mojanode.infrastructure.utility.DateUtils;
 import com.mojagap.mojanode.model.ActionTypeEnum;
 import com.mojagap.mojanode.model.http.HttpCallLog;
 import com.mojagap.mojanode.model.http.HttpResponseStatusEnum;
-import com.mojagap.mojanode.repository.http.HttpCallLogRepository;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
@@ -39,12 +38,6 @@ public class HttpRequestInterceptor implements ClientHttpRequestInterceptor {
         Long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
         httpCallLog.setDuration((int) duration);
-
-
-//        ActionTypeEnum actionTypeEnum = (ActionTypeEnum) httpServletRequest.getAttribute(ActionTypeEnum.class.getName());
-//        HttpCallLogRepository httpCallLogRepository = AppContext.getBean(HttpCallLogRepository.class);
-//        httpCallLog.setActionType(actionTypeEnum);
-//        httpCallLogRepository.saveAndFlush(httpCallLog);
         return response;
     }
 

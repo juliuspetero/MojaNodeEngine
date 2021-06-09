@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mojagap.mojanode.controller.user.contract.AppUserContract;
 import com.mojagap.mojanode.model.user.Organization;
-import com.mojagap.mojanode.helper.ApplicationConstants;
+import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

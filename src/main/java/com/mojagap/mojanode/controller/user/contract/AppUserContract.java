@@ -3,7 +3,7 @@ package com.mojagap.mojanode.controller.user.contract;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mojagap.mojanode.helper.ApplicationConstants;
+import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.model.user.AppUser;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,7 +30,6 @@ public class AppUserContract {
     private Integer organizationId;
     private String organizationName;
     private Integer roleId;
-    private String roleName;
 
     public AppUserContract(AppUser appUser) {
         BeanUtils.copyProperties(appUser, this);

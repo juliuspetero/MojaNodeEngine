@@ -1,4 +1,4 @@
-package com.mojagap.mojanode.helper.utility;
+package com.mojagap.mojanode.infrastructure.utility;
 
 import java.util.Calendar;
 import java.util.Date;

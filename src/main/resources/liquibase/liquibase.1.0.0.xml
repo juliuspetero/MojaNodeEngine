@@ -8,9 +8,7 @@
                 <tableExists tableName="app_user"/>
             </not>
         </preConditions>
-
         <comment>Create table for recording all the users of the system</comment>
-
         <createTable tableName="app_user">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
@@ -198,9 +196,7 @@
                 <tableExists tableName="http_call_log"/>
             </not>
         </preConditions>
-
         <comment>Create table for logging all external HTTP request from the systems</comment>
-
         <createTable tableName="http_call_log">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
@@ -240,6 +236,70 @@
             </column>
             <column name="duration" type="int">
                 <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-user_permission" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="user_permission"/>
+            </not>
+        </preConditions>
+        <comment>Create table for recording all the permission users have for endpoints</comment>
+        <createTable tableName="user_permission">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action_type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="entity_type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-user_role" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="user_role"/>
+            </not>
+        </preConditions>
+        <comment>Create table for recording roles of app users</comment>
+        <createTable tableName="user_role">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="longtext">
+                <constraints nullable="true"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="create-table-role_permission" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="role_permission"/>
+            </not>
+        </preConditions>
+        <comment>Create join table for role and permission</comment>
+        <createTable tableName="role_permission">
+            <column name="role_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="permission_id" type="bigint">
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>

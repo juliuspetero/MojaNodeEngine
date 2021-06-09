@@ -1,9 +1,9 @@
 package com.mojagap.mojanode.model.user;
 
 
-import com.mojagap.mojanode.helper.ErrorMessages;
-import com.mojagap.mojanode.helper.Validator;
-import com.mojagap.mojanode.helper.exception.BadRequestException;
+import com.mojagap.mojanode.infrastructure.ErrorMessages;
+import com.mojagap.mojanode.infrastructure.Validator;
+import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

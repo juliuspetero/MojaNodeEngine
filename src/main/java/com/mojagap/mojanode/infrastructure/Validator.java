@@ -1,6 +1,6 @@
-package com.mojagap.mojanode.helper;
+package com.mojagap.mojanode.infrastructure;
 
-import com.mojagap.mojanode.helper.exception.BadRequestException;
+import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
 
 public class Validator {
 

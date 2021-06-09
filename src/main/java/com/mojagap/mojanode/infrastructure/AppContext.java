@@ -1,6 +1,6 @@
-package com.mojagap.mojanode.helper;
+package com.mojagap.mojanode.infrastructure;
 
-import com.mojagap.mojanode.helper.utility.DateUtils;
+import com.mojagap.mojanode.infrastructure.utility.DateUtils;
 import com.mojagap.mojanode.model.AuditEntity;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.user.AppUserRepository;

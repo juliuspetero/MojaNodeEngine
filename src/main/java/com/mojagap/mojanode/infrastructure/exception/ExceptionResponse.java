@@ -1,4 +1,4 @@
-package com.mojagap.mojanode.helper.exception;
+package com.mojagap.mojanode.infrastructure.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

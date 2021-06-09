@@ -1,10 +1,10 @@
-package com.mojagap.mojanode.helper.filter;
+package com.mojagap.mojanode.infrastructure.logger;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mojagap.mojanode.helper.ApplicationConstants;
-import com.mojagap.mojanode.helper.utility.CommonUtils;
-import com.mojagap.mojanode.helper.utility.DateUtils;
+import com.mojagap.mojanode.infrastructure.ApplicationConstants;
+import com.mojagap.mojanode.infrastructure.utility.CommonUtils;
+import com.mojagap.mojanode.infrastructure.utility.DateUtils;
 import com.mojagap.mojanode.model.user.PlatformTypeEnum;
 import com.mojagap.mojanode.model.user.UserActivityLog;
 import com.mojagap.mojanode.repository.user.UserActivityLogRepository;

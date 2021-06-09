@@ -51,7 +51,8 @@ public class AuditEntity extends BaseEntity {
 
     public enum RecordStatus {
         ACTIVE,
+        INACTIVE,
         DELETED,
-        LOCKED
+        LOCKED;
     }
 }
