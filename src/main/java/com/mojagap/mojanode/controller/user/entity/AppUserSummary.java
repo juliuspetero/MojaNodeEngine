@@ -1,10 +1,10 @@
-package com.mojagap.mojanode.controller.user.contract;
+package com.mojagap.mojanode.controller.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
-import com.mojagap.mojanode.model.user.UserPermission;
+import com.mojagap.mojanode.model.role.UserPermission;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor
-public class AppUserContract {
+public class AppUserSummary {
     private Integer id;
     private String authentication;
     private String firstName;

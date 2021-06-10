@@ -44,6 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, ApplicationConstants.CREATE_USER_URL).permitAll()
                 .antMatchers(HttpMethod.POST, ApplicationConstants.AUTHENTICATION_URL).permitAll()
+                .antMatchers(HttpMethod.POST, ApplicationConstants.CREATE_ORGANIZATION_URL).permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -54,7 +55,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .authenticationEntryPoint((request, response, ex) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage()))
                 .and()
-                .addFilter(new JwtAuthenticationFilter())
                 .addFilter(new JwtAuthorizationFilter(authenticationManager()));
     }
 

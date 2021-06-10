@@ -2,6 +2,58 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
 
+    <changeSet id="create-table-organization" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="organization"/>
+            </not>
+        </preConditions>
+
+        <comment>Create table for recording all organizations/companies registered to used the system</comment>
+
+        <createTable tableName="organization">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="registration_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="registration_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="org_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="unique_org_email"/>
+            </column>
+            <column name="phone_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
     <changeSet id="create-table-user_permission" author="juliuspetero@outlook.com">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -17,12 +69,43 @@
                 <constraints nullable="false"/>
             </column>
             <column name="action_type" type="varchar(255)">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
             </column>
             <column name="entity_type" type="varchar(255)">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="varchar(255)">
+                <constraints nullable="false"/>
             </column>
         </createTable>
+    </changeSet>
+
+    <changeSet id="add-initial-user-permissions" author="juliuspetero@outlook.com">
+        <comment>Create commonly used permissions for all users</comment>
+        <sql>
+            <![CDATA[
+                INSERT IGNORE INTO user_permission(name, action_type, entity_type, category)
+                VALUES ('SUPER_PERMISSION', 'ALL_ACTIONS', 'ALL', 'GENERAL');
+
+                INSERT IGNORE INTO user_permission(name, action_type, entity_type, category)
+                VALUES ('READ_APPLICATION_USERS', 'READ', 'USER', 'GENERAL');
+
+                INSERT IGNORE INTO user_permission(name, action_type, entity_type, category)
+                VALUES ('READ_USER_ROLES', 'READ', 'ROLE', 'GENERAL');
+
+                INSERT IGNORE INTO user_permission(name, action_type, entity_type, category)
+                VALUES ('CREATE_USER_ROLES', 'CREATE', 'ROLE', 'GENERAL');
+
+                INSERT IGNORE INTO user_permission(name, action_type, entity_type, category)
+                VALUES ('UPDATE_USER_ROLES', 'UPDATE', 'ROLE', 'GENERAL');
+
+                INSERT IGNORE INTO user_permission(name, action_type, entity_type, category)
+                VALUES ('UPDATE_USER', 'UPDATE', 'USER', 'GENERAL');
+
+                INSERT IGNORE INTO user_permission(name, action_type, entity_type, category)
+                VALUES ('APPROVE_ORGANIZATION', 'APPROVE', 'ORGANIZATION', 'BACK_OFFICE');
+            ]]>
+        </sql>
     </changeSet>
 
     <changeSet id="create-table-user_role" author="juliuspetero@outlook.com">
@@ -40,10 +123,14 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="longtext">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
+            </column>
+            <column name="org_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="10062021_FK_role_role_org_id"
+                             references="organization(id)"/>
             </column>
             <column name="record_status" type="varchar(255)">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
@@ -95,7 +182,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="email" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true" uniqueConstraintName="unique_app_user_email"/>
             </column>
             <column name="phone_number" type="varchar(255)">
                 <constraints nullable="false"/>
@@ -133,65 +220,20 @@
             <column name="record_status" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-        </createTable>
-    </changeSet>
-
-    <changeSet id="create-table-organization" author="juliuspetero@outlook.com">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="organization"/>
-            </not>
-        </preConditions>
-
-        <comment>Create table for recording all organizations/companies registered to used the system</comment>
-
-        <createTable tableName="organization">
-            <column name="id" type="bigint" autoIncrement="true">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="registration_date" type="date">
-                <constraints nullable="false"/>
-            </column>
-            <column name="registration_number" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="org_type" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="address" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="email" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="phone_number" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_on" type="timestamp" defaultValueComputed="now()">
-                <constraints nullable="true"/>
-            </column>
-            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
-                <constraints nullable="true"/>
-            </column>
-            <column name="created_by" type="bigint">
-                <constraints nullable="true"
-                             foreignKeyName="01062021_FK_organization_creator"
-                             references="app_user(id)"/>
-            </column>
-            <column name="modified_by" type="bigint">
-                <constraints nullable="true"
-                             foreignKeyName="01062021_FK_organization_modifier"
-                             references="app_user(id)"/>
-            </column>
-            <column name="record_status" type="varchar(255)">
+            <column name="category" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
-    </changeSet>
 
+        <addForeignKeyConstraint baseTableName="organization" baseColumnNames="created_by"
+                                 constraintName="01062021_FK_organization_created_by"
+                                 referencedTableName="app_user"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="organization" baseColumnNames="modified_by"
+                                 constraintName="01062021_FK_organization_modified_by"
+                                 referencedTableName="app_user"
+                                 referencedColumnNames="id"/>
+    </changeSet>
 
     <changeSet id="create-table-user_activity_log" author="juliuspetero@outlook.com">
         <preConditions onFail="MARK_RAN">
@@ -260,7 +302,6 @@
         </createTable>
     </changeSet>
 
-
     <changeSet id="create-table-http_call_log" author="juliuspetero@outlook.com">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -310,5 +351,4 @@
             </column>
         </createTable>
     </changeSet>
-
 </databaseChangeLog>

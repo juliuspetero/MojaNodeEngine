@@ -1,6 +1,7 @@
 package com.mojagap.mojanode.model;
 
 public enum EntityTypeEnum {
+    ALL,
     USER,
     ORGANIZATION,
     BENEFICIARY,

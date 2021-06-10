@@ -70,7 +70,7 @@ public class UserQueryService implements UserDetailsService {
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         AppUser appUser = appUserRepository.findOneByEmail(s);
         List<GrantedAuthority> authorities = new ArrayList<>();
-//        appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);
+        appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);
         return new AppUserDetails(appUser, authorities);
     }
 

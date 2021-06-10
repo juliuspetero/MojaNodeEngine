@@ -1,10 +1,12 @@
 package com.mojagap.mojanode.model;
 
 public enum ActionTypeEnum {
+    ALL_ACTIONS,
     APPROVE,
     CREATE,
     UPDATE,
     DELETE,
+    READ,
     MONEY_TRANSFER,
     REGISTER,
     UNSUBSCRIBE,

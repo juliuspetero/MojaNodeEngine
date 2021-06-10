@@ -1,17 +1,16 @@
 package com.mojagap.mojanode.model.user;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.mojagap.mojanode.controller.user.contract.AppUserContract;
+import com.mojagap.mojanode.controller.user.entity.AppUserSummary;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.model.AuditEntity;
+import com.mojagap.mojanode.model.EntityCategory;
+import com.mojagap.mojanode.model.role.UserRole;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Setter
 @Entity(name = "app_user")
@@ -26,17 +25,18 @@ public class AppUser extends AuditEntity {
     private String phoneNumber;
     private String password;
     private Boolean verified = Boolean.FALSE;
+    private EntityCategory category;
     private Organization organization;
     private UserRole role;
 
-    public AppUser(AppUserContract appUserContract, Organization organization) {
-        BeanUtils.copyProperties(appUserContract, this);
+    public AppUser(AppUserSummary appUserSummary, Organization organization) {
+        BeanUtils.copyProperties(appUserSummary, this);
         this.organization = organization;
         AppContext.stamp(this);
     }
 
-    public AppUser(AppUserContract appUserContract) {
-        BeanUtils.copyProperties(appUserContract, this);
+    public AppUser(AppUserSummary appUserSummary) {
+        BeanUtils.copyProperties(appUserSummary, this);
         AppContext.stamp(this);
     }
 
@@ -84,6 +84,12 @@ public class AppUser extends AuditEntity {
     @Column(name = "is_verified")
     public Boolean getVerified() {
         return verified;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    public EntityCategory getCategory() {
+        return category;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

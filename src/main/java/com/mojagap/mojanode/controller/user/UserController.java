@@ -1,7 +1,7 @@
 package com.mojagap.mojanode.controller.user;
 
 import com.mojagap.mojanode.controller.BaseController;
-import com.mojagap.mojanode.controller.user.contract.AppUserContract;
+import com.mojagap.mojanode.controller.user.entity.AppUserSummary;
 import com.mojagap.mojanode.model.ActionTypeEnum;
 import com.mojagap.mojanode.model.EntityTypeEnum;
 import com.mojagap.mojanode.model.RecordHolder;
@@ -33,17 +33,17 @@ public class UserController extends BaseController {
     }
 
     @PostMapping("/create")
-    public AppUserContract createAppUser(@RequestBody AppUserContract appUserContract) {
+    public AppUserSummary createAppUser(@RequestBody AppUserSummary appUserSummary) {
         return logUserActivity(EntityTypeEnum.USER, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
-            AppUserContract response = userCommandService.createUser(appUserContract);
+            AppUserSummary response = userCommandService.createUser(appUserSummary);
             log.setEntityId(response.getId());
             return response;
         });
     }
 
     @PostMapping("/authenticate")
-    public AppUserContract authenticate(@RequestBody AppUserContract appUserContract) {
-        return userCommandService.authenticateUser(appUserContract);
+    public AppUserSummary authenticate(@RequestBody AppUserSummary appUserSummary) {
+        return userCommandService.authenticateUser(appUserSummary);
     }
 
     @GetMapping("/external/{id}")

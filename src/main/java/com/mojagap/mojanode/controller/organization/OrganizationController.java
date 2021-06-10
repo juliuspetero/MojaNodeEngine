@@ -2,7 +2,7 @@ package com.mojagap.mojanode.controller.organization;
 
 
 import com.mojagap.mojanode.controller.BaseController;
-import com.mojagap.mojanode.controller.organization.contract.OrganizationSummary;
+import com.mojagap.mojanode.controller.organization.entity.OrganizationSummary;
 import com.mojagap.mojanode.model.ActionTypeEnum;
 import com.mojagap.mojanode.model.EntityTypeEnum;
 import com.mojagap.mojanode.model.user.UserActivityLog;
@@ -24,7 +24,7 @@ public class OrganizationController extends BaseController {
     @Autowired
     private OrganizationQueryService organizationQueryService;
 
-    @PostMapping
+    @PostMapping("/create")
     public OrganizationSummary createOrganization(@RequestBody OrganizationSummary organizationSummary) {
         return logUserActivity(EntityTypeEnum.ORGANIZATION, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             OrganizationSummary response = organizationCommandService.createOrganization(organizationSummary);

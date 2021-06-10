@@ -1,9 +1,9 @@
-package com.mojagap.mojanode.controller.organization.contract;
+package com.mojagap.mojanode.controller.organization.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mojagap.mojanode.controller.user.contract.AppUserContract;
+import com.mojagap.mojanode.controller.user.entity.AppUserSummary;
 import com.mojagap.mojanode.model.user.Organization;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import lombok.Data;
@@ -28,5 +28,5 @@ public class OrganizationSummary {
     private String address;
     private String email;
     private String phoneNumber;
-    private List<AppUserContract> userSummaries = new ArrayList<>();
+    private List<AppUserSummary> userSummaries = new ArrayList<>();
 }

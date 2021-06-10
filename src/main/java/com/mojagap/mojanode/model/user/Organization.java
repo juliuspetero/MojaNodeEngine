@@ -1,6 +1,6 @@
 package com.mojagap.mojanode.model.user;
 
-import com.mojagap.mojanode.controller.organization.contract.OrganizationSummary;
+import com.mojagap.mojanode.controller.organization.entity.OrganizationSummary;
 import com.mojagap.mojanode.model.AuditEntity;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package com.mojagap.mojanode.service.user;
 
-import com.mojagap.mojanode.controller.user.contract.AppUserContract;
+import com.mojagap.mojanode.controller.user.entity.AppUserSummary;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
@@ -47,47 +47,49 @@ public class UserCommandService {
     protected HttpServletResponse httpServletResponse;
 
 
-    public AppUserContract createUser(AppUserContract appUserContract) {
+    public AppUserSummary createUser(AppUserSummary appUserSummary) {
         AppUser loggedInUser = AppContext.getLoggedInUser();
-        AppUser appUser = new AppUser(appUserContract);
+        AppUser appUser = new AppUser(appUserSummary);
         if (loggedInUser != null) {
             appUser.setOrganization(loggedInUser.getOrganization());
         } else {
             appUser.setCreatedBy(appUser);
             appUser.setModifiedBy(appUser);
         }
-        appUser.setPassword(passwordEncoder.encode(appUserContract.getPassword()));
+        appUser.setPassword(passwordEncoder.encode(appUserSummary.getPassword()));
         appUser = appUserRepository.saveAndFlush(appUser);
-        appUserContract.setId(appUser.getId());
-        return appUserContract;
+        appUserSummary.setId(appUser.getId());
+        return appUserSummary;
     }
 
-    public AppUserContract authenticateUser(AppUserContract appUserContract) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUserContract.getEmail(), appUserContract.getPassword()));
+    public AppUserSummary authenticateUser(AppUserSummary appUserSummary) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUserSummary.getEmail(), appUserSummary.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Date expiryDate = new Date(System.currentTimeMillis() + ApplicationConstants.JWT_EXPIRATION_TIME);
         String secretKey = Base64.getEncoder().encodeToString(ApplicationConstants.JWT_SECRET_KEY.getBytes());
 
         AppUser appUser = ((AppUserDetails) authentication.getPrincipal()).getAppUser();
         Claims claims = Jwts.claims().setSubject(appUser.getEmail());
+        claims.put("userId", appUser.getId());
+
         String authenticationToken = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secretKey).setExpiration(expiryDate).compact();
-        appUserContract.setAuthentication(authenticationToken);
-        BeanUtils.copyProperties(appUser, appUserContract);
-        appUserContract.setPassword(null);
+        appUserSummary.setAuthentication(authenticationToken);
+        BeanUtils.copyProperties(appUser, appUserSummary);
+        appUserSummary.setPassword(null);
         if (appUser.getOrganization() != null) {
-            appUserContract.setOrganizationId(appUser.getOrganization().getId());
-            appUserContract.setOrganizationName(appUser.getOrganization().getName());
+            appUserSummary.setOrganizationId(appUser.getOrganization().getId());
+            appUserSummary.setOrganizationName(appUser.getOrganization().getName());
         }
         httpServletResponse.setHeader(ApplicationConstants.AUTHENTICATION_HEADER_NAME, authenticationToken);
-        return appUserContract;
+        return appUserSummary;
     }
 
-    public AppUserContract updateUser(AppUserContract appUserContract) {
-        return appUserContract;
+    public AppUserSummary updateUser(AppUserSummary appUserSummary) {
+        return appUserSummary;
     }
 
-    public AppUserContract removeUser(Integer userId) {
-        return new AppUserContract();
+    public AppUserSummary removeUser(Integer userId) {
+        return new AppUserSummary();
     }
 
     public ExternalUser createExternalUser(ExternalUser externalUser) {
