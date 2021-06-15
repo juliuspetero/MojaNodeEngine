@@ -7,7 +7,7 @@ import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
-import com.mojagap.mojanode.repository.user.OrganizationRepository;
+import com.mojagap.mojanode.repository.company.CompanyRepository;
 import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -29,7 +29,7 @@ import java.util.Date;
 public class UserCommandService {
 
     @Autowired
-    private OrganizationRepository organizationRepository;
+    private CompanyRepository companyRepository;
 
     @Autowired
     private AppUserRepository appUserRepository;
@@ -51,7 +51,7 @@ public class UserCommandService {
         AppUser loggedInUser = AppContext.getLoggedInUser();
         AppUser appUser = new AppUser(appUserSummary);
         if (loggedInUser != null) {
-            appUser.setOrganization(loggedInUser.getOrganization());
+            appUser.setCompany(loggedInUser.getCompany());
         } else {
             appUser.setCreatedBy(appUser);
             appUser.setModifiedBy(appUser);
@@ -76,10 +76,13 @@ public class UserCommandService {
         appUserSummary.setAuthentication(authenticationToken);
         BeanUtils.copyProperties(appUser, appUserSummary);
         appUserSummary.setPassword(null);
-        if (appUser.getOrganization() != null) {
-            appUserSummary.setOrganizationId(appUser.getOrganization().getId());
-            appUserSummary.setOrganizationName(appUser.getOrganization().getName());
+        if (appUser.getCompany() != null) {
+            appUserSummary.setOrganizationId(appUser.getCompany().getId());
+            appUserSummary.setOrganizationName(appUser.getCompany().getName());
         }
+        appUserSummary.setRoleId(appUser.getRole().getId());
+        appUserSummary.setRoleName(appUser.getRole().getName());
+        appUserSummary.setPermissions(appUser.getRole().getPermissions());
         httpServletResponse.setHeader(ApplicationConstants.AUTHENTICATION_HEADER_NAME, authenticationToken);
         return appUserSummary;
     }

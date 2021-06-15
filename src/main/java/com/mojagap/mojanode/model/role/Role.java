@@ -1,35 +1,44 @@
 package com.mojagap.mojanode.model.role;
 
 
-import com.mojagap.mojanode.model.AuditEntity;
-import com.mojagap.mojanode.model.BaseEntity;
-import com.mojagap.mojanode.model.user.Organization;
+import com.mojagap.mojanode.model.common.AuditEntity;
+import com.mojagap.mojanode.model.common.BaseEntity;
+import com.mojagap.mojanode.model.account.Account;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Setter
-@Entity(name = "user_role")
+@Entity(name = "role")
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRole extends BaseEntity {
+public class Role extends BaseEntity {
     private String name;
     private String description;
     private AuditEntity.RecordStatus status = AuditEntity.RecordStatus.ACTIVE;
-    private Organization organization;
-    private List<UserPermission> permissions;
+    private Account account;
+    private List<Permission> permissions;
+
+    public Role(String name, String description, Account account, AuditEntity.RecordStatus status, List<Permission> permissions) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.permissions = permissions;
+        this.account = account;
+    }
 
     @Column(name = "name")
+    @NotBlank(message = "Role name is required")
     public String getName() {
         return name;
     }
 
     @Column(name = "description")
+    @NotBlank(message = "Role description is needed")
     public String getDescription() {
         return description;
     }
@@ -41,16 +50,16 @@ public class UserRole extends BaseEntity {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "org_id")
-    public Organization getOrganization() {
-        return organization;
+    @JoinColumn(name = "account_id")
+    public Account getAccount() {
+        return account;
     }
 
     @JoinTable(name = "role_permission", joinColumns = {
             @JoinColumn(name = "role_id", referencedColumnName = "id")}, inverseJoinColumns = {
             @JoinColumn(name = "permission_id", referencedColumnName = "id")})
-    @OneToMany(targetEntity = UserPermission.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    public List<UserPermission> getPermissions() {
+    @OneToMany(targetEntity = Permission.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    public List<Permission> getPermissions() {
         return permissions;
     }
 }

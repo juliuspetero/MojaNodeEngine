@@ -1,7 +1,7 @@
 package com.mojagap.mojanode.service.httpgateway;
 
 import com.mojagap.mojanode.infrastructure.logger.HttpRequestInterceptor;
-import com.mojagap.mojanode.model.ActionTypeEnum;
+import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.http.HttpCallLog;
 import com.mojagap.mojanode.repository.http.HttpCallLogRepository;
 import lombok.SneakyThrows;

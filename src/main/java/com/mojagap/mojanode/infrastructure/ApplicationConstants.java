@@ -13,4 +13,6 @@ public class ApplicationConstants {
     public static final String JWT_SECRET_KEY = CommonUtils.getEnvProperty(EnvironmentVariables.MOJA_NODE_JWT_SECRET_KEY, "q3t6w9z$C&F)J@NcQfTjWnZr4u7x!A%D*G-KaPdSgUkXp2s5v8y/B?E(H+MbQeTh");
     public static final String AUTHENTICATION_HEADER_NAME = "authentication";
     public static final Long JWT_EXPIRATION_TIME = Long.valueOf(CommonUtils.getEnvProperty(EnvironmentVariables.JWT_EXPIRATION_TIME, "" + 1000L * 60 * 60));
+    public static final String DEFAULT_ROLE_NAME = "Super Administrator";
+    public static final String DEFAULT_ROLE_DESCRIPTION = "This role provides all application permissions";
 }

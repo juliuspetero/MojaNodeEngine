@@ -2,9 +2,9 @@ package com.mojagap.mojanode.controller.user;
 
 import com.mojagap.mojanode.controller.BaseController;
 import com.mojagap.mojanode.controller.user.entity.AppUserSummary;
-import com.mojagap.mojanode.model.ActionTypeEnum;
-import com.mojagap.mojanode.model.EntityTypeEnum;
-import com.mojagap.mojanode.model.RecordHolder;
+import com.mojagap.mojanode.model.common.ActionTypeEnum;
+import com.mojagap.mojanode.model.common.EntityTypeEnum;
+import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.user.UserActivityLog;
@@ -41,7 +41,7 @@ public class UserController extends BaseController {
         });
     }
 
-    @PostMapping("/authenticate")
+    @GetMapping("/authenticate")
     public AppUserSummary authenticate(@RequestBody AppUserSummary appUserSummary) {
         return userCommandService.authenticateUser(appUserSummary);
     }

@@ -1,11 +1,11 @@
-package com.mojagap.mojanode.controller.organization.entity;
+package com.mojagap.mojanode.controller.company.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mojagap.mojanode.controller.user.entity.AppUserSummary;
-import com.mojagap.mojanode.model.user.Organization;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
+import com.mojagap.mojanode.model.company.CompanyType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,12 +18,12 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor
-public class OrganizationSummary {
+public class CompanySummary {
     private Integer id;
     private String name;
     @JsonFormat(pattern = ApplicationConstants.DD_MMM_YYY)
     private Date registrationDate;
-    private Organization.OrganizationType organizationType;
+    private CompanyType companyType;
     private String registrationNumber;
     private String address;
     private String email;

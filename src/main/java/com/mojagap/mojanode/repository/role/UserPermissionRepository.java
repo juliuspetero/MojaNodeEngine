@@ -1,12 +1,12 @@
 package com.mojagap.mojanode.repository.role;
 
 
-import com.mojagap.mojanode.model.role.UserPermission;
+import com.mojagap.mojanode.model.role.Permission;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserPermissionRepository extends JpaRepository<UserPermission, Integer> {
+public interface UserPermissionRepository extends JpaRepository<Permission, Integer> {
 
-    UserPermission findOneByName(String name);
+    Permission findOneByName(String name);
 }

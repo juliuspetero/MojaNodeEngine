@@ -1,7 +1,5 @@
-package com.mojagap.mojanode.model;
+package com.mojagap.mojanode.model.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.mojagap.mojanode.model.user.AppUser;
 import lombok.Setter;
 
@@ -13,11 +11,11 @@ import java.util.Date;
 public class AuditEntity extends BaseEntity {
     private Date createdOn;
     private Date modifiedOn;
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private AppUser createdBy;
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private AppUser modifiedBy;
-    private RecordStatus recordStatus = RecordStatus.ACTIVE;
+    private RecordStatus recordStatus = RecordStatus.INACTIVE;
 
     @Column(name = "created_on")
     @Temporal(TemporalType.TIMESTAMP)

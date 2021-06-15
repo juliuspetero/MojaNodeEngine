@@ -1,4 +1,4 @@
-package com.mojagap.mojanode.model;
+package com.mojagap.mojanode.model.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

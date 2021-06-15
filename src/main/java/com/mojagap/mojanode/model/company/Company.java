@@ -1,37 +1,42 @@
-package com.mojagap.mojanode.model.user;
+package com.mojagap.mojanode.model.company;
 
-import com.mojagap.mojanode.controller.organization.entity.OrganizationSummary;
-import com.mojagap.mojanode.model.AuditEntity;
+import com.mojagap.mojanode.controller.company.entity.CompanySummary;
 import com.mojagap.mojanode.infrastructure.AppContext;
+import com.mojagap.mojanode.model.common.AuditEntity;
+import com.mojagap.mojanode.model.account.Account;
+import com.mojagap.mojanode.model.user.AppUser;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 
-@Entity(name = "organization")
+@Entity(name = "company")
 @Setter
 @NoArgsConstructor
-public class Organization extends AuditEntity {
+public class Company extends AuditEntity {
     private String name;
     private Date registrationDate;
-    private OrganizationType OrganizationType;
+    private CompanyType companyType;
     private String registrationNumber;
     private String address;
     private String email;
     private String phoneNumber;
     private List<AppUser> appUsers = new ArrayList<>();
+    private Account account;
 
-    public Organization(OrganizationSummary organizationSummary) {
-        BeanUtils.copyProperties(organizationSummary, this);
+    public Company(CompanySummary companySummary) {
+        BeanUtils.copyProperties(companySummary, this);
         AppContext.stamp(this);
     }
 
     @Column(name = "name")
+    @Size(min = 6, max = 100)
     public String getName() {
         return name;
     }
@@ -43,9 +48,9 @@ public class Organization extends AuditEntity {
     }
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "org_type")
-    public Organization.OrganizationType getOrganizationType() {
-        return OrganizationType;
+    @Column(name = "company_type")
+    public CompanyType getCompanyType() {
+        return companyType;
     }
 
     @Column(name = "registration_number")
@@ -68,17 +73,14 @@ public class Organization extends AuditEntity {
         return phoneNumber;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "organization", fetch = FetchType.LAZY)
-    public List<AppUser> getAppUsers() {
-        return appUsers;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    public Account getAccount() {
+        return account;
     }
 
-    public enum OrganizationType {
-        SCHOOL,
-        RELIGIOUS,
-        BUSINESS,
-        NGO,
-        COMPANY,
-        OTHER
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "company", fetch = FetchType.LAZY)
+    public List<AppUser> getAppUsers() {
+        return appUsers;
     }
 }

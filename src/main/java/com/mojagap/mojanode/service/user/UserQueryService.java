@@ -5,7 +5,7 @@ import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
 import com.mojagap.mojanode.infrastructure.utility.DateUtils;
-import com.mojagap.mojanode.model.RecordHolder;
+import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.user.IdentificationEnum;
@@ -52,8 +52,8 @@ public class UserQueryService implements UserDetailsService {
         AppUser loggedInUser = AppContext.getLoggedInUser();
         Arrays.asList(AppUserQueryParams.values()).forEach(param -> queryParams.putIfAbsent(param.getValue(), null));
         MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource(queryParams);
-        if (loggedInUser.getOrganization() != null) {
-            mapSqlParameterSource.addValue(AppUserQueryParams.ORGANIZATION_ID.getValue(), loggedInUser.getOrganization().getId());
+        if (loggedInUser.getCompany() != null) {
+            mapSqlParameterSource.addValue(AppUserQueryParams.ORGANIZATION_ID.getValue(), loggedInUser.getCompany().getId());
         }
         if (queryParams.get(AppUserQueryParams.VERIFIED.getValue()) != null) {
             mapSqlParameterSource.addValue(AppUserQueryParams.VERIFIED.getValue(), Boolean.parseBoolean(queryParams.get(AppUserQueryParams.VERIFIED.getValue())), Types.BOOLEAN);

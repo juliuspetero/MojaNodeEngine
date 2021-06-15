@@ -3,7 +3,7 @@ package com.mojagap.mojanode.infrastructure.logger;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.utility.CommonUtils;
 import com.mojagap.mojanode.infrastructure.utility.DateUtils;
-import com.mojagap.mojanode.model.ActionTypeEnum;
+import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.http.HttpCallLog;
 import com.mojagap.mojanode.model.http.HttpResponseStatusEnum;
 import lombok.SneakyThrows;

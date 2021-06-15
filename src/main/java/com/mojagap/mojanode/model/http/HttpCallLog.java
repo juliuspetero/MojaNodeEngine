@@ -1,7 +1,7 @@
 package com.mojagap.mojanode.model.http;
 
-import com.mojagap.mojanode.model.ActionTypeEnum;
-import com.mojagap.mojanode.model.BaseEntity;
+import com.mojagap.mojanode.model.common.ActionTypeEnum;
+import com.mojagap.mojanode.model.common.BaseEntity;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 

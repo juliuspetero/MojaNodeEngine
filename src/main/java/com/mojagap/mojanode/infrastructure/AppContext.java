@@ -1,7 +1,7 @@
 package com.mojagap.mojanode.infrastructure;
 
 import com.mojagap.mojanode.infrastructure.utility.DateUtils;
-import com.mojagap.mojanode.model.AuditEntity;
+import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.user.AppUser;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -19,6 +19,10 @@ public class AppContext implements ApplicationContextAware {
 
     public static <T> T getBean(Class<T> beanClass) {
         return context.getBean(beanClass);
+    }
+
+    public static <T> T getBean(String name) {
+        return (T) context.getBean(name);
     }
 
     @Override

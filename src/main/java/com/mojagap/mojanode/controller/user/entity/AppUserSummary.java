@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
-import com.mojagap.mojanode.model.role.UserPermission;
+import com.mojagap.mojanode.model.role.Permission;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -33,5 +33,5 @@ public class AppUserSummary {
     private String organizationName;
     private Integer roleId;
     private String roleName;
-    private List<UserPermission> permissions;
+    private List<Permission> permissions;
 }

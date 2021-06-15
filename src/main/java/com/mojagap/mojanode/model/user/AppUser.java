@@ -2,9 +2,9 @@ package com.mojagap.mojanode.model.user;
 
 import com.mojagap.mojanode.controller.user.entity.AppUserSummary;
 import com.mojagap.mojanode.infrastructure.AppContext;
-import com.mojagap.mojanode.model.AuditEntity;
-import com.mojagap.mojanode.model.EntityCategory;
-import com.mojagap.mojanode.model.role.UserRole;
+import com.mojagap.mojanode.model.common.AuditEntity;
+import com.mojagap.mojanode.model.company.Company;
+import com.mojagap.mojanode.model.role.Role;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
@@ -25,13 +25,12 @@ public class AppUser extends AuditEntity {
     private String phoneNumber;
     private String password;
     private Boolean verified = Boolean.FALSE;
-    private EntityCategory category;
-    private Organization organization;
-    private UserRole role;
+    private Company company;
+    private Role role;
 
-    public AppUser(AppUserSummary appUserSummary, Organization organization) {
+    public AppUser(AppUserSummary appUserSummary, Company company) {
         BeanUtils.copyProperties(appUserSummary, this);
-        this.organization = organization;
+        this.company = company;
         AppContext.stamp(this);
     }
 
@@ -86,21 +85,15 @@ public class AppUser extends AuditEntity {
         return verified;
     }
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "category")
-    public EntityCategory getCategory() {
-        return category;
-    }
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "org_id")
-    public Organization getOrganization() {
-        return organization;
+    @JoinColumn(name = "company_id")
+    public Company getCompany() {
+        return company;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
-    public UserRole getRole() {
+    public Role getRole() {
         return role;
     }
 }

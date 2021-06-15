@@ -1,11 +1,9 @@
 package com.mojagap.mojanode.infrastructure.security;
 
 
-import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -19,8 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
-import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -40,21 +36,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         httpSecurity
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.POST, ApplicationConstants.CREATE_USER_URL).permitAll()
-                .antMatchers(HttpMethod.POST, ApplicationConstants.AUTHENTICATION_URL).permitAll()
-                .antMatchers(HttpMethod.POST, ApplicationConstants.CREATE_ORGANIZATION_URL).permitAll()
-                .anyRequest()
-                .authenticated()
+//                .and()
+//                .authorizeRequests()
+//                .antMatchers(HttpMethod.POST, ApplicationConstants.CREATE_USER_URL).permitAll()
+//                .antMatchers(HttpMethod.GET, ApplicationConstants.AUTHENTICATION_URL).permitAll()
+//                .antMatchers(HttpMethod.POST, ApplicationConstants.CREATE_ORGANIZATION_URL).permitAll()
+//                .antMatchers(HttpMethod.GET, "/user").hasAnyAuthority("SUPER_PERMISSION7")
+//                .anyRequest()
+//                .authenticated()
                 .and()
                 .csrf()
                 .disable()
                 .cors()
                 .disable()
-                .exceptionHandling()
-                .authenticationEntryPoint((request, response, ex) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage()))
-                .and()
+//                .exceptionHandling()
+//                .authenticationEntryPoint((request, response, ex) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage()))
+//                .and()
                 .addFilter(new JwtAuthorizationFilter(authenticationManager()));
     }
 

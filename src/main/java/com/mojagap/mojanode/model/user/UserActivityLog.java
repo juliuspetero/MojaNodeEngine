@@ -1,9 +1,9 @@
 package com.mojagap.mojanode.model.user;
 
 
-import com.mojagap.mojanode.model.ActionTypeEnum;
-import com.mojagap.mojanode.model.BaseEntity;
-import com.mojagap.mojanode.model.EntityTypeEnum;
+import com.mojagap.mojanode.model.common.ActionTypeEnum;
+import com.mojagap.mojanode.model.common.BaseEntity;
+import com.mojagap.mojanode.model.common.EntityTypeEnum;
 import com.mojagap.mojanode.model.http.HttpResponseStatusEnum;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

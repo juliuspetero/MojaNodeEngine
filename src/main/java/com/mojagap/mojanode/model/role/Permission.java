@@ -1,9 +1,9 @@
 package com.mojagap.mojanode.model.role;
 
-import com.mojagap.mojanode.model.ActionTypeEnum;
-import com.mojagap.mojanode.model.BaseEntity;
-import com.mojagap.mojanode.model.EntityTypeEnum;
-import com.mojagap.mojanode.model.EntityCategory;
+import com.mojagap.mojanode.model.account.AccountType;
+import com.mojagap.mojanode.model.common.ActionTypeEnum;
+import com.mojagap.mojanode.model.common.BaseEntity;
+import com.mojagap.mojanode.model.common.EntityTypeEnum;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -14,13 +14,13 @@ import javax.persistence.Enumerated;
 
 
 @Setter
-@Entity(name = "user_permission")
+@Entity(name = "permission")
 @NoArgsConstructor
-public class UserPermission extends BaseEntity {
+public class Permission extends BaseEntity {
     private String name;
     private EntityTypeEnum entityType;
     private ActionTypeEnum actionType;
-    private EntityCategory category;
+    private AccountType accountType;
 
     @Column(name = "name")
     public String getName() {
@@ -41,7 +41,7 @@ public class UserPermission extends BaseEntity {
 
     @Column(name = "category")
     @Enumerated(EnumType.STRING)
-    public EntityCategory getCategory() {
-        return category;
+    public AccountType getAccountType() {
+        return accountType;
     }
 }
