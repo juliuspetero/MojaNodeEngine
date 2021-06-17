@@ -51,7 +51,7 @@ public abstract class BaseController {
         return userActivityLog;
     }
 
-    protected <R> R logUserActivity(EntityTypeEnum entityTypeEnum, ActionTypeEnum actionTypeEnum, Function<UserActivityLog, R> function) {
+    protected <R> R executeAndLogUserActivity(EntityTypeEnum entityTypeEnum, ActionTypeEnum actionTypeEnum, Function<UserActivityLog, R> function) {
         UserActivityLog userActivityLog = setUserActivityLogProperties(entityTypeEnum, actionTypeEnum, HttpResponseStatusEnum.PENDING);
         try {
             R response = function.apply(userActivityLog);

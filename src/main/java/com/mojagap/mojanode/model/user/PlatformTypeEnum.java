@@ -2,7 +2,7 @@ package com.mojagap.mojanode.model.user;
 
 
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
-import com.mojagap.mojanode.infrastructure.Validator;
+import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +18,7 @@ public enum PlatformTypeEnum {
     private final Integer id;
 
     public static PlatformTypeEnum fromInt(Integer id) {
-        Validator.notNull(id, ErrorMessages.MISSING_APPLICATION_PLATFORM);
+        PowerValidator.notNull(id, ErrorMessages.MISSING_APPLICATION_PLATFORM);
         return switch (id) {
             case 1 -> WEB_APP;
             case 2 -> ANDROID_APP;

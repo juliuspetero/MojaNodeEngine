@@ -1,32 +1,23 @@
 package com.mojagap.mojanode.service.user;
 
-import com.mojagap.mojanode.controller.user.entity.AppUserSummary;
+import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
-import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
-import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.repository.company.CompanyRepository;
+import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.BeanUtils;
+import com.mojagap.mojanode.service.user.interfaces.UserCommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Base64;
-import java.util.Date;
 
 @Service
-public class UserCommandService {
+public class UserCommandService implements UserCommandHandler {
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -47,54 +38,27 @@ public class UserCommandService {
     protected HttpServletResponse httpServletResponse;
 
 
-    public AppUserSummary createUser(AppUserSummary appUserSummary) {
-        AppUser loggedInUser = AppContext.getLoggedInUser();
-        AppUser appUser = new AppUser(appUserSummary);
-        if (loggedInUser != null) {
-            appUser.setCompany(loggedInUser.getCompany());
-        } else {
-            appUser.setCreatedBy(appUser);
-            appUser.setModifiedBy(appUser);
-        }
-        appUser.setPassword(passwordEncoder.encode(appUserSummary.getPassword()));
+    @Override
+    public AppUserDto createUser(AppUserDto appUserDto) {
+        AppUser appUser = new AppUser(appUserDto);
+        AppContext.stamp(appUser);
+        appUser.setPassword(passwordEncoder.encode(appUserDto.getPassword()));
         appUser = appUserRepository.saveAndFlush(appUser);
-        appUserSummary.setId(appUser.getId());
-        return appUserSummary;
+        appUserDto.setId(appUser.getId());
+        return appUserDto;
     }
 
-    public AppUserSummary authenticateUser(AppUserSummary appUserSummary) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUserSummary.getEmail(), appUserSummary.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        Date expiryDate = new Date(System.currentTimeMillis() + ApplicationConstants.JWT_EXPIRATION_TIME);
-        String secretKey = Base64.getEncoder().encodeToString(ApplicationConstants.JWT_SECRET_KEY.getBytes());
-
-        AppUser appUser = ((AppUserDetails) authentication.getPrincipal()).getAppUser();
-        Claims claims = Jwts.claims().setSubject(appUser.getEmail());
-        claims.put("userId", appUser.getId());
-
-        String authenticationToken = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secretKey).setExpiration(expiryDate).compact();
-        appUserSummary.setAuthentication(authenticationToken);
-        BeanUtils.copyProperties(appUser, appUserSummary);
-        appUserSummary.setPassword(null);
-        if (appUser.getCompany() != null) {
-            appUserSummary.setOrganizationId(appUser.getCompany().getId());
-            appUserSummary.setOrganizationName(appUser.getCompany().getName());
-        }
-        appUserSummary.setRoleId(appUser.getRole().getId());
-        appUserSummary.setRoleName(appUser.getRole().getName());
-        appUserSummary.setPermissions(appUser.getRole().getPermissions());
-        httpServletResponse.setHeader(ApplicationConstants.AUTHENTICATION_HEADER_NAME, authenticationToken);
-        return appUserSummary;
+    @Override
+    public AppUserDto updateUser(AppUserDto appUserDto) {
+        return appUserDto;
     }
 
-    public AppUserSummary updateUser(AppUserSummary appUserSummary) {
-        return appUserSummary;
+    @Override
+    public AppUserDto removeUser(Integer userId) {
+        return new AppUserDto();
     }
 
-    public AppUserSummary removeUser(Integer userId) {
-        return new AppUserSummary();
-    }
-
+    @Override
     public ExternalUser createExternalUser(ExternalUser externalUser) {
         return restTemplateService.doHttpPost(ApplicationConstants.BANK_TRANSFER_BASE_URL + "/users", externalUser, ExternalUser.class);
 

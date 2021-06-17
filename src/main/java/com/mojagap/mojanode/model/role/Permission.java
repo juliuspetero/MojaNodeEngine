@@ -1,6 +1,5 @@
 package com.mojagap.mojanode.model.role;
 
-import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.BaseEntity;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
@@ -20,7 +19,7 @@ public class Permission extends BaseEntity {
     private String name;
     private EntityTypeEnum entityType;
     private ActionTypeEnum actionType;
-    private AccountType accountType;
+    private PermCategoryEnum category;
 
     @Column(name = "name")
     public String getName() {
@@ -41,7 +40,7 @@ public class Permission extends BaseEntity {
 
     @Column(name = "category")
     @Enumerated(EnumType.STRING)
-    public AccountType getAccountType() {
-        return accountType;
+    public PermCategoryEnum getCategory() {
+        return category;
     }
 }

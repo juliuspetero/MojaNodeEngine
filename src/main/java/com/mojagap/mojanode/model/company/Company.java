@@ -1,19 +1,17 @@
 package com.mojagap.mojanode.model.company;
 
-import com.mojagap.mojanode.controller.company.entity.CompanySummary;
-import com.mojagap.mojanode.infrastructure.AppContext;
-import com.mojagap.mojanode.model.common.AuditEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.mojagap.mojanode.dto.company.CompanyDto;
+import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.model.account.Account;
-import com.mojagap.mojanode.model.user.AppUser;
+import com.mojagap.mojanode.model.common.AuditEntity;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 
 @Entity(name = "company")
@@ -21,18 +19,17 @@ import java.util.List;
 @NoArgsConstructor
 public class Company extends AuditEntity {
     private String name;
+    @JsonFormat(pattern = ApplicationConstants.DD_MMM_YYY)
     private Date registrationDate;
     private CompanyType companyType;
     private String registrationNumber;
     private String address;
     private String email;
     private String phoneNumber;
-    private List<AppUser> appUsers = new ArrayList<>();
     private Account account;
 
-    public Company(CompanySummary companySummary) {
-        BeanUtils.copyProperties(companySummary, this);
-        AppContext.stamp(this);
+    public Company(CompanyDto companyDto) {
+        BeanUtils.copyProperties(companyDto, this);
     }
 
     @Column(name = "name")
@@ -73,14 +70,9 @@ public class Company extends AuditEntity {
         return phoneNumber;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
     public Account getAccount() {
         return account;
-    }
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "company", fetch = FetchType.LAZY)
-    public List<AppUser> getAppUsers() {
-        return appUsers;
     }
 }

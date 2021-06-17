@@ -1,19 +1,20 @@
 package com.mojagap.mojanode.model.account;
 
 
+import com.mojagap.mojanode.dto.account.AccountDto;
 import com.mojagap.mojanode.model.common.AuditEntity;
+import com.mojagap.mojanode.model.company.Company;
+import com.mojagap.mojanode.model.user.AppUser;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Entity(name = "account")
@@ -24,7 +25,15 @@ public class Account extends AuditEntity {
     private CountryCode countryCode;
     private String email;
     private String contactPhoneNumber;
+    private AppUser approvedBy;
     private AccountType accountType;
+    private Set<AppUser> appUsers = new HashSet<>();
+    private Set<Company> companies = new HashSet<>();
+
+    public Account(AccountDto accountDto) {
+        this.countryCode = CountryCode.getByCode(accountDto.getCountryCode());
+        this.accountType = AccountType.valueOf(accountDto.getAccountType());
+    }
 
     @NotNull(message = "Account name cannot be empty")
     public String getName() {
@@ -38,7 +47,7 @@ public class Account extends AuditEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "country_code")
-    @Size(min = 3, max = 3, message = "Please provide a valid country code")
+    @NotNull(message = "Please provide a valid country code")
     public CountryCode getCountryCode() {
         return countryCode;
     }
@@ -54,11 +63,27 @@ public class Account extends AuditEntity {
         return email;
     }
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "approved_by")
+    public AppUser getApprovedBy() {
+        return approvedBy;
+    }
+
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type")
-    @NotBlank(message = "Account Type cannot be empty")
+    @NotNull(message = "Account Type cannot be empty")
     public AccountType getAccountType() {
         return accountType;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "account", fetch = FetchType.LAZY)
+    public Set<AppUser> getAppUsers() {
+        return appUsers;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "account", fetch = FetchType.LAZY)
+    public Set<Company> getCompanies() {
+        return companies;
     }
 }
 

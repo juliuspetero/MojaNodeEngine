@@ -36,22 +36,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         httpSecurity
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers(HttpMethod.POST, ApplicationConstants.CREATE_USER_URL).permitAll()
-//                .antMatchers(HttpMethod.GET, ApplicationConstants.AUTHENTICATION_URL).permitAll()
-//                .antMatchers(HttpMethod.POST, ApplicationConstants.CREATE_ORGANIZATION_URL).permitAll()
-//                .antMatchers(HttpMethod.GET, "/user").hasAnyAuthority("SUPER_PERMISSION7")
-//                .anyRequest()
-//                .authenticated()
                 .and()
                 .csrf()
                 .disable()
                 .cors()
                 .disable()
-//                .exceptionHandling()
-//                .authenticationEntryPoint((request, response, ex) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage()))
-//                .and()
                 .addFilter(new JwtAuthorizationFilter(authenticationManager()));
     }
 

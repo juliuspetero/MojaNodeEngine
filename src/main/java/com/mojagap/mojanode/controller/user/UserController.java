@@ -1,16 +1,15 @@
 package com.mojagap.mojanode.controller.user;
 
 import com.mojagap.mojanode.controller.BaseController;
-import com.mojagap.mojanode.controller.user.entity.AppUserSummary;
+import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
 import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.user.UserActivityLog;
-import com.mojagap.mojanode.service.user.UserCommandService;
-import com.mojagap.mojanode.service.user.UserQueryService;
-import com.mojagap.mojanode.service.user.entities.AppUserDTO;
+import com.mojagap.mojanode.service.user.interfaces.UserCommandHandler;
+import com.mojagap.mojanode.service.user.interfaces.UserQueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,43 +17,39 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/v1/user")
 public class UserController extends BaseController {
 
     @Autowired
-    private UserCommandService userCommandService;
+    private UserCommandHandler userCommandHandler;
 
     @Autowired
-    private UserQueryService userQueryService;
+    private UserQueryHandler userQueryHandler;
 
     @GetMapping
-    public RecordHolder<AppUserDTO> getAppUsers(@RequestParam Map<String, String> queryParams) {
-        return executeHttpGet(() -> userQueryService.getAppUsersByQueryParams(queryParams));
+    public RecordHolder<AppUserDto> getAppUsers(@RequestParam Map<String, String> queryParams) {
+        return executeHttpGet(() -> userQueryHandler.getAppUsersByQueryParams(queryParams));
     }
 
-    @PostMapping("/create")
-    public AppUserSummary createAppUser(@RequestBody AppUserSummary appUserSummary) {
-        return logUserActivity(EntityTypeEnum.USER, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
-            AppUserSummary response = userCommandService.createUser(appUserSummary);
+    @RequestMapping(method = RequestMethod.POST)
+    public AppUserDto createAppUser(@RequestBody AppUserDto appUserDto) {
+        return executeAndLogUserActivity(EntityTypeEnum.USER, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
+            AppUserDto response = userCommandHandler.createUser(appUserDto);
             log.setEntityId(response.getId());
             return response;
         });
     }
 
-    @GetMapping("/authenticate")
-    public AppUserSummary authenticate(@RequestBody AppUserSummary appUserSummary) {
-        return userCommandService.authenticateUser(appUserSummary);
-    }
 
-    @GetMapping("/external/{id}")
+    @RequestMapping(path = "/external/{id}", method = RequestMethod.GET)
     public ExternalUser getExternalUser(@PathVariable Integer id) {
-        return executeHttpGet(() -> userQueryService.getExternalUserById(id));
+        return executeHttpGet(() -> userQueryHandler.getExternalUserById(id));
     }
 
-    @PostMapping("/external")
+    @RequestMapping(path = "/external", method = RequestMethod.GET)
     public ExternalUser createExternalUser(@RequestBody ExternalUser externalUser) {
-        return logUserActivity(EntityTypeEnum.USER, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
-            ExternalUser response = userCommandService.createExternalUser(externalUser);
+        return executeAndLogUserActivity(EntityTypeEnum.USER, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
+            ExternalUser response = userCommandHandler.createExternalUser(externalUser);
             log.setEntityId(response.getId());
             return response;
         });
@@ -62,7 +57,7 @@ public class UserController extends BaseController {
 
     @GetMapping("/external/all")
     public List<AppUser> getExternalUsers() {
-        return executeHttpGet(() -> userQueryService.getExternalUsers());
+        return executeHttpGet(() -> userQueryHandler.getExternalUsers());
     }
 
 }

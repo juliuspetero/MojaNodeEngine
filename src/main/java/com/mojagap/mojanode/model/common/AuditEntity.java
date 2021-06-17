@@ -11,11 +11,9 @@ import java.util.Date;
 public class AuditEntity extends BaseEntity {
     private Date createdOn;
     private Date modifiedOn;
-//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private AppUser createdBy;
-//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private AppUser modifiedBy;
-    private RecordStatus recordStatus = RecordStatus.INACTIVE;
+    private RecordStatus recordStatus = RecordStatus.ACTIVE;
 
     @Column(name = "created_on")
     @Temporal(TemporalType.TIMESTAMP)

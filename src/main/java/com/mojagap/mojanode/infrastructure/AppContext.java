@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.Objects;
 
 @Component
 public class AppContext implements ApplicationContextAware {
@@ -38,17 +37,16 @@ public class AppContext implements ApplicationContextAware {
         APP_USER.set(loggedInUser);
     }
 
-    public static <T extends AuditEntity> T stamp(T entity) {
+    public static <T extends AuditEntity> void stamp(T entity) {
         AppUser appUser = AppContext.getLoggedInUser();
         Date now = DateUtils.now();
         entity.setModifiedBy(appUser);
         entity.setModifiedOn(now);
-        if (Objects.isNull(entity.getCreatedBy())) {
+        if (entity.getCreatedBy() == null) {
             entity.setCreatedBy(appUser);
         }
-        if (Objects.isNull(entity.getCreatedOn())) {
+        if (entity.getCreatedOn() == null) {
             entity.setCreatedOn(now);
         }
-        return entity;
     }
 }

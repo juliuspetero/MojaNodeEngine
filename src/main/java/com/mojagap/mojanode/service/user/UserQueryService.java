@@ -1,8 +1,12 @@
 package com.mojagap.mojanode.service.user;
 
 
+import com.mojagap.mojanode.dto.user.AppUserDto;
+import com.mojagap.mojanode.dto.user.UserSqlResultSet;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
+import com.mojagap.mojanode.infrastructure.ErrorMessages;
+import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
 import com.mojagap.mojanode.infrastructure.utility.DateUtils;
 import com.mojagap.mojanode.model.common.RecordHolder;
@@ -11,9 +15,10 @@ import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.user.IdentificationEnum;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
-import com.mojagap.mojanode.service.user.entities.AppUserDTO;
+import com.mojagap.mojanode.service.user.interfaces.UserQueryHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -24,6 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -37,7 +43,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class UserQueryService implements UserDetailsService {
+public class UserQueryService implements UserDetailsService, UserQueryHandler {
 
     @Autowired
     private AppUserRepository appUserRepository;
@@ -48,13 +54,15 @@ public class UserQueryService implements UserDetailsService {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public RecordHolder<AppUserDTO> getAppUsersByQueryParams(Map<String, String> queryParams) {
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Override
+    public RecordHolder<AppUserDto> getAppUsersByQueryParams(Map<String, String> queryParams) {
         AppUser loggedInUser = AppContext.getLoggedInUser();
         Arrays.asList(AppUserQueryParams.values()).forEach(param -> queryParams.putIfAbsent(param.getValue(), null));
         MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource(queryParams);
-        if (loggedInUser.getCompany() != null) {
-            mapSqlParameterSource.addValue(AppUserQueryParams.ORGANIZATION_ID.getValue(), loggedInUser.getCompany().getId());
-        }
+        mapSqlParameterSource.addValue(AppUserQueryParams.ACCOUNT_ID.getValue(), loggedInUser.getAccount().getId());
         if (queryParams.get(AppUserQueryParams.VERIFIED.getValue()) != null) {
             mapSqlParameterSource.addValue(AppUserQueryParams.VERIFIED.getValue(), Boolean.parseBoolean(queryParams.get(AppUserQueryParams.VERIFIED.getValue())), Types.BOOLEAN);
         }
@@ -62,15 +70,20 @@ public class UserQueryService implements UserDetailsService {
         mapSqlParameterSource.addValue(AppUserQueryParams.LIMIT.getValue(), limit, Types.INTEGER);
         Integer offset = queryParams.get(AppUserQueryParams.OFFSET.getValue()) != null ? Integer.parseInt(queryParams.get(AppUserQueryParams.OFFSET.getValue())) : 0;
         mapSqlParameterSource.addValue(AppUserQueryParams.OFFSET.getValue(), offset, Types.INTEGER);
-        List<AppUserDTO> appUserDTOS = jdbcTemplate.query(appUserQuery(), mapSqlParameterSource, new AppUserMapper());
-        return new RecordHolder<>(appUserDTOS.size(), appUserDTOS);
+        List<UserSqlResultSet> sqlResultSets = jdbcTemplate.query(appUserQuery(), mapSqlParameterSource, new AppUserMapper());
+        List<AppUserDto> appUserDtos = sqlResultSets.stream().map(resultSet -> modelMapper.map(resultSet, AppUserDto.class))
+                .collect(Collectors.toList());
+        return new RecordHolder<>(appUserDtos.size(), appUserDtos);
     }
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         AppUser appUser = appUserRepository.findOneByEmail(s);
+        PowerValidator.notNull(appUser, ErrorMessages.INVALID_SECURITY_CREDENTIAL);
         List<GrantedAuthority> authorities = new ArrayList<>();
-        appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);
+        if (appUser.getRole() != null) {
+            appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);
+        }
         return new AppUserDetails(appUser, authorities);
     }
 
@@ -104,26 +117,26 @@ public class UserQueryService implements UserDetailsService {
     }
 
 
-    private static final class AppUserMapper implements RowMapper<AppUserDTO> {
+    private static final class AppUserMapper implements RowMapper<UserSqlResultSet> {
 
         @Override
-        public AppUserDTO mapRow(ResultSet resultSet, int i) throws SQLException {
-            AppUserDTO appUserDTO = new AppUserDTO();
-            appUserDTO.setId(resultSet.getInt(AppUserQueryParams.ID.getValue()));
-            appUserDTO.setFirstName(resultSet.getString(AppUserQueryParams.FIRST_NAME.getValue()));
-            appUserDTO.setLastName(resultSet.getString(AppUserQueryParams.LAST_NAME.getValue()));
-            appUserDTO.setDateOfBirth(resultSet.getDate(AppUserQueryParams.DATE_OF_BIRTH.getValue()));
-            appUserDTO.setIdNumber(resultSet.getString(AppUserQueryParams.ID_NUMBER.getValue()));
-            appUserDTO.setAddress(resultSet.getString(AppUserQueryParams.ADDRESS.getValue()));
-            appUserDTO.setEmail(resultSet.getString(AppUserQueryParams.EMAIL.getValue()));
-            appUserDTO.setPassword(resultSet.getString(AppUserQueryParams.PASSWORD.getValue()));
-            appUserDTO.setVerified(resultSet.getBoolean(AppUserQueryParams.VERIFIED.getValue()));
-            appUserDTO.setStatus(resultSet.getString(AppUserQueryParams.STATUS.getValue()));
-            appUserDTO.setOrganizationId(resultSet.getInt(AppUserQueryParams.ORGANIZATION_ID.getValue()));
-            appUserDTO.setOrganizationName(resultSet.getString(AppUserQueryParams.ORGANIZATION_NAME.getValue()));
-            appUserDTO.setCreatedByFullName(resultSet.getString(AppUserQueryParams.CREATED_BY_FULL_NAME.getValue()));
-            appUserDTO.setModifiedByFullName(resultSet.getString(AppUserQueryParams.MODIFIED_BY_FULL_NAME.getValue()));
-            return appUserDTO;
+        public UserSqlResultSet mapRow(ResultSet resultSet, int i) throws SQLException {
+            UserSqlResultSet userSqlResultSet = new UserSqlResultSet();
+            userSqlResultSet.setId(resultSet.getInt(AppUserQueryParams.ID.getValue()));
+            userSqlResultSet.setFirstName(resultSet.getString(AppUserQueryParams.FIRST_NAME.getValue()));
+            userSqlResultSet.setLastName(resultSet.getString(AppUserQueryParams.LAST_NAME.getValue()));
+            userSqlResultSet.setDateOfBirth(resultSet.getDate(AppUserQueryParams.DATE_OF_BIRTH.getValue()));
+            userSqlResultSet.setIdNumber(resultSet.getString(AppUserQueryParams.ID_NUMBER.getValue()));
+            userSqlResultSet.setAddress(resultSet.getString(AppUserQueryParams.ADDRESS.getValue()));
+            userSqlResultSet.setEmail(resultSet.getString(AppUserQueryParams.EMAIL.getValue()));
+            userSqlResultSet.setPassword(resultSet.getString(AppUserQueryParams.PASSWORD.getValue()));
+            userSqlResultSet.setVerified(resultSet.getBoolean(AppUserQueryParams.VERIFIED.getValue()));
+            userSqlResultSet.setStatus(resultSet.getString(AppUserQueryParams.STATUS.getValue()));
+            userSqlResultSet.setCompanyId(resultSet.getInt(AppUserQueryParams.COMPANY_ID.getValue()));
+            userSqlResultSet.setCompanyName(resultSet.getString(AppUserQueryParams.COMPANY_NAME.getValue()));
+            userSqlResultSet.setCreatedByFullName(resultSet.getString(AppUserQueryParams.CREATED_BY_FULL_NAME.getValue()));
+            userSqlResultSet.setModifiedByFullName(resultSet.getString(AppUserQueryParams.MODIFIED_BY_FULL_NAME.getValue()));
+            return userSqlResultSet;
         }
     }
 
@@ -132,6 +145,7 @@ public class UserQueryService implements UserDetailsService {
     public enum AppUserQueryParams {
         LIMIT("limit"),
         OFFSET("offset"),
+        ACCOUNT_ID("accountid"),
         ID("id"),
         LAST_NAME("lastName"),
         FIRST_NAME("firstName"),
@@ -143,8 +157,8 @@ public class UserQueryService implements UserDetailsService {
         ID_NUMBER("idNumber"),
         PHONE_NUMBER("phoneNumber"),
         PASSWORD("password"),
-        ORGANIZATION_NAME("organizationName"),
-        ORGANIZATION_ID("organizationId"),
+        COMPANY_NAME("organizationName"),
+        COMPANY_ID("organizationId"),
         VERIFIED("verified"),
         CREATED_BY_FULL_NAME("createdByFullName"),
         MODIFIED_BY_FULL_NAME("modifiedByFullName");

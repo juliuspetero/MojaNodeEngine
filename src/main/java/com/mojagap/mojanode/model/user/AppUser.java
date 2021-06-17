@@ -1,7 +1,7 @@
 package com.mojagap.mojanode.model.user;
 
-import com.mojagap.mojanode.controller.user.entity.AppUserSummary;
-import com.mojagap.mojanode.infrastructure.AppContext;
+import com.mojagap.mojanode.dto.user.AppUserDto;
+import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.role.Role;
@@ -25,18 +25,12 @@ public class AppUser extends AuditEntity {
     private String phoneNumber;
     private String password;
     private Boolean verified = Boolean.FALSE;
+    private Account account;
     private Company company;
     private Role role;
 
-    public AppUser(AppUserSummary appUserSummary, Company company) {
-        BeanUtils.copyProperties(appUserSummary, this);
-        this.company = company;
-        AppContext.stamp(this);
-    }
-
-    public AppUser(AppUserSummary appUserSummary) {
-        BeanUtils.copyProperties(appUserSummary, this);
-        AppContext.stamp(this);
+    public AppUser(AppUserDto appUserDto) {
+        BeanUtils.copyProperties(appUserDto, this);
     }
 
     @Column(name = "first_name")
@@ -85,13 +79,19 @@ public class AppUser extends AuditEntity {
         return verified;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "account_id")
+    public Account getAccount() {
+        return account;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "company_id")
     public Company getCompany() {
         return company;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id")
     public Role getRole() {
         return role;

@@ -42,9 +42,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private final Logger LOG = Logger.getLogger(JwtAuthorizationFilter.class.getName());
 
     private static final String NON_AUTH_PATH = "" +
-            "/user/authenticate:GET" +
-            "/user/create:POST" +
-            "/organization/create:POST";
+            "/v1/account/authenticate:GET" +
+            "/v1/account:POST";
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
@@ -72,7 +71,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             String secretKey = Base64.getEncoder().encodeToString(ApplicationConstants.JWT_SECRET_KEY.getBytes());
             Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(authentication).getBody();
             AppUserRepository appUserRepository = AppContext.getBean(AppUserRepository.class);
-            Integer userId = claims.get("userId", Integer.class);
+            Integer userId = claims.get(ApplicationConstants.APP_USER_ID, Integer.class);
             AppUser appUser = appUserRepository.getById(userId);
             List<GrantedAuthority> authorities = new ArrayList<>();
             appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);
@@ -87,6 +86,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private void verifyPermissions(HttpServletRequest request, AppUser appUser) throws IOException {
         String requestMethod = request.getMethod();
         String requestURI = request.getRequestURI();
+        String accountType = appUser.getAccount().getAccountType().name();
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream("security/security.csv");
         String csv = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
@@ -100,7 +100,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 .parse();
         List<String> pathPermissions = new ArrayList<>(Collections.singletonList(CommonPermissions.SUPER_PERMISSION.name()));
         requestSecurities.stream()
-                .filter(security -> requestMethod.equals(security.getHttpMethod()) && requestURI.equals(security.getUrl()))
+                .filter(security -> requestMethod.equals(security.getHttpMethod())
+                        && requestURI.equals(security.getUrl())
+                        && accountType.equals(security.getAccountType()))
                 .forEach(row -> pathPermissions.addAll(List.of(row.getPermissions().split(","))));
         List<String> userPermissions = appUser.getRole().getPermissions().stream().map(Permission::getName).collect(Collectors.toList());
         userPermissions.add(CommonPermissions.AUTHENTICATED.name());
@@ -113,6 +115,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     public static class RequestSecurity {
         private String httpMethod;
         private String url;
+        private String accountType;
         private String permissions;
     }
 }

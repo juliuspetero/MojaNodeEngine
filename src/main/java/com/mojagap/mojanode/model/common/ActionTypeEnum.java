@@ -4,6 +4,7 @@ public enum ActionTypeEnum {
     ALL_ACTIONS,
     APPROVE,
     CREATE,
+    AUTHENTICATE,
     UPDATE,
     DELETE,
     READ,
