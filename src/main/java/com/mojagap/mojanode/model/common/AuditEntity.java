@@ -47,6 +47,8 @@ public class AuditEntity extends BaseEntity {
 
     public enum RecordStatus {
         ACTIVE,
+        REJECTED,
+        APPROVED,
         INACTIVE,
         DELETED,
         LOCKED;

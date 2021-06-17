@@ -40,10 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -148,13 +145,16 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         appUserDto.setAuthentication(authenticationToken);
         BeanUtils.copyProperties(appUser, appUserDto);
         appUserDto.setPassword(null);
-        RoleDto roleDto = modelMapper.map(appUser.getRole(), RoleDto.class);
-        List<PermissionDto> permissionDtoList = appUser.getRole().getPermissions()
-                .stream()
-                .map(permission -> modelMapper.map(permission, PermissionDto.class))
-                .collect(Collectors.toList());
-        roleDto.setPermissions(permissionDtoList);
-        appUserDto.setRole(roleDto);
+
+        if (EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(appUser.getAccount().getAccountType())) {
+            RoleDto roleDto = modelMapper.map(appUser.getRole(), RoleDto.class);
+            List<PermissionDto> permissionDtoList = appUser.getRole().getPermissions()
+                    .stream()
+                    .map(permission -> modelMapper.map(permission, PermissionDto.class))
+                    .collect(Collectors.toList());
+            roleDto.setPermissions(permissionDtoList);
+            appUserDto.setRole(roleDto);
+        }
         Company company = appUser.getCompany();
         if (company != null) {
             appUserDto.setCompany(new CompanyDto(company.getId(), company.getName(), company.getCompanyType().name()));
