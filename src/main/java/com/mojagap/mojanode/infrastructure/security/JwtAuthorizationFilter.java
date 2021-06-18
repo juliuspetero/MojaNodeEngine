@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private final Logger LOG = Logger.getLogger(JwtAuthorizationFilter.class.getName());
 
-    private static final String NON_AUTH_PATH = "" +
+    private static final String ANONYMOUS_USER_PATHS = "" +
             "/v1/account/authenticate:GET" +
             "/v1/account:POST";
 
@@ -54,7 +54,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         try {
             String authenticationToken = servletRequest.getHeader(ApplicationConstants.AUTHENTICATION_HEADER_NAME);
             String requestPath = servletRequest.getRequestURI() + ":" + servletRequest.getMethod();
-            if (!NON_AUTH_PATH.contains(requestPath)) {
+            if (!ANONYMOUS_USER_PATHS.contains(requestPath)) {
                 AppUser appUser = verifyAuthenticationToken(authenticationToken);
                 AppContext.setLoggedInUser(appUser);
                 verifyPermissions(servletRequest, appUser);
