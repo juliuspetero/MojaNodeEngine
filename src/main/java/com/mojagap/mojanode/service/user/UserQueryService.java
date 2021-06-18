@@ -29,7 +29,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -87,6 +86,7 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
         return new AppUserDetails(appUser, authorities);
     }
 
+    @Override
     public ExternalUser getExternalUserById(Integer id) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.set("name", "Peter");
@@ -95,6 +95,7 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
         return restTemplateService.doHttpGet(ApplicationConstants.BANK_TRANSFER_BASE_URL + "/users/" + id, queryParams, ExternalUser.class);
     }
 
+    @Override
     public List<AppUser> getExternalUsers() {
         ExternalUser[] externalUsers = restTemplateService.doHttpGet(ApplicationConstants.BANK_TRANSFER_BASE_URL + "/users", null, ExternalUser[].class);
         List<AppUser> appUsers = List.of(externalUsers).stream().map(x -> {
