@@ -4,7 +4,7 @@ public enum EntityTypeEnum {
     ALL,
     USER,
     ACCOUNT,
-    ORGANIZATION,
+    COMPANY,
     BENEFICIARY,
     DEPARTMENT,
     WALLET,

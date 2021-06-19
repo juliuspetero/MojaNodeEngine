@@ -5,17 +5,16 @@ import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.exception.ForbiddenException;
 import com.mojagap.mojanode.infrastructure.exception.UnauthorizedException;
+import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
+import com.mojagap.mojanode.infrastructure.utility.CsvUtil;
+import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.role.CommonPermissions;
 import com.mojagap.mojanode.model.role.Permission;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.bean.CsvToBeanBuilder;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.Data;
-import org.apache.commons.io.IOUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,14 +25,12 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -50,7 +47,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain chain) {
         try {
             String authenticationToken = servletRequest.getHeader(ApplicationConstants.AUTHENTICATION_HEADER_NAME);
             String requestPath = servletRequest.getRequestURI() + ":" + servletRequest.getMethod();
@@ -83,26 +80,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
     }
 
-    private void verifyPermissions(HttpServletRequest request, AppUser appUser) throws IOException {
+    private void verifyPermissions(HttpServletRequest request, AppUser appUser) {
         String requestMethod = request.getMethod();
         String requestURI = request.getRequestURI();
-        String accountType = appUser.getAccount().getAccountType().name();
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream("security/security.csv");
-        String csv = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
-        StringReader stringReader = new StringReader(csv);
-        CSVReader csvReader = new CSVReaderBuilder(stringReader).build();
-        List<RequestSecurity> requestSecurities = new CsvToBeanBuilder<RequestSecurity>(csvReader)
-                .withType(RequestSecurity.class)
-                .withIgnoreLeadingWhiteSpace(true)
-                .withSkipLines(1)
-                .build()
-                .parse();
+        AccountType accountType = appUser.getAccount().getAccountType();
+        List<RequestSecurity> requestSecurities = CsvUtil.parseSecurityCsv();
         List<String> pathPermissions = new ArrayList<>(Collections.singletonList(CommonPermissions.SUPER_PERMISSION.name()));
         requestSecurities.stream()
                 .filter(security -> requestMethod.equals(security.getHttpMethod())
-                        && requestURI.equals(security.getUrl())
-                        && accountType.equals(security.getAccountType()))
+                        && UrlSecurityMatcher.matches(security.getUrl(), requestURI)
+                        && List.of(security.getAccountTypes().split(",")).contains(accountType.name()))
                 .forEach(row -> pathPermissions.addAll(List.of(row.getPermissions().split(","))));
         List<String> userPermissions = appUser.getRole().getPermissions().stream().map(Permission::getName).collect(Collectors.toList());
         userPermissions.add(CommonPermissions.AUTHENTICATED.name());
@@ -115,7 +102,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     public static class RequestSecurity {
         private String httpMethod;
         private String url;
-        private String accountType;
+        private String accountTypes;
         private String permissions;
     }
 }

@@ -9,6 +9,7 @@ import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
+import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.company.CompanyType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,7 @@ public class CompanyDto {
     private Integer companyId;
     private String name;
     private String companyType;
-    @JsonFormat(pattern = ApplicationConstants.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
     private Date registrationDate;
     private String registrationNumber;
     private String address;

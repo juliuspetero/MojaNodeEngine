@@ -8,7 +8,7 @@ import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
-import com.mojagap.mojanode.infrastructure.utility.DateUtils;
+import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
@@ -108,7 +108,7 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
             appUser.setAddress("XXXXXXXXX");
             appUser.setPassword("PASSWORD");
             appUser.setVerified(Boolean.FALSE);
-            appUser.setDateOfBirth(DateUtils.now());
+            appUser.setDateOfBirth(DateUtil.now());
             appUser.setIdNumber(IdentificationEnum.NATIONAL_ID.name());
             AppContext.stamp(appUser);
             return appUser;

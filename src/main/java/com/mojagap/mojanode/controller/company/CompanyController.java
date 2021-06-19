@@ -28,7 +28,7 @@ public class CompanyController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ActionResponse createCompany(@RequestBody CompanyDto companyDto) {
-        return executeAndLogUserActivity(EntityTypeEnum.ORGANIZATION, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
+        return executeAndLogUserActivity(EntityTypeEnum.COMPANY, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             ActionResponse response = companyCommandService.createCompany(companyDto);
             log.setEntityId(response.getResourceId());
             return response;

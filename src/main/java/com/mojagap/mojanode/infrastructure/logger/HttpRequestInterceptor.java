@@ -1,8 +1,8 @@
 package com.mojagap.mojanode.infrastructure.logger;
 
 import com.mojagap.mojanode.infrastructure.AppContext;
-import com.mojagap.mojanode.infrastructure.utility.CommonUtils;
-import com.mojagap.mojanode.infrastructure.utility.DateUtils;
+import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
+import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.http.HttpCallLog;
 import com.mojagap.mojanode.model.http.HttpResponseStatusEnum;
@@ -46,12 +46,12 @@ public class HttpRequestInterceptor implements ClientHttpRequestInterceptor {
         LOG.log(Level.INFO, "===========================Request Begin================================================");
         HttpCallLog httpCallLog = new HttpCallLog();
         httpCallLog.setActionType(ActionTypeEnum.MONEY_TRANSFER);
-        httpCallLog.setCreatedOn(DateUtils.now());
+        httpCallLog.setCreatedOn(DateUtil.now());
         String requestBody = new String(body, StandardCharsets.UTF_8);
         httpCallLog.setRequestBody(requestBody);
         httpCallLog.setRequestUrl(request.getURI().toString());
         httpCallLog.setRequestMethod(Objects.requireNonNull(request.getMethod()).name());
-        httpCallLog.setRequestHeaders(CommonUtils.OBJECT_MAPPER.writeValueAsString(request.getHeaders()));
+        httpCallLog.setRequestHeaders(CommonUtil.OBJECT_MAPPER.writeValueAsString(request.getHeaders()));
         httpCallLog.setResponseStatus(HttpResponseStatusEnum.PENDING);
         LOG.log(Level.INFO, "Making HTTP " + request.getMethod() + " Request " + " To " + request.getURI().toString());
         LOG.log(Level.INFO, "==========================Request End================================================");
@@ -61,7 +61,7 @@ public class HttpRequestInterceptor implements ClientHttpRequestInterceptor {
     @SneakyThrows
     private void logHttpResponse(ClientHttpResponse response, HttpCallLog httpCallLog) {
         LOG.log(Level.INFO, "============================Response Begin==========================================");
-        httpCallLog.setResponseHeaders(CommonUtils.OBJECT_MAPPER.writeValueAsString(response.getHeaders()));
+        httpCallLog.setResponseHeaders(CommonUtil.OBJECT_MAPPER.writeValueAsString(response.getHeaders()));
         httpCallLog.setResponseStatusCode(response.getRawStatusCode());
         httpCallLog.setResponseBody(StreamUtils.copyToString(response.getBody(), Charset.defaultCharset()));
         HttpStatus statusCode = response.getStatusCode();

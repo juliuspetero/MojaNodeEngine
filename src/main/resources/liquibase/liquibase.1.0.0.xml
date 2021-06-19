@@ -139,29 +139,28 @@
         <comment>Create commonly used permissions for all users</comment>
         <sql>
             <![CDATA[
-                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
-                VALUES ('SUPER_PERMISSION', 'ALL_ACTIONS', 'ALL', 'GENERAL');
 
+                -- Add account permissions
                 INSERT IGNORE INTO permission(name, action_type, entity_type, category)
-                VALUES ('READ_APPLICATION_USERS', 'READ', 'USER', 'GENERAL');
+                VALUES ('SUPER_PERMISSION', 'ALL', 'ALL', 'GENERAL'),
+                ('APPROVE_USER_ACCOUNTS', 'APPROVE', 'ACCOUNT', 'BACK_OFFICE'),
+                ('READ_USER_ACCOUNTS', 'READ', 'ACCOUNT', 'BACK_OFFICE'),
+                ('UPDATE_USER_ACCOUNTS', 'UPDATE', 'ACCOUNT', 'BACK_OFFICE');
 
+                -- Add user permissions
                 INSERT IGNORE INTO permission(name, action_type, entity_type, category)
-                VALUES ('READ_USER_ROLES', 'READ', 'ROLE', 'GENERAL');
+                VALUES ('READ_APPLICATION_USERS', 'READ', 'USER', 'GENERAL'),
+                ('UPDATE_APPLICATION_USERS', 'UPDATE', 'USER', 'GENERAL'),
+                ('CREATE_APPLICATION_USERS', 'CREATE', 'USER', 'GENERAL'),
+                ('REMOVE_APPLICATION_USERS', 'REMOVE', 'USER', 'GENERAL');
 
+                -- Add role permissions
                 INSERT IGNORE INTO permission(name, action_type, entity_type, category)
-                VALUES ('CREATE_USER_ROLES', 'CREATE', 'ROLE', 'GENERAL');
+                VALUES ('READ_USER_ROLES', 'READ', 'ROLE', 'GENERAL'),
+                ('CREATE_USER_ROLES', 'CREATE', 'ROLE', 'GENERAL'),
+                ('UPDATE_USER_ROLES', 'UPDATE', 'ROLE', 'GENERAL'),
+                ('READ_USER_PERMISSIONS', 'READ', 'PERMISSION', 'GENERAL');
 
-                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
-                VALUES ('UPDATE_USER_ROLES', 'UPDATE', 'ROLE', 'GENERAL');
-
-                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
-                VALUES ('UPDATE_USER', 'UPDATE', 'USER', 'GENERAL');
-
-                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
-                VALUES ('APPROVE_USER_ACCOUNTS', 'APPROVE', 'COMPANY', 'BACK_OFFICE');
-
-                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
-                VALUES ('READ_USER_ACCOUNTS', 'READ', 'COMPANY', 'BACK_OFFICE');
             ]]>
         </sql>
     </changeSet>

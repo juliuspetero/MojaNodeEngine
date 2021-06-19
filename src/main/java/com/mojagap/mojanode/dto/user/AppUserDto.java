@@ -9,6 +9,7 @@ import com.mojagap.mojanode.dto.role.RoleDto;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
+import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.user.IdentificationEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class AppUserDto {
     private String authentication;
     private String firstName;
     private String lastName;
-    @JsonFormat(pattern = ApplicationConstants.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
     private Date dateOfBirth;
     private String idNumber;
     private String idType;

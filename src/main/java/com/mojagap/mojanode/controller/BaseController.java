@@ -2,8 +2,8 @@ package com.mojagap.mojanode.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
-import com.mojagap.mojanode.infrastructure.utility.CommonUtils;
-import com.mojagap.mojanode.infrastructure.utility.DateUtils;
+import com.mojagap.mojanode.infrastructure.logger.UserActivityLogFilter;
+import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
 import com.mojagap.mojanode.model.http.HttpResponseStatusEnum;
@@ -83,17 +83,8 @@ public abstract class BaseController {
         }
         Integer platformType = Integer.valueOf(httpServletRequest.getHeader(ApplicationConstants.PLATFORM_TYPE_HEADER_KEY));
         PlatformTypeEnum platformTypeEnum = PlatformTypeEnum.fromInt(platformType);
-        String fullUrl = httpServletRequest.getRequestURI();
-        String queryString = httpServletRequest.getQueryString();
-        if (queryString != null) {
-            fullUrl += "?" + queryString;
-        }
-        userActivityLog.setRequestUrl(fullUrl);
-        userActivityLog.setRequestMethod(httpServletRequest.getMethod());
-        String headers = getRequestHeaders(httpServletRequest);
-        userActivityLog.setRequestHeaders(headers);
-        userActivityLog.setRemoteIpAddress(httpServletRequest.getRemoteAddr());
-        userActivityLog.setCreatedOn(DateUtils.now());
+        UserActivityLogFilter.setUserActivityLogProps(userActivityLog, httpServletRequest.getRequestURI(), httpServletRequest.getQueryString(),
+                httpServletRequest.getMethod(), getRequestHeaders(httpServletRequest), httpServletRequest.getRemoteAddr());
         userActivityLog.setPlatformType(platformTypeEnum.getId());
         String stackTrace = ExceptionUtils.getStackTrace(ex);
         userActivityLog.setStackTrace(stackTrace);
@@ -101,7 +92,7 @@ public abstract class BaseController {
         httpServletRequest.setAttribute(UserActivityLog.class.getName(), userActivityLog);
     }
 
-    private String getRequestHeaders(HttpServletRequest httpServletRequest) throws JsonProcessingException {
+    public static String getRequestHeaders(HttpServletRequest httpServletRequest) throws JsonProcessingException {
         Map<String, String> headerMap = new HashMap<>();
         Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
         while (headerNames.hasMoreElements()) {
@@ -109,8 +100,7 @@ public abstract class BaseController {
             String value = httpServletRequest.getHeader(key);
             headerMap.put(key, value);
         }
-        return CommonUtils.OBJECT_MAPPER.writeValueAsString(headerMap);
+        return CommonUtil.OBJECT_MAPPER.writeValueAsString(headerMap);
     }
-
 
 }
