@@ -5,7 +5,6 @@ import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.exception.ForbiddenException;
 import com.mojagap.mojanode.infrastructure.exception.UnauthorizedException;
-import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
 import com.mojagap.mojanode.infrastructure.utility.CsvUtil;
 import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.role.CommonPermissions;
