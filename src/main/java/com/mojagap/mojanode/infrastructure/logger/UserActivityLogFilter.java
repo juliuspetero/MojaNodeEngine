@@ -9,7 +9,6 @@ import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.user.PlatformTypeEnum;
 import com.mojagap.mojanode.model.user.UserActivityLog;
 import com.mojagap.mojanode.repository.user.UserActivityLogRepository;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,10 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -39,7 +41,7 @@ public class UserActivityLogFilter implements Filter {
     private static final Logger LOG = Logger.getLogger(UserActivityLogFilter.class.getName());
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) {
         try {
             long startTime = System.currentTimeMillis();
             ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper((HttpServletRequest) servletRequest);
@@ -86,7 +88,8 @@ public class UserActivityLogFilter implements Filter {
     }
 
     public static void setUserActivityLogProps(UserActivityLog userActivityLog, String requestURI, String queryString, String method, String requestHeaders, String remoteAddress) {
-        userActivityLog.setRequestUrl(requestURI + "?" + queryString);
+        String fullUrl = queryString != null ? requestURI + "?" + queryString : requestURI;
+        userActivityLog.setRequestUrl(fullUrl);
         userActivityLog.setRequestMethod(method);
         userActivityLog.setRequestHeaders(requestHeaders);
         userActivityLog.setRemoteIpAddress(remoteAddress);
