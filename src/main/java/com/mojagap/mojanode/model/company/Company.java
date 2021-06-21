@@ -2,7 +2,7 @@ package com.mojagap.mojanode.model.company;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mojagap.mojanode.dto.company.CompanyDto;
-import com.mojagap.mojanode.infrastructure.ApplicationConstants;
+import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class Company extends AuditEntity {
     private String name;
-    @JsonFormat(pattern = ApplicationConstants.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
     private Date registrationDate;
     private CompanyType companyType;
     private String registrationNumber;

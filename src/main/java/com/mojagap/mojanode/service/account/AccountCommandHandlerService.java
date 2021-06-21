@@ -136,12 +136,8 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
     public AppUserDto authenticateUser(AppUserDto appUserDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUserDto.getEmail(), appUserDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        Date expiryDate = new Date(System.currentTimeMillis() + ApplicationConstants.JWT_EXPIRATION_TIME);
-        String secretKey = Base64.getEncoder().encodeToString(ApplicationConstants.JWT_SECRET_KEY.getBytes());
         AppUser appUser = ((AppUserDetails) authentication.getPrincipal()).getAppUser();
-        Claims claims = Jwts.claims().setSubject(appUser.getEmail());
-        claims.put(ApplicationConstants.APP_USER_ID, appUser.getId());
-        String authenticationToken = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secretKey).setExpiration(expiryDate).compact();
+        String authenticationToken = generateAuthenticationToken(appUser);
         appUserDto.setAuthentication(authenticationToken);
         BeanUtils.copyProperties(appUser, appUserDto);
         appUserDto.setPassword(null);
@@ -163,6 +159,15 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         appUserDto.setAccount(new AccountDto(account.getId(), account.getAccountType().name(), account.getCountryCode().name()));
         httpServletResponse.setHeader(ApplicationConstants.AUTHENTICATION_HEADER_NAME, authenticationToken);
         return appUserDto;
+    }
+
+    public static String generateAuthenticationToken(AppUser appUser) {
+        String expirationTime = ApplicationConstants.JWT_EXPIRATION_TIME_IN_MINUTES;
+        Date expiryDate = new Date(System.currentTimeMillis() + Long.parseLong(expirationTime) * 60 * 1000);
+        String secretKey = Base64.getEncoder().encodeToString(ApplicationConstants.JWT_SECRET_KEY.getBytes());
+        Claims claims = Jwts.claims().setSubject(appUser.getEmail());
+        claims.put(ApplicationConstants.APP_USER_ID, appUser.getId());
+        return Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secretKey).setExpiration(expiryDate).compact();
     }
 
     @Override
