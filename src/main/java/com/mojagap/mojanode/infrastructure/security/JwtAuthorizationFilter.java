@@ -11,6 +11,7 @@ import com.mojagap.mojanode.model.role.CommonPermissions;
 import com.mojagap.mojanode.model.role.Permission;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
+import com.mojagap.mojanode.service.account.AccountCommandHandlerService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.Data;
@@ -35,6 +36,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
+
     private final Logger LOG = Logger.getLogger(JwtAuthorizationFilter.class.getName());
 
     private static final String ANONYMOUS_USER_PATHS = "" +
@@ -54,6 +56,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 AppUser appUser = verifyAuthenticationToken(authenticationToken);
                 AppContext.setLoggedInUser(appUser);
                 verifyPermissions(servletRequest, appUser);
+                authenticationToken = AccountCommandHandlerService.generateAuthenticationToken(AppContext.getLoggedInUser());
+                servletResponse.setHeader(ApplicationConstants.AUTHENTICATION_HEADER_NAME, authenticationToken);
             }
             chain.doFilter(servletRequest, servletResponse);
         } catch (Exception ex) {

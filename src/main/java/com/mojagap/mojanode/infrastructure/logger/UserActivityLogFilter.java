@@ -67,7 +67,6 @@ public class UserActivityLogFilter implements Filter {
                 userActivityLog.setResponseBody(responseBody);
                 responseWrapper.copyBodyToResponse();
                 setHttpResponseProperties(responseWrapper, userActivityLog);
-
                 long endTime = System.currentTimeMillis();
                 userActivityLog.setDuration((int) (endTime - startTime));
                 userActivityLogRepository.saveAndFlush(userActivityLog);
