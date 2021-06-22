@@ -81,8 +81,11 @@ public abstract class BaseController {
         if (userActivityLog == null) {
             userActivityLog = new UserActivityLog();
         }
-        Integer platformType = Integer.valueOf(httpServletRequest.getHeader(ApplicationConstants.PLATFORM_TYPE_HEADER_KEY));
-        PlatformTypeEnum platformTypeEnum = PlatformTypeEnum.fromInt(platformType);
+        PlatformTypeEnum platformTypeEnum = null;
+        if (httpServletRequest.getHeader(ApplicationConstants.PLATFORM_TYPE_HEADER_KEY) != null) {
+            Integer platformType = Integer.valueOf(httpServletRequest.getHeader(ApplicationConstants.PLATFORM_TYPE_HEADER_KEY));
+            platformTypeEnum = PlatformTypeEnum.fromInt(platformType);
+        }
         UserActivityLogFilter.setUserActivityLogProps(userActivityLog, httpServletRequest.getRequestURI(), httpServletRequest.getQueryString(),
                 httpServletRequest.getMethod(), getRequestHeaders(httpServletRequest), httpServletRequest.getRemoteAddr());
         userActivityLog.setPlatformType(platformTypeEnum.getId());

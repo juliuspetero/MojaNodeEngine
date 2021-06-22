@@ -1,4 +1,4 @@
-package com.mojagap.mojanode.service.account.interfaces;
+package com.mojagap.mojanode.service.account.handler;
 
 import com.mojagap.mojanode.controller.ActionResponse;
 import com.mojagap.mojanode.dto.account.AccountDto;
@@ -10,7 +10,7 @@ public interface AccountCommandHandler {
 
     AppUserDto authenticateUser(AppUserDto appUserDto);
 
-    ActionResponse updateAccount(AccountDto accountDto);
+    ActionResponse updateAccount(AccountDto accountDto, Integer accountId);
 
     ActionResponse approveAccount(Integer accountId);
 

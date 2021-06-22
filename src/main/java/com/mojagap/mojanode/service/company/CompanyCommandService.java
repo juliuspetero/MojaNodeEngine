@@ -9,16 +9,15 @@ import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
 import com.mojagap.mojanode.model.account.Account;
-import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
-import com.mojagap.mojanode.model.role.CommonPermissions;
 import com.mojagap.mojanode.model.role.Permission;
+import com.mojagap.mojanode.model.role.PermissionEnum;
 import com.mojagap.mojanode.model.role.Role;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.company.CompanyRepository;
 import com.mojagap.mojanode.repository.role.PermissionRepository;
 import com.mojagap.mojanode.repository.role.RoleRepository;
-import com.mojagap.mojanode.service.company.interfaces.CompanyCommandHandler;
+import com.mojagap.mojanode.service.company.handler.CompanyCommandHandler;
 import com.mojagap.mojanode.service.user.UserCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,8 +58,8 @@ public class CompanyCommandService implements CompanyCommandHandler {
         }
         Company company = new Company(companyDto);
         Account account = loggedInUser.getAccount();
-        Permission superPermission = permissionRepository.findOneByName(CommonPermissions.SUPER_PERMISSION.name());
-        Role superAdminRole = new Role(ApplicationConstants.DEFAULT_ROLE_NAME, ApplicationConstants.DEFAULT_ROLE_DESCRIPTION, account, AuditEntity.RecordStatus.ACTIVE, Collections.singletonList(superPermission));
+        Permission superPermission = permissionRepository.findOneByName(PermissionEnum.SUPER_PERMISSION.name());
+        Role superAdminRole = new Role(ApplicationConstants.DEFAULT_ROLE_NAME, ApplicationConstants.DEFAULT_ROLE_DESCRIPTION, account, Collections.singletonList(superPermission));
         roleRepository.save(superAdminRole);
         List<AppUser> appUsers = userSummaries.stream().map(AppUser::new).collect(Collectors.toList());
         appUsers.forEach(user -> {

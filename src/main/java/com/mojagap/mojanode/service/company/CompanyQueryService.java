@@ -2,7 +2,7 @@ package com.mojagap.mojanode.service.company;
 
 
 import com.mojagap.mojanode.dto.company.CompanyDto;
-import com.mojagap.mojanode.service.company.interfaces.CompanyQueryHandler;
+import com.mojagap.mojanode.service.company.handler.CompanyQueryHandler;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

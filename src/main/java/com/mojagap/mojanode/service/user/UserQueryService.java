@@ -15,7 +15,7 @@ import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.user.IdentificationEnum;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
-import com.mojagap.mojanode.service.user.interfaces.UserQueryHandler;
+import com.mojagap.mojanode.service.user.handler.UserQueryHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.modelmapper.ModelMapper;

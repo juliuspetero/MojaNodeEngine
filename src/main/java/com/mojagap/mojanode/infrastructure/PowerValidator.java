@@ -5,10 +5,12 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
 import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
+import com.mojagap.mojanode.model.account.AccountType;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -72,6 +74,13 @@ public class PowerValidator {
         } catch (NumberParseException ex) {
             LOG.log(Level.INFO, "Failed to parse the provided phone number = " + phoneNumber, ex);
             throw new BadRequestException(message);
+        }
+    }
+
+    public static void iPermittedAccountType(AccountType providedType, AccountType... accountTypes) {
+        List<AccountType> accountTypeList = List.of(accountTypes);
+        if (!accountTypeList.contains(providedType)) {
+            throw new BadRequestException(providedType.name() + " user is not permitted to access this resource");
         }
     }
 }

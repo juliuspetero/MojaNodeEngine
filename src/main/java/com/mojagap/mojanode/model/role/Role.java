@@ -23,10 +23,9 @@ public class Role extends BaseEntity {
     private Account account;
     private List<Permission> permissions;
 
-    public Role(String name, String description, Account account, AuditEntity.RecordStatus status, List<Permission> permissions) {
+    public Role(String name, String description, Account account, List<Permission> permissions) {
         this.name = name;
         this.description = description;
-        this.status = status;
         this.permissions = permissions;
         this.account = account;
     }

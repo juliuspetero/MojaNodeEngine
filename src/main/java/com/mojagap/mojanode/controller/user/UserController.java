@@ -8,8 +8,8 @@ import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.user.UserActivityLog;
-import com.mojagap.mojanode.service.user.interfaces.UserCommandHandler;
-import com.mojagap.mojanode.service.user.interfaces.UserQueryHandler;
+import com.mojagap.mojanode.service.user.handler.UserCommandHandler;
+import com.mojagap.mojanode.service.user.handler.UserQueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,4 +1,4 @@
-package com.mojagap.mojanode.service.user.interfaces;
+package com.mojagap.mojanode.service.user.handler;
 
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.model.http.ExternalUser;

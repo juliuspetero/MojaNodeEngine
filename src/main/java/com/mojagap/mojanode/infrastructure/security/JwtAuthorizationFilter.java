@@ -7,8 +7,8 @@ import com.mojagap.mojanode.infrastructure.exception.ForbiddenException;
 import com.mojagap.mojanode.infrastructure.exception.UnauthorizedException;
 import com.mojagap.mojanode.infrastructure.utility.CsvUtil;
 import com.mojagap.mojanode.model.account.AccountType;
-import com.mojagap.mojanode.model.role.CommonPermissions;
 import com.mojagap.mojanode.model.role.Permission;
+import com.mojagap.mojanode.model.role.PermissionEnum;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.service.account.AccountCommandHandlerService;
@@ -27,10 +27,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -74,7 +71,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             Integer userId = claims.get(ApplicationConstants.APP_USER_ID, Integer.class);
             AppUser appUser = appUserRepository.getById(userId);
             List<GrantedAuthority> authorities = new ArrayList<>();
-            appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);
+            if (EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(appUser.getAccount().getAccountType())) {
+                appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);
+            }
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(appUser.getEmail(), null, authorities));
             return appUser;
         } catch (Exception ex) {
@@ -87,15 +86,19 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String requestMethod = request.getMethod();
         String requestURI = request.getRequestURI();
         AccountType accountType = appUser.getAccount().getAccountType();
-        List<RequestSecurity> requestSecurities = CsvUtil.parseSecurityCsv();
-        List<String> pathPermissions = new ArrayList<>(Collections.singletonList(CommonPermissions.SUPER_PERMISSION.name()));
-        requestSecurities.stream()
+        List<RequestSecurity> requestSecurities = CsvUtil.parseSecurityCsv()
+                .stream()
                 .filter(security -> requestMethod.equals(security.getHttpMethod())
                         && UrlSecurityMatcher.matches(security.getUrl(), requestURI)
-                        && List.of(security.getAccountTypes().split(",")).contains(accountType.name()))
-                .forEach(row -> pathPermissions.addAll(List.of(row.getPermissions().split(","))));
-        List<String> userPermissions = appUser.getRole().getPermissions().stream().map(Permission::getName).collect(Collectors.toList());
-        userPermissions.add(CommonPermissions.AUTHENTICATED.name());
+                        && List.of(security.getAccountTypes().split(",")).contains(accountType.name())).collect(Collectors.toList());
+        Set<String> pathPermissions = new HashSet<>();
+        if (!CollectionUtils.isEmpty(requestSecurities)) {
+            pathPermissions.add(PermissionEnum.SUPER_PERMISSION.name());
+            requestSecurities.forEach(security -> pathPermissions.addAll(List.of(security.getPermissions().split(","))));
+        }
+        List<String> userPermissions = EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(accountType) ?
+                appUser.getRole().getPermissions().stream().map(Permission::getName).collect(Collectors.toList()) : new ArrayList<>();
+        userPermissions.add(PermissionEnum.AUTHENTICATED.name());
         if (!CollectionUtils.containsAny(pathPermissions, userPermissions)) {
             throw new ForbiddenException(ErrorMessages.FORBIDDEN_INSUFFICIENT_PERMISSION);
         }

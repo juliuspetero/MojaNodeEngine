@@ -8,8 +8,8 @@ import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
 import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.user.UserActivityLog;
-import com.mojagap.mojanode.service.account.interfaces.AccountCommandHandler;
-import com.mojagap.mojanode.service.account.interfaces.AccountQueryHandler;
+import com.mojagap.mojanode.service.account.handler.AccountCommandHandler;
+import com.mojagap.mojanode.service.account.handler.AccountQueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +19,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/v1/account")
 public class AccountController extends BaseController {
+    private final AccountCommandHandler accountCommandHandler;
+    private final AccountQueryHandler accountQueryHandler;
 
     @Autowired
-    private AccountCommandHandler accountCommandHandler;
-
-    @Autowired
-    private AccountQueryHandler accountQueryHandler;
+    public AccountController(AccountCommandHandler accountCommandHandler, AccountQueryHandler accountQueryHandler) {
+        this.accountCommandHandler = accountCommandHandler;
+        this.accountQueryHandler = accountQueryHandler;
+    }
 
     @RequestMapping(method = RequestMethod.POST)
     public AppUserDto createAccount(@RequestBody AccountDto accountDto) {
@@ -40,11 +42,11 @@ public class AccountController extends BaseController {
         return executeHttpGet(() -> accountCommandHandler.authenticateUser(appUserDto));
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
-    public ActionResponse updateAccount(AccountDto accountDto) {
+    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
+    public ActionResponse updateAccount(@RequestBody AccountDto accountDto, @PathVariable("id") Integer accountId) {
         return executeAndLogUserActivity(EntityTypeEnum.ACCOUNT, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
-            ActionResponse actionResponse = accountCommandHandler.updateAccount(accountDto);
-            log.setEntityId(actionResponse.getResourceId());
+            ActionResponse actionResponse = accountCommandHandler.updateAccount(accountDto, accountId);
+            log.setEntityId(actionResponse.resourceId());
             return actionResponse;
         });
     }

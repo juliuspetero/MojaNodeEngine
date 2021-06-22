@@ -21,4 +21,7 @@ public class ErrorMessages {
     public static final String INVALID_ID_TYPE = "Please a correct ID category";
     public static final String COMPANY_REGISTRATION_DATE_REQUIRED = "Company registration date is needed";
     public static final String DATE_OF_BIRTH_REQUIRED = "Date of birth is mandatory";
+    public static final String INVALID_ROLE_NAME = "Role name should be between 5 to 100 characters";
+    public static final String INVALID_ROLE_DESCRIPTION = "Role description should be between 10 to 100 characters";
+    public static final String PERMISSIONS_REQUIRED_FOR_ROLE = "Attach at least one permission when creating or updating role";
 }

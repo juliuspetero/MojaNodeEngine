@@ -31,14 +31,15 @@ import java.util.logging.Logger;
 
 @Component
 public class UserActivityLogFilter implements Filter {
-
-    @Autowired
-    private UserActivityLogRepository userActivityLogRepository;
-
-    @Autowired
-    private HandlerExceptionResolver handlerExceptionResolver;
-
     private static final Logger LOG = Logger.getLogger(UserActivityLogFilter.class.getName());
+    private final UserActivityLogRepository userActivityLogRepository;
+    private final HandlerExceptionResolver handlerExceptionResolver;
+
+    @Autowired
+    public UserActivityLogFilter(UserActivityLogRepository userActivityLogRepository, HandlerExceptionResolver handlerExceptionResolver) {
+        this.userActivityLogRepository = userActivityLogRepository;
+        this.handlerExceptionResolver = handlerExceptionResolver;
+    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) {
@@ -46,11 +47,9 @@ public class UserActivityLogFilter implements Filter {
             long startTime = System.currentTimeMillis();
             ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper((HttpServletRequest) servletRequest);
             ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper((HttpServletResponse) servletResponse);
-
-            Integer platformType = Integer.valueOf(requestWrapper.getHeader(ApplicationConstants.PLATFORM_TYPE_HEADER_KEY));
-            PlatformTypeEnum platformTypeEnum = PlatformTypeEnum.fromInt(platformType);
-
             if (!requestWrapper.getMethod().equals(HttpMethod.GET.name())) {
+                Integer platformType = Integer.valueOf(requestWrapper.getHeader(ApplicationConstants.PLATFORM_TYPE_HEADER_KEY));
+                PlatformTypeEnum platformTypeEnum = PlatformTypeEnum.fromInt(platformType);
                 UserActivityLog userActivityLog;
                 userActivityLog = initializeUserActivityLog(requestWrapper);
                 userActivityLog.setPlatformType(platformTypeEnum.getId());

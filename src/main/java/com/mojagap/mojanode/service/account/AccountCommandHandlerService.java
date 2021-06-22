@@ -13,18 +13,14 @@ import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
 import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.account.AccountType;
-import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
-import com.mojagap.mojanode.model.role.CommonPermissions;
 import com.mojagap.mojanode.model.role.Permission;
+import com.mojagap.mojanode.model.role.PermissionEnum;
 import com.mojagap.mojanode.model.role.Role;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.account.AccountRepository;
-import com.mojagap.mojanode.repository.company.CompanyRepository;
 import com.mojagap.mojanode.repository.role.PermissionRepository;
-import com.mojagap.mojanode.repository.role.RoleRepository;
-import com.mojagap.mojanode.repository.user.AppUserRepository;
-import com.mojagap.mojanode.service.account.interfaces.AccountCommandHandler;
+import com.mojagap.mojanode.service.account.handler.AccountCommandHandler;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -45,33 +41,23 @@ import java.util.stream.Collectors;
 
 @Service
 public class AccountCommandHandlerService implements AccountCommandHandler {
+    private final PasswordEncoder passwordEncoder;
+    private final AccountRepository accountRepository;
+    private final PermissionRepository permissionRepository;
+    private final ModelMapper modelMapper;
+    private final AuthenticationManager authenticationManager;
+    protected final HttpServletResponse httpServletResponse;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AppUserRepository appUserRepository;
-
-    @Autowired
-    private AccountRepository accountRepository;
-
-    @Autowired
-    private PermissionRepository permissionRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private CompanyRepository companyRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    protected HttpServletResponse httpServletResponse;
+    public AccountCommandHandlerService(PasswordEncoder passwordEncoder, AccountRepository accountRepository, PermissionRepository permissionRepository,
+                                        ModelMapper modelMapper, AuthenticationManager authenticationManager, HttpServletResponse httpServletResponse) {
+        this.passwordEncoder = passwordEncoder;
+        this.accountRepository = accountRepository;
+        this.permissionRepository = permissionRepository;
+        this.modelMapper = modelMapper;
+        this.authenticationManager = authenticationManager;
+        this.httpServletResponse = httpServletResponse;
+    }
 
     @Override
     @Transactional
@@ -112,8 +98,8 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 account.setContactPhoneNumber(companyDto.getPhoneNumber());
                 account.setName(companyDto.getName());
 
-                Permission superPermission = permissionRepository.findOneByName(CommonPermissions.SUPER_PERMISSION.name());
-                Role superAdminRole = new Role(ApplicationConstants.DEFAULT_ROLE_NAME, ApplicationConstants.DEFAULT_ROLE_DESCRIPTION, account, AuditEntity.RecordStatus.ACTIVE, Collections.singletonList(superPermission));
+                Permission superPermission = permissionRepository.findOneByName(PermissionEnum.SUPER_PERMISSION.name());
+                Role superAdminRole = new Role(ApplicationConstants.DEFAULT_ROLE_NAME, ApplicationConstants.DEFAULT_ROLE_DESCRIPTION, account, Collections.singletonList(superPermission));
                 appUser.setRole(superAdminRole);
 
                 Company company = modelMapper.map(companyDto, Company.class);
@@ -171,8 +157,8 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
     }
 
     @Override
-    public ActionResponse updateAccount(AccountDto accountDto) {
-        return new ActionResponse(23);
+    public ActionResponse updateAccount(AccountDto accountDto, Integer accountId) {
+        return new ActionResponse(accountId);
     }
 
     @Override

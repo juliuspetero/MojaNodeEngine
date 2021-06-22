@@ -8,7 +8,7 @@ import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.company.CompanyRepository;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
-import com.mojagap.mojanode.service.user.interfaces.UserCommandHandler;
+import com.mojagap.mojanode.service.user.handler.UserCommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;

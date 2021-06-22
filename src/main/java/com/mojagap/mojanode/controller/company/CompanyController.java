@@ -30,7 +30,7 @@ public class CompanyController extends BaseController {
     public ActionResponse createCompany(@RequestBody CompanyDto companyDto) {
         return executeAndLogUserActivity(EntityTypeEnum.COMPANY, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             ActionResponse response = companyCommandService.createCompany(companyDto);
-            log.setEntityId(response.getResourceId());
+            log.setEntityId(response.resourceId());
             return response;
         });
     }

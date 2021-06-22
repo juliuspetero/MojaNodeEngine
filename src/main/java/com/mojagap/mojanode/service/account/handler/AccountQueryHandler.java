@@ -1,4 +1,4 @@
-package com.mojagap.mojanode.service.account.interfaces;
+package com.mojagap.mojanode.service.account.handler;
 
 import com.mojagap.mojanode.dto.account.AccountDto;
 import com.mojagap.mojanode.model.common.RecordHolder;
