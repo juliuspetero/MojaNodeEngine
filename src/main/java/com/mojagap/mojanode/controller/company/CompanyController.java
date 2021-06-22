@@ -1,7 +1,7 @@
 package com.mojagap.mojanode.controller.company;
 
 
-import com.mojagap.mojanode.controller.ActionResponse;
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.controller.BaseController;
 import com.mojagap.mojanode.dto.company.CompanyDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;

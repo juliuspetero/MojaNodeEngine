@@ -1,7 +1,7 @@
 package com.mojagap.mojanode.service.company;
 
 
-import com.mojagap.mojanode.controller.ActionResponse;
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.company.CompanyDto;
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.infrastructure.AppContext;

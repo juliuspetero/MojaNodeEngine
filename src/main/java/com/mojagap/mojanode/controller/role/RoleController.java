@@ -1,7 +1,7 @@
 package com.mojagap.mojanode.controller.role;
 
 
-import com.mojagap.mojanode.controller.ActionResponse;
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.controller.BaseController;
 import com.mojagap.mojanode.dto.role.PermissionDto;
 import com.mojagap.mojanode.dto.role.RoleDto;

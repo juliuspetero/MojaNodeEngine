@@ -48,7 +48,7 @@ public class Role extends BaseEntity {
         return status;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     public Account getAccount() {
         return account;

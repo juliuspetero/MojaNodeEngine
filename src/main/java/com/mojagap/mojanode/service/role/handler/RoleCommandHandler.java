@@ -1,6 +1,6 @@
 package com.mojagap.mojanode.service.role.handler;
 
-import com.mojagap.mojanode.controller.ActionResponse;
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.role.RoleDto;
 
 public interface RoleCommandHandler {

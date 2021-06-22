@@ -1,6 +1,6 @@
 package com.mojagap.mojanode.controller.account;
 
-import com.mojagap.mojanode.controller.ActionResponse;
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.controller.BaseController;
 import com.mojagap.mojanode.dto.account.AccountDto;
 import com.mojagap.mojanode.dto.user.AppUserDto;

@@ -1,4 +1,4 @@
-package com.mojagap.mojanode.controller;
+package com.mojagap.mojanode.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

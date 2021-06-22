@@ -1,6 +1,6 @@
 package com.mojagap.mojanode.service.account;
 
-import com.mojagap.mojanode.controller.ActionResponse;
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.account.AccountDto;
 import com.mojagap.mojanode.dto.company.CompanyDto;
 import com.mojagap.mojanode.dto.role.PermissionDto;
