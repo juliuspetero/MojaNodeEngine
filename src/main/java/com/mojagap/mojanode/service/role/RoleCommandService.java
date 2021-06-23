@@ -44,7 +44,6 @@ public class RoleCommandService implements RoleCommandHandler {
         roleDto.isValid();
         Account account = AppContext.getLoggedInUser().getAccount();
         PowerValidator.iPermittedAccountType(account.getAccountType(), AccountType.COMPANY, AccountType.BACK_OFFICE);
-
         List<Permission> permissions = new ArrayList<>();
         if (roleDto.isSuperUser()) {
             Permission superPermission = permissionRepository.findOneByName(PermissionEnum.SUPER_PERMISSION.name());
@@ -55,6 +54,10 @@ public class RoleCommandService implements RoleCommandHandler {
             permissions.forEach(p -> {
                 if (!PermCategoryEnum.GENERAL.equals(p.getCategory()) && !account.getAccountType().name().equals(p.getCategory().name())) {
                     throw new BadRequestException("Invalid permission provided");
+                }
+
+                if (PermissionEnum.SUPER_PERMISSION.name().equals(p.getName())) {
+                    throw new BadRequestException("You can't use super permission here");
                 }
             });
         }
