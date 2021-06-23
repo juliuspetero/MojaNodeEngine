@@ -3,10 +3,12 @@ package com.mojagap.mojanode.infrastructure.security;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
+import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.exception.ForbiddenException;
 import com.mojagap.mojanode.infrastructure.exception.UnauthorizedException;
 import com.mojagap.mojanode.infrastructure.utility.CsvUtil;
 import com.mojagap.mojanode.model.account.AccountType;
+import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.role.Permission;
 import com.mojagap.mojanode.model.role.PermissionEnum;
 import com.mojagap.mojanode.model.user.AppUser;
@@ -69,7 +71,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(authentication).getBody();
             AppUserRepository appUserRepository = AppContext.getBean(AppUserRepository.class);
             Integer userId = claims.get(ApplicationConstants.APP_USER_ID, Integer.class);
-            AppUser appUser = appUserRepository.getById(userId);
+            AppUser appUser = appUserRepository.findOneByIdAndRecordStatus(userId, AuditEntity.RecordStatus.ACTIVE);
+            PowerValidator.notNull(appUser, ErrorMessages.INVALID_SECURITY_CREDENTIAL);
             List<GrantedAuthority> authorities = new ArrayList<>();
             if (EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(appUser.getAccount().getAccountType())) {
                 appUser.getRole().getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getName())).forEach(authorities::add);

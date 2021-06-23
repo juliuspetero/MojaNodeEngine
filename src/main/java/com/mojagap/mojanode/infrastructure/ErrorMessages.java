@@ -24,4 +24,7 @@ public class ErrorMessages {
     public static final String INVALID_ROLE_NAME = "Role name should be between 5 to 100 characters";
     public static final String INVALID_ROLE_DESCRIPTION = "Role description should be between 10 to 100 characters";
     public static final String PERMISSIONS_REQUIRED_FOR_ROLE = "Attach at least one permission when creating or updating role";
+    public static final String ENTITY_ALREADY_EXISTS = "%s with that %s is already exists";
+    public static final String ENTITY_DOES_NOT_EXISTS = "%s with that %s does not exists";
+    public static final String ROLE_IS_IN_USE = "There is an active user with that role";
 }

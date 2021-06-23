@@ -1,11 +1,13 @@
 package com.mojagap.mojanode.repository.role;
 
+import com.mojagap.mojanode.model.role.Permission;
 import com.mojagap.mojanode.model.role.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
@@ -21,4 +23,10 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
             """,
             nativeQuery = true)
     List<Role> findByQueryParams(Integer id, Integer accountId, String name, String description);
+
+    default List<Role> findByAccountIdAndName(String name, Integer accountId) {
+        return findByQueryParams(null, accountId, name, null);
+    }
+
+    Optional<Role> findByIdAndAccountId(Integer Id, Integer accountId);
 }

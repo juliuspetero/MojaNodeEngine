@@ -51,7 +51,11 @@ public class RoleQueryService implements RoleQueryHandler {
         String name = queryParams.get(RoleQueryParams.NAME.getValue());
         String description = queryParams.get(RoleQueryParams.DESCRIPTION.getValue());
         List<Role> roles = roleRepository.findByQueryParams(id, accountId, name, description);
-        List<RoleDto> roleDtos = roles.stream().map(role -> modelMapper.map(role, RoleDto.class)).collect(Collectors.toList());
+        List<RoleDto> roleDtos = roles.stream().map(role -> {
+            RoleDto roleDto = modelMapper.map(role, RoleDto.class);
+            roleDto.setSuperUser(role.isSuperUser());
+            return roleDto;
+        }).collect(Collectors.toList());
         return new RecordHolder<>(roleDtos.size(), roleDtos);
     }
 
