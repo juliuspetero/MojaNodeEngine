@@ -1,9 +1,9 @@
 package com.mojagap.mojanode.model.role;
 
 
+import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.common.BaseEntity;
-import com.mojagap.mojanode.model.account.Account;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,6 +11,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Setter
 @Entity(name = "role")
@@ -60,5 +61,10 @@ public class Role extends BaseEntity {
     @OneToMany(targetEntity = Permission.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     public List<Permission> getPermissions() {
         return permissions;
+    }
+
+    @Transient
+    public Boolean isSuperUser() {
+        return permissions != null && permissions.stream().map(Permission::getName).collect(Collectors.toList()).contains(PermissionEnum.SUPER_PERMISSION.name());
     }
 }

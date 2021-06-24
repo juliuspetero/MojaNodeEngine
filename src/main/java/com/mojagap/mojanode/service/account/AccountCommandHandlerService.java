@@ -66,6 +66,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
     @Transactional
     public AppUserDto createAccount(AccountDto accountDto) {
         accountDto.isValid();
+        PowerValidator.notEmpty(accountDto.getUsers(), ErrorMessages.USER_REQUIRED_WHEN_CREATING_ACCOUNT);
         AppUserDto appUserDto = accountDto.getUsers().get(0);
         appUserDto.isValid();
         AppUser appUser = new AppUser(appUserDto);
@@ -94,6 +95,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 account.setName(appUserDto.getFirstName() + " " + appUserDto.getLastName());
             }
             case COMPANY -> {
+                accountDto.isValidCompany();
                 PowerValidator.notEmpty(accountDto.getCompanies(), ErrorMessages.COMPANY_DETAILS_REQUIRED);
                 CompanyDto companyDto = accountDto.getCompanies().get(0);
                 companyDto.isValid();
@@ -162,53 +164,48 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
 
     @Override
     public ActionResponse updateAccount(AccountDto accountDto, Integer accountId) {
+        accountDto.isValid();
         AppUser loggedInUser = AppContext.getLoggedInUser();
         Account account = loggedInUser.getAccount();
+        account.setAccountType(AccountType.valueOf(accountDto.getAccountType()));
+        account.setCountryCode(CountryCode.valueOf(accountDto.getCountryCode()));
         AccountType accountType = account.getAccountType();
         switch (accountType) {
-
             case INDIVIDUAL -> {
-                PowerValidator.ValidEnum(CountryCode.class, accountDto.getCountryCode(), ErrorMessages.VALID_COUNTRY_REQUIRED);
-                PowerValidator.ValidEnum(AccountType.class, accountDto.getAccountType(), ErrorMessages.VALID_ACCOUNT_TYPE_REQUIRED);
-
-                if (accountDto.getAccountType().equals(accountType.name())) {
-                    account.setCountryCode(CountryCode.valueOf(accountDto.getCountryCode()));
-
-                } else if (accountDto.getAccountType().equals(AccountType.COMPANY.name())) {
-
-                    PowerValidator.validEmail(accountDto.getEmail(), ErrorMessages.INVALID_EMAIL_ADDRESS);
-                    Power
-
-
-                } else {
-                    throw new BadRequestException("Account type is not accepted here");
+                if (accountDto.getAccountType().equals(AccountType.COMPANY.name())) {
+                    accountDto.isValidCompany();
                 }
-
-
             }
-
             case COMPANY -> {
                 accountDto.isValidCompany();
                 account.setName(accountDto.getName());
                 account.setAddress(accountDto.getAddress());
-                account.setCountryCode(CountryCode.valueOf(accountDto.getCountryCode()));
                 account.setEmail(accountDto.getEmail());
                 account.setContactPhoneNumber(accountDto.getContactPhoneNumber());
+
+
+                accountDto.isValidCompany();
+                account.setName(accountDto.getName());
+                account.setAddress(accountDto.getAddress());
+                account.setEmail(accountDto.getEmail());
+                account.setContactPhoneNumber(accountDto.getContactPhoneNumber());
+
+                PowerValidator.notEmpty(accountDto.getCompanies(), ErrorMessages.COMPANY_DETAILS_REQUIRED);
+                CompanyDto companyDto = accountDto.getCompanies().get(0);
+                companyDto.isValid();
+                Company company = modelMapper.map(companyDto, Company.class);
+                company.setAccount(account);
+
+                Permission superPermission = permissionRepository.findOneByName(PermissionEnum.SUPER_PERMISSION.name());
+                Role superAdminRole = new Role(ApplicationConstants.DEFAULT_ROLE_NAME, ApplicationConstants.DEFAULT_ROLE_DESCRIPTION, account, Collections.singletonList(superPermission));
+                loggedInUser.setRole(superAdminRole);
+                AppContext.stamp(company);
+                loggedInUser.setCompany(company);
+                account.getCompanies().add(company);
             }
-
-            case BACK_OFFICE -> {
-                PowerValidator.notNull(accountId, String.format(ErrorMessages.ENTITY_REQUIRED, "account ID"));
-                account = accountRepository.findByIdAndRecordStatus(accountId, AuditEntity.RecordStatus.ACTIVE).orElseThrow(() -> new BadRequestException("Account with that ID does not exists"));
-
-            }
-
             default -> throw new UnsupportedOperationException("The account Type provided is not accepted here");
-
         }
-
         accountRepository.save(account);
-
-
         return new ActionResponse(accountId);
     }
 

@@ -25,8 +25,20 @@ public class PowerValidator {
         }
     }
 
+    public static void isNull(Object object, String message) {
+        if (object != null) {
+            throw new BadRequestException(message);
+        }
+    }
+
     public static void notEmpty(Collection<?> collection, String message) {
         if (CollectionUtils.isEmpty(collection)) {
+            throw new BadRequestException(message);
+        }
+    }
+
+    public static void isEmpty(Collection<?> collection, String message) {
+        if (!CollectionUtils.isEmpty(collection)) {
             throw new BadRequestException(message);
         }
     }

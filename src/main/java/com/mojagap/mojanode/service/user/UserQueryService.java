@@ -9,6 +9,7 @@ import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
 import com.mojagap.mojanode.infrastructure.utility.DateUtil;
+import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
@@ -77,7 +78,7 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        AppUser appUser = appUserRepository.findOneByEmail(s);
+        AppUser appUser = appUserRepository.findOneByEmailAndRecordStatus(s, AuditEntity.RecordStatus.ACTIVE);
         PowerValidator.notNull(appUser, ErrorMessages.INVALID_SECURITY_CREDENTIAL);
         List<GrantedAuthority> authorities = new ArrayList<>();
         if (appUser.getRole() != null) {

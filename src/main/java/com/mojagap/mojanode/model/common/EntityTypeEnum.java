@@ -3,9 +3,10 @@ package com.mojagap.mojanode.model.common;
 public enum EntityTypeEnum {
     ALL,
     USER,
+    ROLE,
+    PERMISSION,
     ACCOUNT,
     COMPANY,
-    ROLE,
     BENEFICIARY,
     DEPARTMENT,
     WALLET,

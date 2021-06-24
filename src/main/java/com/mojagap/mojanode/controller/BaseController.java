@@ -1,6 +1,7 @@
 package com.mojagap.mojanode.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.logger.UserActivityLogFilter;
 import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
@@ -47,6 +48,9 @@ public abstract class BaseController {
             userActivityLog.setEntityType(entityTypeEnum);
             userActivityLog.setActionType(actionTypeEnum);
             userActivityLog.setResponseStatus(httpResponseStatusEnum);
+            if (AppContext.getLoggedInUser() != null) {
+                userActivityLog.setUserId(AppContext.getLoggedInUser().getId());
+            }
         }
         return userActivityLog;
     }
@@ -81,17 +85,19 @@ public abstract class BaseController {
         if (userActivityLog == null) {
             userActivityLog = new UserActivityLog();
         }
-        PlatformTypeEnum platformTypeEnum = null;
         if (httpServletRequest.getHeader(ApplicationConstants.PLATFORM_TYPE_HEADER_KEY) != null) {
             Integer platformType = Integer.valueOf(httpServletRequest.getHeader(ApplicationConstants.PLATFORM_TYPE_HEADER_KEY));
-            platformTypeEnum = PlatformTypeEnum.fromInt(platformType);
+            PlatformTypeEnum platformTypeEnum = PlatformTypeEnum.fromInt(platformType);
+            userActivityLog.setPlatformType(platformTypeEnum.getId());
         }
         UserActivityLogFilter.setUserActivityLogProps(userActivityLog, httpServletRequest.getRequestURI(), httpServletRequest.getQueryString(),
                 httpServletRequest.getMethod(), getRequestHeaders(httpServletRequest), httpServletRequest.getRemoteAddr());
-        userActivityLog.setPlatformType(platformTypeEnum.getId());
         String stackTrace = ExceptionUtils.getStackTrace(ex);
         userActivityLog.setStackTrace(stackTrace);
         userActivityLog.setResponseStatus(HttpResponseStatusEnum.FAILED);
+        if (AppContext.getLoggedInUser() != null) {
+            userActivityLog.setUserId(AppContext.getLoggedInUser().getId());
+        }
         httpServletRequest.setAttribute(UserActivityLog.class.getName(), userActivityLog);
     }
 

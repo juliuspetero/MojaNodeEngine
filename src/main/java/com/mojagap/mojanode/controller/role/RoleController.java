@@ -1,8 +1,8 @@
 package com.mojagap.mojanode.controller.role;
 
 
-import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.controller.BaseController;
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.role.PermissionDto;
 import com.mojagap.mojanode.dto.role.RoleDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
@@ -38,10 +38,19 @@ public class RoleController extends BaseController {
         });
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
-    public ActionResponse updateRole(@RequestBody RoleDto roleDto, Integer roleId) {
+    @RequestMapping(path = "/{roleId}", method = RequestMethod.PUT)
+    public ActionResponse updateRole(@RequestBody RoleDto roleDto, @PathVariable("roleId") Integer roleId) {
         return executeAndLogUserActivity(EntityTypeEnum.ROLE, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             ActionResponse response = roleCommandHandler.updateRole(roleDto, roleId);
+            log.setEntityId(response.resourceId());
+            return response;
+        });
+    }
+
+    @RequestMapping(path = "/{roleId}", method = RequestMethod.DELETE)
+    public ActionResponse removeRole(@PathVariable("roleId") Integer roleId) {
+        return executeAndLogUserActivity(EntityTypeEnum.ROLE, ActionTypeEnum.REMOVE, (UserActivityLog log) -> {
+            ActionResponse response = roleCommandHandler.removeRole(roleId);
             log.setEntityId(response.resourceId());
             return response;
         });

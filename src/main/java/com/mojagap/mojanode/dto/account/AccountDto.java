@@ -39,7 +39,6 @@ public class AccountDto {
     }
 
     public void isValid() {
-        PowerValidator.notEmpty(users, ErrorMessages.USER_REQUIRED_WHEN_CREATING_ACCOUNT);
         PowerValidator.ValidEnum(CountryCode.class, countryCode, ErrorMessages.VALID_COUNTRY_REQUIRED);
         PowerValidator.ValidEnum(AccountType.class, accountType, ErrorMessages.VALID_ACCOUNT_TYPE_REQUIRED);
     }
