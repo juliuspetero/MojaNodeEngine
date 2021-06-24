@@ -50,8 +50,7 @@ public class UserActivityLogFilter implements Filter {
             if (!requestWrapper.getMethod().equals(HttpMethod.GET.name())) {
                 Integer platformType = Integer.valueOf(requestWrapper.getHeader(ApplicationConstants.PLATFORM_TYPE_HEADER_KEY));
                 PlatformTypeEnum platformTypeEnum = PlatformTypeEnum.fromInt(platformType);
-                UserActivityLog userActivityLog;
-                userActivityLog = initializeUserActivityLog(requestWrapper);
+                UserActivityLog userActivityLog = initializeUserActivityLog(requestWrapper);
                 userActivityLog.setPlatformType(platformTypeEnum.getId());
                 requestWrapper.setAttribute(UserActivityLog.class.getName(), userActivityLog);
             }

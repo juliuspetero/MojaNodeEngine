@@ -1,7 +1,7 @@
 package com.mojagap.mojanode.controller.account;
 
-import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.controller.BaseController;
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.account.AccountDto;
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
@@ -51,6 +51,14 @@ public class AccountController extends BaseController {
         });
     }
 
+    @RequestMapping(path = "/approve/{id}", method = RequestMethod.POST)
+    public ActionResponse approveAccount(@PathVariable("id") Integer accountId) {
+        return executeAndLogUserActivity(EntityTypeEnum.ACCOUNT, ActionTypeEnum.APPROVE, (UserActivityLog log) -> {
+            ActionResponse actionResponse = accountCommandHandler.approveAccount(accountId);
+            log.setEntityId(actionResponse.resourceId());
+            return actionResponse;
+        });
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public RecordHolder<AccountDto> getAccounts(@RequestParam Map<String, String> queryParams) {

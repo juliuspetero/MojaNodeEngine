@@ -83,4 +83,16 @@ public class PowerValidator {
             throw new BadRequestException(providedType.name() + " user is not permitted to access this resource");
         }
     }
+
+    public static void isTrue(Boolean bool, String message) {
+        if (bool == null || !bool) {
+            throw new BadRequestException(message);
+        }
+    }
+
+    public static void isFalse(Boolean bool, String message) {
+        if (bool == null || bool) {
+            throw new BadRequestException(message);
+        }
+    }
 }

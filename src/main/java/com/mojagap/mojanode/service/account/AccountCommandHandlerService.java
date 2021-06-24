@@ -10,9 +10,12 @@ import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
+import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
 import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
 import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.account.AccountType;
+import com.mojagap.mojanode.model.account.CountryCode;
+import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.role.Permission;
 import com.mojagap.mojanode.model.role.PermissionEnum;
@@ -74,6 +77,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         appUser.setPassword(passwordEncoder.encode(appUserDto.getPassword()));
 
         Account account = new Account(accountDto);
+        account.setRecordStatus(AuditEntity.RecordStatus.INACTIVE);
         AppContext.stamp(account);
         AppContext.stamp(account);
         account.setCreatedBy(appUser);
@@ -158,13 +162,63 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
 
     @Override
     public ActionResponse updateAccount(AccountDto accountDto, Integer accountId) {
+        AppUser loggedInUser = AppContext.getLoggedInUser();
+        Account account = loggedInUser.getAccount();
+        AccountType accountType = account.getAccountType();
+        switch (accountType) {
+
+            case INDIVIDUAL -> {
+                PowerValidator.ValidEnum(CountryCode.class, accountDto.getCountryCode(), ErrorMessages.VALID_COUNTRY_REQUIRED);
+                PowerValidator.ValidEnum(AccountType.class, accountDto.getAccountType(), ErrorMessages.VALID_ACCOUNT_TYPE_REQUIRED);
+
+                if (accountDto.getAccountType().equals(accountType.name())) {
+                    account.setCountryCode(CountryCode.valueOf(accountDto.getCountryCode()));
+
+                } else if (accountDto.getAccountType().equals(AccountType.COMPANY.name())) {
+
+                    PowerValidator.validEmail(accountDto.getEmail(), ErrorMessages.INVALID_EMAIL_ADDRESS);
+                    Power
+
+
+                } else {
+                    throw new BadRequestException("Account type is not accepted here");
+                }
+
+
+            }
+
+            case COMPANY -> {
+                accountDto.isValidCompany();
+                account.setName(accountDto.getName());
+                account.setAddress(accountDto.getAddress());
+                account.setCountryCode(CountryCode.valueOf(accountDto.getCountryCode()));
+                account.setEmail(accountDto.getEmail());
+                account.setContactPhoneNumber(accountDto.getContactPhoneNumber());
+            }
+
+            case BACK_OFFICE -> {
+                PowerValidator.notNull(accountId, String.format(ErrorMessages.ENTITY_REQUIRED, "account ID"));
+                account = accountRepository.findByIdAndRecordStatus(accountId, AuditEntity.RecordStatus.ACTIVE).orElseThrow(() -> new BadRequestException("Account with that ID does not exists"));
+
+            }
+
+            default -> throw new UnsupportedOperationException("The account Type provided is not accepted here");
+
+        }
+
+        accountRepository.save(account);
+
+
         return new ActionResponse(accountId);
     }
 
     @Override
     public ActionResponse approveAccount(Integer accountId) {
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new BadRequestException("Account with that ID does not exists"));
+        PowerValidator.isFalse(AuditEntity.RecordStatus.ACTIVE.equals(account.getRecordStatus()), "Account is already active");
+        account.setRecordStatus(AuditEntity.RecordStatus.ACTIVE);
+        accountRepository.saveAndFlush(account);
         return new ActionResponse(accountId);
     }
-
 
 }
