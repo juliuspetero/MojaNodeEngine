@@ -12,6 +12,7 @@ import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
 import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
+import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.account.CountryCode;
@@ -103,11 +104,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 account.setEmail(companyDto.getEmail());
                 account.setContactPhoneNumber(companyDto.getPhoneNumber());
                 account.setName(companyDto.getName());
-
-                Permission superPermission = permissionRepository.findOneByName(PermissionEnum.SUPER_PERMISSION.name());
-                Role superAdminRole = new Role(ApplicationConstants.DEFAULT_ROLE_NAME, ApplicationConstants.DEFAULT_ROLE_DESCRIPTION, account, Collections.singletonList(superPermission));
-                appUser.setRole(superAdminRole);
-
+                appUser.setRole(createSuperUserRole(account));
                 Company company = modelMapper.map(companyDto, Company.class);
                 company.setAccount(account);
                 AppContext.stamp(company);
@@ -117,7 +114,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 account.getCompanies().add(company);
             }
             case PARTNER, BACK_OFFICE -> throw new UnsupportedOperationException("You cannot create a backoffice or partner account at the moment");
-            default -> throw new UnsupportedOperationException("The account Type provided is not accepted here");
+            default -> throw new UnsupportedOperationException("The account type provided is not accepted here");
         }
         accountRepository.save(account);
         appUserDto.setPassword(rawPassword);
@@ -163,7 +160,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
     }
 
     @Override
-    public ActionResponse updateAccount(AccountDto accountDto, Integer accountId) {
+    public ActionResponse updateAccount(AccountDto accountDto) {
         accountDto.isValid();
         AppUser loggedInUser = AppContext.getLoggedInUser();
         Account account = loggedInUser.getAccount();
@@ -173,49 +170,50 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         switch (accountType) {
             case INDIVIDUAL -> {
                 if (accountDto.getAccountType().equals(AccountType.COMPANY.name())) {
-                    accountDto.isValidCompany();
+                    setAccountProperties(account, accountDto);
+                    PowerValidator.notEmpty(accountDto.getCompanies(), ErrorMessages.COMPANY_DETAILS_REQUIRED);
+                    CompanyDto companyDto = accountDto.getCompanies().get(0);
+                    companyDto.isValid();
+                    Company company = modelMapper.map(companyDto, Company.class);
+                    company.setAccount(account);
+                    loggedInUser.setRole(createSuperUserRole(account));
+                    AppContext.stamp(loggedInUser);
+                    AppContext.stamp(company);
+                    loggedInUser.setCompany(company);
+                    account.getCompanies().add(company);
                 }
             }
-            case COMPANY -> {
-                accountDto.isValidCompany();
-                account.setName(accountDto.getName());
-                account.setAddress(accountDto.getAddress());
-                account.setEmail(accountDto.getEmail());
-                account.setContactPhoneNumber(accountDto.getContactPhoneNumber());
-
-
-                accountDto.isValidCompany();
-                account.setName(accountDto.getName());
-                account.setAddress(accountDto.getAddress());
-                account.setEmail(accountDto.getEmail());
-                account.setContactPhoneNumber(accountDto.getContactPhoneNumber());
-
-                PowerValidator.notEmpty(accountDto.getCompanies(), ErrorMessages.COMPANY_DETAILS_REQUIRED);
-                CompanyDto companyDto = accountDto.getCompanies().get(0);
-                companyDto.isValid();
-                Company company = modelMapper.map(companyDto, Company.class);
-                company.setAccount(account);
-
-                Permission superPermission = permissionRepository.findOneByName(PermissionEnum.SUPER_PERMISSION.name());
-                Role superAdminRole = new Role(ApplicationConstants.DEFAULT_ROLE_NAME, ApplicationConstants.DEFAULT_ROLE_DESCRIPTION, account, Collections.singletonList(superPermission));
-                loggedInUser.setRole(superAdminRole);
-                AppContext.stamp(company);
-                loggedInUser.setCompany(company);
-                account.getCompanies().add(company);
-            }
-            default -> throw new UnsupportedOperationException("The account Type provided is not accepted here");
+            case COMPANY -> setAccountProperties(account, accountDto);
+            default -> throw new UnsupportedOperationException(ErrorMessages.ACCOUNT_TYPE_NOT_PERMITTED);
         }
+        AppContext.stamp(account);
         accountRepository.save(account);
-        return new ActionResponse(accountId);
+        return new ActionResponse(account.getId());
     }
 
     @Override
     public ActionResponse approveAccount(Integer accountId) {
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new BadRequestException("Account with that ID does not exists"));
+        AppUser loggedInUser = AppContext.getLoggedInUser();
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Account.class.getSimpleName(), "ID")));
         PowerValidator.isFalse(AuditEntity.RecordStatus.ACTIVE.equals(account.getRecordStatus()), "Account is already active");
         account.setRecordStatus(AuditEntity.RecordStatus.ACTIVE);
+        AppContext.stamp(account);
+        account.setApprovedBy(loggedInUser);
+        account.setApprovedOn(DateUtil.now());
         accountRepository.saveAndFlush(account);
         return new ActionResponse(accountId);
     }
 
+    private void setAccountProperties(Account account, AccountDto accountDto) {
+        accountDto.isValidCompany();
+        account.setName(accountDto.getName());
+        account.setAddress(accountDto.getAddress());
+        account.setEmail(accountDto.getEmail());
+        account.setContactPhoneNumber(accountDto.getContactPhoneNumber());
+    }
+
+    private Role createSuperUserRole(Account account) {
+        Permission superPermission = permissionRepository.findOneByName(PermissionEnum.SUPER_PERMISSION.name());
+        return new Role(ApplicationConstants.DEFAULT_ROLE_NAME, ApplicationConstants.DEFAULT_ROLE_DESCRIPTION, account, Collections.singletonList(superPermission));
+    }
 }

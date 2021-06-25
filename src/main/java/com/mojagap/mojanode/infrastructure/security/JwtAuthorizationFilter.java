@@ -99,8 +99,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             pathPermissions.add(PermissionEnum.SUPER_PERMISSION.name());
             requestSecurities.forEach(security -> pathPermissions.addAll(List.of(security.getPermissions().split(","))));
         }
-        List<String> userPermissions = EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(accountType) ?
-                appUser.getRole().getPermissions().stream().map(Permission::getName).collect(Collectors.toList()) : new ArrayList<>();
+        Set<String> userPermissions = EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(accountType) ?
+                appUser.getRole().getPermissions().stream().map(Permission::getName).collect(Collectors.toSet()) : new HashSet<>(Collections.singleton(PermissionEnum.SUPER_PERMISSION.name()));
         userPermissions.add(PermissionEnum.AUTHENTICATED.name());
         if (!CollectionUtils.containsAny(pathPermissions, userPermissions)) {
             throw new ForbiddenException(ErrorMessages.FORBIDDEN_INSUFFICIENT_PERMISSION);

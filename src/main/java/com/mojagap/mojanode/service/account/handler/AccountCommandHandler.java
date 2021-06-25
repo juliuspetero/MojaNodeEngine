@@ -10,7 +10,7 @@ public interface AccountCommandHandler {
 
     AppUserDto authenticateUser(AppUserDto appUserDto);
 
-    ActionResponse updateAccount(AccountDto accountDto, Integer accountId);
+    ActionResponse updateAccount(AccountDto accountDto);
 
     ActionResponse approveAccount(Integer accountId);
 

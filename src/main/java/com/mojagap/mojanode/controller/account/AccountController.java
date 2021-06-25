@@ -42,10 +42,10 @@ public class AccountController extends BaseController {
         return executeHttpGet(() -> accountCommandHandler.authenticateUser(appUserDto));
     }
 
-    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
-    public ActionResponse updateAccount(@RequestBody AccountDto accountDto, @PathVariable("id") Integer accountId) {
+    @RequestMapping(method = RequestMethod.PUT)
+    public ActionResponse updateAccount(@RequestBody AccountDto accountDto) {
         return executeAndLogUserActivity(EntityTypeEnum.ACCOUNT, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
-            ActionResponse actionResponse = accountCommandHandler.updateAccount(accountDto, accountId);
+            ActionResponse actionResponse = accountCommandHandler.updateAccount(accountDto);
             log.setEntityId(actionResponse.resourceId());
             return actionResponse;
         });

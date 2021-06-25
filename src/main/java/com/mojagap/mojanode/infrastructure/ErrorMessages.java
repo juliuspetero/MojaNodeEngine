@@ -9,7 +9,7 @@ public class ErrorMessages {
     public static final String VALID_ACCOUNT_TYPE_REQUIRED = "Account type is required";
     public static final String VALID_COUNTRY_REQUIRED = "Please provide a valid country";
     public static final String COMPANY_DETAILS_REQUIRED = "Please provide your company information";
-    public static final String INVALID_COMPANY_NAME = "Please provide a valid company of length 5 to 255";
+    public static final String INVALID_COMPANY_NAME = "Please provide a valid company name of length 5 to 255";
     public static final String INVALID_FIRST_NAME = "Please provide a first name of length 5 to 100";
     public static final String INVALID_LAST_NAME = "Please provide a first name of length 5 to 100";
     public static final String INVALID_ID_NUMBER_PROVIDED = "Please provide a ID number of length 5 to 100";
@@ -28,4 +28,5 @@ public class ErrorMessages {
     public static final String ENTITY_ALREADY_EXISTS = "%s with that %s is already exists";
     public static final String ENTITY_DOES_NOT_EXISTS = "%s with that %s does not exists";
     public static final String ROLE_IS_IN_USE = "There is an active user with that role";
+    public static final String ACCOUNT_TYPE_NOT_PERMITTED = "%s account type is not permitted here";
 }

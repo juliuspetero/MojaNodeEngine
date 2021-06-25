@@ -13,6 +13,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +26,7 @@ public class Account extends AuditEntity {
     private CountryCode countryCode;
     private String email;
     private String contactPhoneNumber;
+    private Date approvedOn;
     private AppUser approvedBy;
     private AccountType accountType;
     private Set<AppUser> appUsers = new HashSet<>();
@@ -67,6 +69,12 @@ public class Account extends AuditEntity {
     @JoinColumn(name = "approved_by")
     public AppUser getApprovedBy() {
         return approvedBy;
+    }
+
+    @Column(name = "approved_on")
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getApprovedOn() {
+        return approvedOn;
     }
 
     @Enumerated(EnumType.STRING)
