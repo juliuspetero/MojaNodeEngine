@@ -2,6 +2,7 @@ package com.mojagap.mojanode.model.user;
 
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.model.account.Account;
+import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.role.Role;
@@ -27,6 +28,7 @@ public class AppUser extends AuditEntity {
     private Boolean verified = Boolean.FALSE;
     private Account account;
     private Company company;
+    private Branch branch;
     private Role role;
 
     public AppUser(AppUserDto appUserDto) {
@@ -79,7 +81,7 @@ public class AppUser extends AuditEntity {
         return verified;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     public Account getAccount() {
         return account;
@@ -89,6 +91,12 @@ public class AppUser extends AuditEntity {
     @JoinColumn(name = "company_id")
     public Company getCompany() {
         return company;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "branch_id")
+    public Branch getBranch() {
+        return branch;
     }
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

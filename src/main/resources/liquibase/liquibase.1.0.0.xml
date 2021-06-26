@@ -31,10 +31,10 @@
             <column name="account_type" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="approved_on" type="timestamp" defaultValueComputed="now()">
+            <column name="activated_on" type="timestamp" defaultValueComputed="now()">
                 <constraints nullable="true"/>
             </column>
-            <column name="approved_by" type="bigint">
+            <column name="activated_by" type="bigint">
                 <constraints nullable="true"/>
             </column>
             <column name="created_on" type="timestamp" defaultValueComputed="now()">
@@ -91,6 +91,48 @@
             <column name="phone_number" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="parent_company_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-branch" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="branch"/>
+            </not>
+        </preConditions>
+        <comment>Branch table is used record all branches under a company</comment>
+        <createTable tableName="branch">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="company_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="25062021_FK_branch_company_id"
+                             references="company(id)"/>
+            </column>
+            <column name="parent_branch_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
             <column name="created_on" type="timestamp" defaultValueComputed="now()">
                 <constraints nullable="true"/>
             </column>
@@ -140,21 +182,21 @@
         <sql>
             <![CDATA[
 
-                -- Add account permissions
+                -- Account permissions
                 INSERT IGNORE INTO permission(name, action_type, entity_type, category)
                 VALUES ('SUPER_PERMISSION', 'ALL', 'ALL', 'GENERAL'),
-                ('APPROVE_USER_ACCOUNTS', 'APPROVE', 'ACCOUNT', 'BACK_OFFICE'),
+                ('ACTIVATE_USER_ACCOUNTS', 'APPROVE', 'ACCOUNT', 'BACK_OFFICE'),
                 ('READ_USER_ACCOUNTS', 'READ', 'ACCOUNT', 'BACK_OFFICE'),
                 ('UPDATE_USER_ACCOUNTS', 'UPDATE', 'ACCOUNT', 'BACK_OFFICE');
 
-                -- Add user permissions
+                -- User permissions
                 INSERT IGNORE INTO permission(name, action_type, entity_type, category)
                 VALUES ('READ_APPLICATION_USERS', 'READ', 'USER', 'GENERAL'),
                 ('UPDATE_APPLICATION_USERS', 'UPDATE', 'USER', 'GENERAL'),
                 ('CREATE_APPLICATION_USERS', 'CREATE', 'USER', 'GENERAL'),
                 ('REMOVE_APPLICATION_USERS', 'REMOVE', 'USER', 'GENERAL');
 
-                -- Add role permissions
+                -- Role permissions
                 INSERT IGNORE INTO permission(name, action_type, entity_type, category)
                 VALUES ('READ_USER_ROLES', 'READ', 'ROLE', 'GENERAL'),
                 ('CREATE_USER_ROLES', 'CREATE', 'ROLE', 'GENERAL'),
@@ -257,6 +299,10 @@
             <column name="company_id" type="bigint">
                 <constraints nullable="true" foreignKeyName="18062021_FK_user_company_id"
                              references="company(id)"/>
+            </column>
+            <column name="branch_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="25062021_FK_user_branch_id"
+                             references="branch(id)"/>
             </column>
             <column name="role_id" type="bigint">
                 <constraints nullable="true"

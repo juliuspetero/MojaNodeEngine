@@ -29,4 +29,6 @@ public class ErrorMessages {
     public static final String ENTITY_DOES_NOT_EXISTS = "%s with that %s does not exists";
     public static final String ROLE_IS_IN_USE = "There is an active user with that role";
     public static final String ACCOUNT_TYPE_NOT_PERMITTED = "%s account type is not permitted here";
+    public static final String CANNOT_CREATE_USER_IN_BRANCH = "You are not permitted to create user under this branch";
+    public static final String CANNOT_CREATE_USER_UNDER_SUB_COMPANY = "You are not permitted to create user under this sub-company";
 }

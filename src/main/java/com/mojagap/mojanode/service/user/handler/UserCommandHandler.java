@@ -1,15 +1,16 @@
 package com.mojagap.mojanode.service.user.handler;
 
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.model.http.ExternalUser;
 
 public interface UserCommandHandler {
 
-    AppUserDto createUser(AppUserDto appUserDto);
+    ActionResponse createUser(AppUserDto appUserDto);
 
-    AppUserDto updateUser(AppUserDto appUserDto);
+    ActionResponse updateUser(AppUserDto appUserDto);
 
-    AppUserDto removeUser(Integer userId);
+    ActionResponse removeUser(Integer userId);
 
     ExternalUser createExternalUser(ExternalUser externalUser);
 }

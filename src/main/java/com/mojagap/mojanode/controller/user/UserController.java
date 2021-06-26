@@ -1,6 +1,7 @@
 package com.mojagap.mojanode.controller.user;
 
 import com.mojagap.mojanode.controller.BaseController;
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
@@ -32,10 +33,10 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public AppUserDto createAppUser(@RequestBody AppUserDto appUserDto) {
+    public ActionResponse createAppUser(@RequestBody AppUserDto appUserDto) {
         return executeAndLogUserActivity(EntityTypeEnum.USER, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
-            AppUserDto response = userCommandHandler.createUser(appUserDto);
-            log.setEntityId(response.getId());
+            ActionResponse response = userCommandHandler.createUser(appUserDto);
+            log.setEntityId(response.resourceId());
             return response;
         });
     }

@@ -7,7 +7,6 @@ import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.user.AppUser;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -26,8 +25,8 @@ public class Account extends AuditEntity {
     private CountryCode countryCode;
     private String email;
     private String contactPhoneNumber;
-    private Date approvedOn;
-    private AppUser approvedBy;
+    private Date activatedOn;
+    private AppUser activatedBy;
     private AccountType accountType;
     private Set<AppUser> appUsers = new HashSet<>();
     private Set<Company> companies = new HashSet<>();
@@ -37,12 +36,12 @@ public class Account extends AuditEntity {
         this.accountType = AccountType.valueOf(accountDto.getAccountType());
     }
 
-    @NotNull(message = "Account name cannot be empty")
+    @Column(name = "name")
     public String getName() {
         return name;
     }
 
-    @Length(min = 10, max = 1000, message = "Provide a valid address")
+    @Column(name = "address")
     public String getAddress() {
         return address;
     }
@@ -55,6 +54,7 @@ public class Account extends AuditEntity {
     }
 
     @NotBlank(message = "Contact Phone Number is required")
+    @Column(name = "contact_phone_number")
     public String getContactPhoneNumber() {
         return contactPhoneNumber;
     }
@@ -66,15 +66,15 @@ public class Account extends AuditEntity {
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "approved_by")
-    public AppUser getApprovedBy() {
-        return approvedBy;
+    @JoinColumn(name = "activated_by")
+    public AppUser getActivatedBy() {
+        return activatedBy;
     }
 
-    @Column(name = "approved_on")
+    @Column(name = "activated_on")
     @Temporal(TemporalType.TIMESTAMP)
-    public Date getApprovedOn() {
-        return approvedOn;
+    public Date getActivatedOn() {
+        return activatedOn;
     }
 
     @Enumerated(EnumType.STRING)

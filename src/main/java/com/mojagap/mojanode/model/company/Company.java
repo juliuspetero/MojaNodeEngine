@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mojagap.mojanode.dto.company.CompanyDto;
 import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.account.Account;
+import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,8 @@ import org.springframework.beans.BeanUtils;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity(name = "company")
@@ -27,6 +30,8 @@ public class Company extends AuditEntity {
     private String email;
     private String phoneNumber;
     private Account account;
+    private Company parentCompany;
+    private Set<Branch> branches = new HashSet<>();
 
     public Company(CompanyDto companyDto) {
         BeanUtils.copyProperties(companyDto, this);
@@ -74,5 +79,16 @@ public class Company extends AuditEntity {
     @JoinColumn(name = "account_id")
     public Account getAccount() {
         return account;
+    }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "parent_company_id")
+    public Company getParentCompany() {
+        return parentCompany;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "company", fetch = FetchType.LAZY)
+    public Set<Branch> getBranches() {
+        return branches;
     }
 }

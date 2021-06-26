@@ -11,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -106,5 +107,13 @@ public class PowerValidator {
         if (bool == null || bool) {
             throw new BadRequestException(message);
         }
+    }
+
+    public static <X extends Throwable> void throwException(Supplier<? extends X> exceptionSupplier) throws X {
+        throw exceptionSupplier.get();
+    }
+
+    public static void throwBadRequestException(String message) {
+        throwException(() -> new BadRequestException(message));
     }
 }

@@ -16,6 +16,7 @@ import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.account.CountryCode;
+import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.role.Permission;
@@ -24,6 +25,7 @@ import com.mojagap.mojanode.model.role.Role;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.account.AccountRepository;
 import com.mojagap.mojanode.repository.role.PermissionRepository;
+import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.service.account.handler.AccountCommandHandler;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -48,16 +50,18 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
     private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
     private final PermissionRepository permissionRepository;
+    private final AppUserRepository appUserRepository;
     private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
     protected final HttpServletResponse httpServletResponse;
 
     @Autowired
     public AccountCommandHandlerService(PasswordEncoder passwordEncoder, AccountRepository accountRepository, PermissionRepository permissionRepository,
-                                        ModelMapper modelMapper, AuthenticationManager authenticationManager, HttpServletResponse httpServletResponse) {
+                                        AppUserRepository appUserRepository, ModelMapper modelMapper, AuthenticationManager authenticationManager, HttpServletResponse httpServletResponse) {
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
         this.permissionRepository = permissionRepository;
+        this.appUserRepository = appUserRepository;
         this.modelMapper = modelMapper;
         this.authenticationManager = authenticationManager;
         this.httpServletResponse = httpServletResponse;
@@ -96,22 +100,20 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 account.setName(appUserDto.getFirstName() + " " + appUserDto.getLastName());
             }
             case COMPANY -> {
-                accountDto.isValidCompany();
-                PowerValidator.notEmpty(accountDto.getCompanies(), ErrorMessages.COMPANY_DETAILS_REQUIRED);
-                CompanyDto companyDto = accountDto.getCompanies().get(0);
-                companyDto.isValid();
-                account.setAddress(companyDto.getAddress());
-                account.setEmail(companyDto.getEmail());
-                account.setContactPhoneNumber(companyDto.getPhoneNumber());
-                account.setName(companyDto.getName());
-                appUser.setRole(createSuperUserRole(account));
-                Company company = modelMapper.map(companyDto, Company.class);
-                company.setAccount(account);
-                AppContext.stamp(company);
-                appUser.setCompany(company);
+                // accountDto.isValidCompany();
+                Company company = setCompanyProps(accountDto, account);
                 company.setCreatedBy(appUser);
                 company.setModifiedBy(appUser);
+                Branch branch = new Branch("Head Office", company);
+                branch.setParentBranch(branch);
+                AppContext.stamp(branch);
+                branch.setCreatedBy(appUser);
+                branch.setModifiedBy(appUser);
+                company.getBranches().add(branch);
                 account.getCompanies().add(company);
+                appUser.setCompany(company);
+                appUser.setRole(createSuperUserRole(account));
+                appUser.setBranch(branch);
             }
             case PARTNER, BACK_OFFICE -> throw new UnsupportedOperationException("You cannot create a backoffice or partner account at the moment");
             default -> throw new UnsupportedOperationException("The account type provided is not accepted here");
@@ -162,25 +164,25 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
     @Override
     public ActionResponse updateAccount(AccountDto accountDto) {
         accountDto.isValid();
-        AppUser loggedInUser = AppContext.getLoggedInUser();
+        AppUser loggedInUser = appUserRepository.getById(AppContext.getLoggedInUser().getId());
         Account account = loggedInUser.getAccount();
-        account.setAccountType(AccountType.valueOf(accountDto.getAccountType()));
         account.setCountryCode(CountryCode.valueOf(accountDto.getCountryCode()));
         AccountType accountType = account.getAccountType();
         switch (accountType) {
             case INDIVIDUAL -> {
                 if (accountDto.getAccountType().equals(AccountType.COMPANY.name())) {
-                    setAccountProperties(account, accountDto);
-                    PowerValidator.notEmpty(accountDto.getCompanies(), ErrorMessages.COMPANY_DETAILS_REQUIRED);
-                    CompanyDto companyDto = accountDto.getCompanies().get(0);
-                    companyDto.isValid();
-                    Company company = modelMapper.map(companyDto, Company.class);
-                    company.setAccount(account);
-                    loggedInUser.setRole(createSuperUserRole(account));
-                    AppContext.stamp(loggedInUser);
-                    AppContext.stamp(company);
-                    loggedInUser.setCompany(company);
+                    account.setAccountType(AccountType.valueOf(accountDto.getAccountType()));
+                    Company company = setCompanyProps(accountDto, account);
+                    Branch branch = new Branch("Head Office", company);
+                    branch.setParentBranch(branch);
+                    AppContext.stamp(branch);
+                    company.getBranches().add(branch);
                     account.getCompanies().add(company);
+                    loggedInUser.setCompany(company);
+                    loggedInUser.setRole(createSuperUserRole(account));
+                    loggedInUser.setBranch(branch);
+                    loggedInUser.setAccount(account);
+                    account.getAppUsers().add(loggedInUser);
                 }
             }
             case COMPANY -> setAccountProperties(account, accountDto);
@@ -191,15 +193,30 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         return new ActionResponse(account.getId());
     }
 
+    private Company setCompanyProps(AccountDto accountDto, Account account) {
+        PowerValidator.notEmpty(accountDto.getCompanies(), ErrorMessages.COMPANY_DETAILS_REQUIRED);
+        CompanyDto companyDto = accountDto.getCompanies().get(0);
+        companyDto.isValid();
+        account.setAddress(companyDto.getAddress());
+        account.setEmail(companyDto.getEmail());
+        account.setContactPhoneNumber(companyDto.getPhoneNumber());
+        account.setName(companyDto.getName());
+        Company company = modelMapper.map(companyDto, Company.class);
+        company.setParentCompany(company);
+        company.setAccount(account);
+        AppContext.stamp(company);
+        return company;
+    }
+
     @Override
-    public ActionResponse approveAccount(Integer accountId) {
+    public ActionResponse activateAccount(Integer accountId) {
         AppUser loggedInUser = AppContext.getLoggedInUser();
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Account.class.getSimpleName(), "ID")));
         PowerValidator.isFalse(AuditEntity.RecordStatus.ACTIVE.equals(account.getRecordStatus()), "Account is already active");
         account.setRecordStatus(AuditEntity.RecordStatus.ACTIVE);
         AppContext.stamp(account);
-        account.setApprovedBy(loggedInUser);
-        account.setApprovedOn(DateUtil.now());
+        account.setActivatedBy(loggedInUser);
+        account.setActivatedOn(DateUtil.now());
         accountRepository.saveAndFlush(account);
         return new ActionResponse(accountId);
     }

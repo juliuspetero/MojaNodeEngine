@@ -12,7 +12,7 @@ public interface AccountCommandHandler {
 
     ActionResponse updateAccount(AccountDto accountDto);
 
-    ActionResponse approveAccount(Integer accountId);
+    ActionResponse activateAccount(Integer accountId);
 
 
 }

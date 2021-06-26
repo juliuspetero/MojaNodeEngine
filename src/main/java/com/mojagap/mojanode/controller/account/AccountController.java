@@ -51,10 +51,10 @@ public class AccountController extends BaseController {
         });
     }
 
-    @RequestMapping(path = "/approve/{id}", method = RequestMethod.POST)
-    public ActionResponse approveAccount(@PathVariable("id") Integer accountId) {
+    @RequestMapping(path = "/activate/{id}", method = RequestMethod.POST)
+    public ActionResponse activateAccount(@PathVariable("id") Integer accountId) {
         return executeAndLogUserActivity(EntityTypeEnum.ACCOUNT, ActionTypeEnum.APPROVE, (UserActivityLog log) -> {
-            ActionResponse actionResponse = accountCommandHandler.approveAccount(accountId);
+            ActionResponse actionResponse = accountCommandHandler.activateAccount(accountId);
             log.setEntityId(actionResponse.resourceId());
             return actionResponse;
         });

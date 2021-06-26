@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.mojagap.mojanode.dto.account.AccountDto;
 import com.mojagap.mojanode.dto.user.AppUserDto;
-import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.utility.DateUtil;
@@ -24,7 +23,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class CompanyDto {
-    private Integer companyId;
+    private Integer id;
     private String name;
     private String companyType;
     @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
@@ -36,8 +35,8 @@ public class CompanyDto {
     private AccountDto account;
     private List<AppUserDto> appUsers;
 
-    public CompanyDto(Integer companyId, String name, String companyType) {
-        this.companyId = companyId;
+    public CompanyDto(Integer id, String name, String companyType) {
+        this.id = id;
         this.name = name;
         this.companyType = companyType;
     }

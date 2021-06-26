@@ -1,61 +1,106 @@
 package com.mojagap.mojanode.service.user;
 
+import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
+import com.mojagap.mojanode.infrastructure.ErrorMessages;
+import com.mojagap.mojanode.infrastructure.PowerValidator;
+import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
+import com.mojagap.mojanode.model.account.AccountType;
+import com.mojagap.mojanode.model.branch.Branch;
+import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.http.ExternalUser;
+import com.mojagap.mojanode.model.role.Role;
 import com.mojagap.mojanode.model.user.AppUser;
+import com.mojagap.mojanode.repository.branch.BranchRepository;
 import com.mojagap.mojanode.repository.company.CompanyRepository;
+import com.mojagap.mojanode.repository.role.RoleRepository;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
 import com.mojagap.mojanode.service.user.handler.UserCommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserCommandService implements UserCommandHandler {
+    private final CompanyRepository companyRepository;
+    private final AppUserRepository appUserRepository;
+    private final RestTemplateService restTemplateService;
+    private final PasswordEncoder passwordEncoder;
+    private final BranchRepository branchRepository;
+    protected final HttpServletResponse httpServletResponse;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    private CompanyRepository companyRepository;
-
-    @Autowired
-    private AppUserRepository appUserRepository;
-
-    @Autowired
-    private RestTemplateService restTemplateService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    protected HttpServletResponse httpServletResponse;
-
+    public UserCommandService(CompanyRepository companyRepository, AppUserRepository appUserRepository, RestTemplateService restTemplateService, PasswordEncoder passwordEncoder,
+                              BranchRepository branchRepository, HttpServletResponse httpServletResponse, RoleRepository roleRepository) {
+        this.companyRepository = companyRepository;
+        this.appUserRepository = appUserRepository;
+        this.restTemplateService = restTemplateService;
+        this.passwordEncoder = passwordEncoder;
+        this.branchRepository = branchRepository;
+        this.httpServletResponse = httpServletResponse;
+        this.roleRepository = roleRepository;
+    }
 
     @Override
-    public AppUserDto createUser(AppUserDto appUserDto) {
+    @Transactional
+    public ActionResponse createUser(AppUserDto appUserDto) {
+        appUserDto.isValid();
+        AppUser loggedInUser = AppContext.getLoggedInUser();
+        AccountType accountType = loggedInUser.getAccount().getAccountType();
+        PowerValidator.notNull(appUserDto.getRole().getId(), String.format(ErrorMessages.ENTITY_REQUIRED, "role ID"));
+        Role role = roleRepository.findByIdAndAccountId(appUserDto.getRole().getId(), loggedInUser.getAccount().getId()).orElseThrow(() ->
+                new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Role.class.getSimpleName(), "ID")));
         AppUser appUser = new AppUser(appUserDto);
+        appUser.setRole(role);
+        appUser.setAccount(loggedInUser.getAccount());
         AppContext.stamp(appUser);
         appUser.setPassword(passwordEncoder.encode(appUserDto.getPassword()));
-        appUser = appUserRepository.saveAndFlush(appUser);
-        appUserDto.setId(appUser.getId());
-        return appUserDto;
+
+        switch (accountType) {
+            case COMPANY -> {
+                PowerValidator.notNull(appUserDto.getCompany().getId(), String.format(ErrorMessages.ENTITY_REQUIRED, "company ID"));
+                Company company = companyRepository.findCompanyById(appUserDto.getCompany().getId())
+                        .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Company.class.getSimpleName(), "ID")));
+                List<Integer> loggedInUserCompanies = AppContext.getCompaniesOfLoggedInUser().stream().map(Company::getId).collect(Collectors.toList());
+                if (!loggedInUserCompanies.contains(appUserDto.getCompany().getId())) {
+                    PowerValidator.throwBadRequestException(ErrorMessages.CANNOT_CREATE_USER_IN_BRANCH);
+                }
+                appUser.setCompany(company);
+                PowerValidator.notNull(appUserDto.getBranch().getId(), String.format(ErrorMessages.ENTITY_REQUIRED, "branch ID"));
+                Branch branch = branchRepository.findById(appUserDto.getBranch().getId())
+                        .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Branch.class.getSimpleName(), "ID")));
+                List<Integer> loggedInUserBranches = AppContext.getBranchesOfLoggedInUser().stream().map(Branch::getId).collect(Collectors.toList());
+                if (!loggedInUserBranches.contains(appUserDto.getBranch().getId())) {
+                    PowerValidator.throwBadRequestException(ErrorMessages.CANNOT_CREATE_USER_UNDER_SUB_COMPANY);
+                }
+                appUser.setBranch(branch);
+            }
+
+            case BACK_OFFICE -> {
+            }
+            default -> PowerValidator.throwBadRequestException(String.format(ErrorMessages.ACCOUNT_TYPE_NOT_PERMITTED, accountType));
+        }
+        appUserRepository.save(appUser);
+        return new ActionResponse(appUser.getId());
     }
 
     @Override
-    public AppUserDto updateUser(AppUserDto appUserDto) {
-        return appUserDto;
+    public ActionResponse updateUser(AppUserDto appUserDto) {
+        return new ActionResponse(12);
     }
 
     @Override
-    public AppUserDto removeUser(Integer userId) {
-        return new AppUserDto();
+    public ActionResponse removeUser(Integer userId) {
+        return new ActionResponse(12);
     }
 
     @Override
