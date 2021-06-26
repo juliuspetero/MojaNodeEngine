@@ -1,11 +1,11 @@
 package com.mojagap.mojanode.service.company.handler;
 
 import com.mojagap.mojanode.dto.company.CompanyDto;
+import com.mojagap.mojanode.model.common.RecordHolder;
 
-import java.util.List;
 import java.util.Map;
 
 public interface CompanyQueryHandler {
 
-    List<CompanyDto> getCompanies(Map<String, String> queryParams);
+    RecordHolder<CompanyDto> getCompanies(Map<String, String> queryParams);
 }

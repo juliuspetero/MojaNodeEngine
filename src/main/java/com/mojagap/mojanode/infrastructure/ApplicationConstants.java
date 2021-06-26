@@ -11,5 +11,6 @@ public class ApplicationConstants {
     public static final String JWT_EXPIRATION_TIME_IN_MINUTES = CommonUtil.getEnvProperty(EnvironmentVariables.JWT_EXPIRATION_TIME, "30");
     public static final String DEFAULT_ROLE_NAME = "Super Administrator";
     public static final String DEFAULT_ROLE_DESCRIPTION = "This role provides all application permissions";
+    public static final String DEFAULT_OFFICE_NAME = "Head Office";
     public static final String APP_USER_ID = "userId";
 }

@@ -51,6 +51,6 @@ public class AuditEntity extends BaseEntity {
         APPROVED,
         INACTIVE,
         DELETED,
-        LOCKED;
+        CLOSED;
     }
 }

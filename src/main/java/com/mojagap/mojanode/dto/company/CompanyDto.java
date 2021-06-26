@@ -33,6 +33,7 @@ public class CompanyDto {
     private String email;
     private String phoneNumber;
     private AccountDto account;
+    private CompanyDto parentCompany;
     private List<AppUserDto> appUsers;
 
     public CompanyDto(Integer id, String name, String companyType) {

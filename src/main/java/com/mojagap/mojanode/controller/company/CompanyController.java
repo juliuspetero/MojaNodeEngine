@@ -3,35 +3,62 @@ package com.mojagap.mojanode.controller.company;
 
 import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.controller.BaseController;
+import com.mojagap.mojanode.dto.branch.BranchDto;
 import com.mojagap.mojanode.dto.company.CompanyDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
+import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.user.UserActivityLog;
 import com.mojagap.mojanode.service.company.CompanyCommandService;
 import com.mojagap.mojanode.service.company.CompanyQueryService;
+import com.mojagap.mojanode.service.company.handler.CompanyCommandHandler;
+import com.mojagap.mojanode.service.company.handler.CompanyQueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/company")
 public class CompanyController extends BaseController {
+    private final CompanyQueryHandler companyQueryHandler;
+    private final CompanyCommandHandler companyCommandHandler;
 
     @Autowired
-    private CompanyCommandService companyCommandService;
-
-    @Autowired
-    private CompanyQueryService companyQueryService;
-
+    public CompanyController(CompanyQueryHandler companyQueryHandler, CompanyCommandHandler companyCommandHandler) {
+        this.companyQueryHandler = companyQueryHandler;
+        this.companyCommandHandler = companyCommandHandler;
+    }
 
     @RequestMapping(method = RequestMethod.POST)
     public ActionResponse createCompany(@RequestBody CompanyDto companyDto) {
         return executeAndLogUserActivity(EntityTypeEnum.COMPANY, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
-            ActionResponse response = companyCommandService.createCompany(companyDto);
+            ActionResponse response = companyCommandHandler.createCompany(companyDto);
             log.setEntityId(response.resourceId());
             return response;
         });
+    }
+
+    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
+    public ActionResponse updateCompany(@RequestBody CompanyDto companyDto, @PathVariable Integer id) {
+        return executeAndLogUserActivity(EntityTypeEnum.COMPANY, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
+            ActionResponse response = companyCommandHandler.updateCompany(companyDto, id);
+            log.setEntityId(response.resourceId());
+            return response;
+        });
+    }
+
+    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+    public ActionResponse closedCompany(@PathVariable Integer id) {
+        return executeAndLogUserActivity(EntityTypeEnum.COMPANY, ActionTypeEnum.CLOSE, (UserActivityLog log) -> {
+            ActionResponse response = companyCommandHandler.closeCompany(id);
+            log.setEntityId(response.resourceId());
+            return response;
+        });
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public RecordHolder<CompanyDto> getBranches(@RequestParam Map<String, String> queryParams) {
+        return executeHttpGet(() -> companyQueryHandler.getCompanies(queryParams));
     }
 }

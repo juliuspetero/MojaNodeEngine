@@ -227,7 +227,7 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
         private final String value;
     }
 
-    private String BASE_USER_QUERY = """
+    private final String BASE_USER_QUERY = """
             SELECT usr.id            AS id,
                    usr.first_name    AS firstName,
                    usr.last_name     AS lastName,
@@ -290,12 +290,12 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
               AND (rl.name LIKE CONCAT('%', :roleName, '%') OR :roleName IS NULL)
             """;
 
-    public String backofficeUserQuery() {
+    public final String backofficeUserQuery() {
         return BASE_USER_QUERY + "" +
                 "LIMIT :limit OFFSET :offset";
     }
 
-    public String companyUserQuery() {
+    public final String companyUserQuery() {
         return BASE_USER_QUERY + "" +
                 "   AND (usr.company_id IN (:companyIds))\n" +
                 "   AND (usr.branch_id IN (:branchIds))\n" +

@@ -31,4 +31,6 @@ public class ErrorMessages {
     public static final String ACCOUNT_TYPE_NOT_PERMITTED = "%s account type is not permitted here";
     public static final String CANNOT_CREATE_USER_IN_BRANCH = "You are not permitted to create user under this branch";
     public static final String CANNOT_CREATE_USER_UNDER_SUB_COMPANY = "You are not permitted to create user under this sub-company";
+    public static final String NOT_PERMITTED_TO_PERFORM_ACTION_ON_COMPANY = "You are not permitted perform any action on this company";
+    public static final String NOT_PERMITTED_TO_MIGRATE_COMPANY = "You are not permitted to migrate this company to a different parent";
 }
