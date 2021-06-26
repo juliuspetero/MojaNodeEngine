@@ -54,6 +54,5 @@ public class AppUserDto {
         PowerValidator.validStringLength(address, 10, 255, ErrorMessages.INVALID_LOCATION_ADDRESS);
         PowerValidator.validEmail(email, ErrorMessages.INVALID_EMAIL_ADDRESS);
         PowerValidator.validPhoneNumber(phoneNumber, ErrorMessages.INVALID_PHONE_NUMBER);
-        PowerValidator.validPassword(password, ErrorMessages.INVALID_PASSWORD);
     }
 }

@@ -7,8 +7,10 @@ import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
+import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.branch.Branch;
+import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.role.Role;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +59,7 @@ public class UserCommandService implements UserCommandHandler {
         appUserDto.isValid();
         AppUser loggedInUser = AppContext.getLoggedInUser();
         AccountType accountType = loggedInUser.getAccount().getAccountType();
+        PowerValidator.isTrue(EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(accountType), String.format(ErrorMessages.ACCOUNT_TYPE_NOT_PERMITTED, accountType));
         PowerValidator.notNull(appUserDto.getRole().getId(), String.format(ErrorMessages.ENTITY_REQUIRED, "role ID"));
         Role role = roleRepository.findByIdAndAccountId(appUserDto.getRole().getId(), loggedInUser.getAccount().getId()).orElseThrow(() ->
                 new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Role.class.getSimpleName(), "ID")));
@@ -64,43 +68,65 @@ public class UserCommandService implements UserCommandHandler {
         appUser.setAccount(loggedInUser.getAccount());
         AppContext.stamp(appUser);
         appUser.setPassword(passwordEncoder.encode(appUserDto.getPassword()));
-
-        switch (accountType) {
-            case COMPANY -> {
-                PowerValidator.notNull(appUserDto.getCompany().getId(), String.format(ErrorMessages.ENTITY_REQUIRED, "company ID"));
-                Company company = companyRepository.findCompanyById(appUserDto.getCompany().getId())
-                        .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Company.class.getSimpleName(), "ID")));
-                List<Integer> loggedInUserCompanies = AppContext.getCompaniesOfLoggedInUser().stream().map(Company::getId).collect(Collectors.toList());
-                if (!loggedInUserCompanies.contains(appUserDto.getCompany().getId())) {
-                    PowerValidator.throwBadRequestException(ErrorMessages.CANNOT_CREATE_USER_IN_BRANCH);
-                }
-                appUser.setCompany(company);
-                PowerValidator.notNull(appUserDto.getBranch().getId(), String.format(ErrorMessages.ENTITY_REQUIRED, "branch ID"));
-                Branch branch = branchRepository.findById(appUserDto.getBranch().getId())
-                        .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Branch.class.getSimpleName(), "ID")));
-                List<Integer> loggedInUserBranches = AppContext.getBranchesOfLoggedInUser().stream().map(Branch::getId).collect(Collectors.toList());
-                if (!loggedInUserBranches.contains(appUserDto.getBranch().getId())) {
-                    PowerValidator.throwBadRequestException(ErrorMessages.CANNOT_CREATE_USER_UNDER_SUB_COMPANY);
-                }
-                appUser.setBranch(branch);
-            }
-
-            case BACK_OFFICE -> {
-            }
-            default -> PowerValidator.throwBadRequestException(String.format(ErrorMessages.ACCOUNT_TYPE_NOT_PERMITTED, accountType));
+        if (AccountType.COMPANY.equals(accountType)) {
+            updateCompanyDetails(appUserDto, appUser);
         }
         appUserRepository.save(appUser);
         return new ActionResponse(appUser.getId());
     }
 
     @Override
-    public ActionResponse updateUser(AppUserDto appUserDto) {
-        return new ActionResponse(12);
+    public ActionResponse updateUser(AppUserDto appUserDto, Integer id) {
+        appUserDto.isValid();
+        Account account = AppContext.getLoggedInUser().getAccount();
+        AppUser appUser = appUserRepository.findByIdAndAcountId(id, account.getId()).orElseThrow(() ->
+                new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, "User", "ID")));
+        PowerValidator.isTrue(EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(account.getAccountType()), String.format(ErrorMessages.ACCOUNT_TYPE_NOT_PERMITTED, account.getAccountType()));
+        PowerValidator.notNull(appUserDto.getRole().getId(), String.format(ErrorMessages.ENTITY_REQUIRED, "role ID"));
+        Role role = roleRepository.findByIdAndAccountId(appUserDto.getRole().getId(), account.getId()).orElseThrow(() ->
+                new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Role.class.getSimpleName(), "ID")));
+        appUser.setRole(role);
+        appUser.setAccount(account);
+        AppContext.stamp(appUser);
+        if (appUserDto.getPassword() != null) {
+            appUser.setPassword(passwordEncoder.encode(appUserDto.getPassword()));
+        }
+        if (AccountType.COMPANY.equals(account.getAccountType())) {
+            updateCompanyDetails(appUserDto, appUser);
+        }
+        appUserRepository.save(appUser);
+        return new ActionResponse(appUser.getId());
+    }
+
+    private void updateCompanyDetails(AppUserDto appUserDto, AppUser appUser) {
+        PowerValidator.notNull(appUserDto.getCompany().getId(), String.format(ErrorMessages.ENTITY_REQUIRED, "company ID"));
+        Company company = companyRepository.findCompanyById(appUserDto.getCompany().getId())
+                .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Company.class.getSimpleName(), "ID")));
+        List<Integer> loggedInUserCompanies = AppContext.getCompaniesOfLoggedInUser().stream().map(Company::getId).collect(Collectors.toList());
+        if (!loggedInUserCompanies.contains(appUserDto.getCompany().getId())) {
+            PowerValidator.throwBadRequestException(ErrorMessages.CANNOT_CREATE_USER_IN_BRANCH);
+        }
+        appUser.setCompany(company);
+        PowerValidator.notNull(appUserDto.getBranch().getId(), String.format(ErrorMessages.ENTITY_REQUIRED, "branch ID"));
+        Branch branch = branchRepository.findById(appUserDto.getBranch().getId())
+                .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Branch.class.getSimpleName(), "ID")));
+        List<Integer> loggedInUserBranches = AppContext.getBranchesOfLoggedInUser().stream().map(Branch::getId).collect(Collectors.toList());
+        if (!loggedInUserBranches.contains(appUserDto.getBranch().getId())) {
+            PowerValidator.throwBadRequestException(ErrorMessages.CANNOT_CREATE_USER_UNDER_SUB_COMPANY);
+        }
+        appUser.setBranch(branch);
     }
 
     @Override
     public ActionResponse removeUser(Integer userId) {
-        return new ActionResponse(12);
+        PowerValidator.notNull(userId, String.format(ErrorMessages.ENTITY_REQUIRED, "User ID"));
+        Account account = AppContext.getLoggedInUser().getAccount();
+        AccountType accountType = account.getAccountType();
+        AppUser appUser = appUserRepository.findByIdAndAcountId(userId, account.getId()).orElseThrow(() ->
+                new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, "User", "ID")));
+        PowerValidator.isTrue(EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(accountType), String.format(ErrorMessages.ACCOUNT_TYPE_NOT_PERMITTED, accountType));
+        appUser.setRecordStatus(AuditEntity.RecordStatus.DELETED);
+        return new ActionResponse(userId);
     }
 
     @Override

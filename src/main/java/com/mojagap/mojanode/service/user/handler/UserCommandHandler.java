@@ -8,7 +8,7 @@ public interface UserCommandHandler {
 
     ActionResponse createUser(AppUserDto appUserDto);
 
-    ActionResponse updateUser(AppUserDto appUserDto);
+    ActionResponse updateUser(AppUserDto appUserDto, Integer id);
 
     ActionResponse removeUser(Integer userId);
 

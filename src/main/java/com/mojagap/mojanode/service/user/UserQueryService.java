@@ -1,6 +1,10 @@
 package com.mojagap.mojanode.service.user;
 
 
+import com.mojagap.mojanode.dto.account.AccountDto;
+import com.mojagap.mojanode.dto.branch.BranchDto;
+import com.mojagap.mojanode.dto.company.CompanyDto;
+import com.mojagap.mojanode.dto.role.RoleDto;
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.dto.user.UserSqlResultSet;
 import com.mojagap.mojanode.infrastructure.AppContext;
@@ -9,8 +13,12 @@ import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.security.AppUserDetails;
 import com.mojagap.mojanode.infrastructure.utility.DateUtil;
+import com.mojagap.mojanode.model.account.Account;
+import com.mojagap.mojanode.model.account.AccountType;
+import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.common.RecordHolder;
+import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.user.IdentificationEnum;
@@ -19,7 +27,8 @@ import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
 import com.mojagap.mojanode.service.user.handler.UserQueryHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.modelmapper.ModelMapper;
+import lombok.SneakyThrows;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -36,33 +45,48 @@ import org.springframework.util.MultiValueMap;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class UserQueryService implements UserDetailsService, UserQueryHandler {
+    private final AppUserRepository appUserRepository;
+    private final RestTemplateService restTemplateService;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
-    private AppUserRepository appUserRepository;
-
-    @Autowired
-    private RestTemplateService restTemplateService;
-
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    public UserQueryService(AppUserRepository appUserRepository, RestTemplateService restTemplateService, NamedParameterJdbcTemplate jdbcTemplate) {
+        this.appUserRepository = appUserRepository;
+        this.restTemplateService = restTemplateService;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
+    @SneakyThrows(ParseException.class)
     public RecordHolder<AppUserDto> getAppUsersByQueryParams(Map<String, String> queryParams) {
-        AppUser loggedInUser = AppContext.getLoggedInUser();
+        Account account = AppContext.getLoggedInUser().getAccount();
         Arrays.asList(AppUserQueryParams.values()).forEach(param -> queryParams.putIfAbsent(param.getValue(), null));
         MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource(queryParams);
-        mapSqlParameterSource.addValue(AppUserQueryParams.ACCOUNT_ID.getValue(), loggedInUser.getAccount().getId());
+        String appUserQuery;
+        if (AccountType.COMPANY.equals(account.getAccountType())) {
+            appUserQuery = companyUserQuery();
+            List<Integer> branches = AppContext.getBranchesOfLoggedInUser().stream().map(Branch::getId).collect(Collectors.toList());
+            List<Integer> companies = AppContext.getCompaniesOfLoggedInUser().stream().map(Company::getId).collect(Collectors.toList());
+            mapSqlParameterSource.addValue(AppUserQueryParams.BRANCH_IDS.getValue(), branches);
+            mapSqlParameterSource.addValue(AppUserQueryParams.COMPANY_IDS.getValue(), companies);
+            mapSqlParameterSource.addValue(AppUserQueryParams.ACCOUNT_ID.getValue(), account.getId());
+        } else {
+            appUserQuery = backofficeUserQuery();
+            if (queryParams.get(AppUserQueryParams.ACCOUNT_ID.getValue()) == null) {
+                mapSqlParameterSource.addValue(AppUserQueryParams.ACCOUNT_ID.getValue(), account.getId());
+            }
+        }
+
+        if (queryParams.get(AppUserQueryParams.DATE_OF_BIRTH.getValue()) != null) {
+            Date dateOfBirth = DateUtil.DefaultDateFormat().parse(queryParams.get(AppUserQueryParams.DATE_OF_BIRTH.getValue()));
+            mapSqlParameterSource.addValue(AppUserQueryParams.DATE_OF_BIRTH.getValue(), dateOfBirth, Types.BOOLEAN);
+        }
         if (queryParams.get(AppUserQueryParams.VERIFIED.getValue()) != null) {
             mapSqlParameterSource.addValue(AppUserQueryParams.VERIFIED.getValue(), Boolean.parseBoolean(queryParams.get(AppUserQueryParams.VERIFIED.getValue())), Types.BOOLEAN);
         }
@@ -70,10 +94,25 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
         mapSqlParameterSource.addValue(AppUserQueryParams.LIMIT.getValue(), limit, Types.INTEGER);
         Integer offset = queryParams.get(AppUserQueryParams.OFFSET.getValue()) != null ? Integer.parseInt(queryParams.get(AppUserQueryParams.OFFSET.getValue())) : 0;
         mapSqlParameterSource.addValue(AppUserQueryParams.OFFSET.getValue(), offset, Types.INTEGER);
-        List<UserSqlResultSet> sqlResultSets = jdbcTemplate.query(appUserQuery(), mapSqlParameterSource, new AppUserMapper());
-        List<AppUserDto> appUserDtos = sqlResultSets.stream().map(resultSet -> modelMapper.map(resultSet, AppUserDto.class))
-                .collect(Collectors.toList());
+        List<UserSqlResultSet> sqlResultSets = jdbcTemplate.query(appUserQuery, mapSqlParameterSource, new AppUserMapper());
+        List<AppUserDto> appUserDtos = sqlResultSets.stream().map(this::fromSqlResultSet).collect(Collectors.toList());
         return new RecordHolder<>(appUserDtos.size(), appUserDtos);
+    }
+
+    private AppUserDto fromSqlResultSet(UserSqlResultSet resultSet) {
+        AppUserDto appUserDto = new AppUserDto();
+        BeanUtils.copyProperties(resultSet, appUserDto);
+        appUserDto.setAccount(new AccountDto(resultSet.getAccountId(), resultSet.getAccountType(), resultSet.getCountryCode()));
+        if (resultSet.getCompanyId() != 0 && resultSet.getCompanyId() != null) {
+            appUserDto.setCompany(new CompanyDto(resultSet.getCompanyId(), resultSet.getCompanyName(), resultSet.getCompanyType()));
+        }
+        if (resultSet.getBranchId() != 0 && resultSet.getBranchId() != null) {
+            appUserDto.setBranch(new BranchDto(resultSet.getBranchId(), resultSet.getBranchName(), resultSet.getBranchOpeningDate(), resultSet.getBranchStatus()));
+        }
+        if (resultSet.getRoleId() != 0 && resultSet.getRoleId() != null) {
+            appUserDto.setRole(new RoleDto(resultSet.getRoleId(), resultSet.getRoleName(), resultSet.getRoleDescription(), resultSet.getRoleStatus()));
+        }
+        return appUserDto;
     }
 
     @Override
@@ -125,19 +164,28 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
         public UserSqlResultSet mapRow(ResultSet resultSet, int i) throws SQLException {
             UserSqlResultSet userSqlResultSet = new UserSqlResultSet();
             userSqlResultSet.setId(resultSet.getInt(AppUserQueryParams.ID.getValue()));
-            userSqlResultSet.setFirstName(resultSet.getString(AppUserQueryParams.FIRST_NAME.getValue()));
             userSqlResultSet.setLastName(resultSet.getString(AppUserQueryParams.LAST_NAME.getValue()));
-            userSqlResultSet.setDateOfBirth(resultSet.getDate(AppUserQueryParams.DATE_OF_BIRTH.getValue()));
-            userSqlResultSet.setIdNumber(resultSet.getString(AppUserQueryParams.ID_NUMBER.getValue()));
+            userSqlResultSet.setFirstName(resultSet.getString(AppUserQueryParams.FIRST_NAME.getValue()));
             userSqlResultSet.setAddress(resultSet.getString(AppUserQueryParams.ADDRESS.getValue()));
             userSqlResultSet.setEmail(resultSet.getString(AppUserQueryParams.EMAIL.getValue()));
-            userSqlResultSet.setPassword(resultSet.getString(AppUserQueryParams.PASSWORD.getValue()));
+            userSqlResultSet.setDateOfBirth(resultSet.getDate(AppUserQueryParams.DATE_OF_BIRTH.getValue()));
+            userSqlResultSet.setIdNumber(resultSet.getString(AppUserQueryParams.ID_NUMBER.getValue()));
             userSqlResultSet.setVerified(resultSet.getBoolean(AppUserQueryParams.VERIFIED.getValue()));
-            userSqlResultSet.setStatus(resultSet.getString(AppUserQueryParams.STATUS.getValue()));
+            userSqlResultSet.setUserStatus(resultSet.getString(AppUserQueryParams.USER_STATUS.getValue()));
             userSqlResultSet.setCompanyId(resultSet.getInt(AppUserQueryParams.COMPANY_ID.getValue()));
             userSqlResultSet.setCompanyName(resultSet.getString(AppUserQueryParams.COMPANY_NAME.getValue()));
-            userSqlResultSet.setCreatedByFullName(resultSet.getString(AppUserQueryParams.CREATED_BY_FULL_NAME.getValue()));
-            userSqlResultSet.setModifiedByFullName(resultSet.getString(AppUserQueryParams.MODIFIED_BY_FULL_NAME.getValue()));
+            userSqlResultSet.setCompanyStatus(resultSet.getString(AppUserQueryParams.COMPANY_STATUS.getValue()));
+            userSqlResultSet.setAccountId(resultSet.getInt(AppUserQueryParams.ACCOUNT_ID.getValue()));
+            userSqlResultSet.setAccountType(resultSet.getString(AppUserQueryParams.ACCOUNT_TYPE.getValue()));
+            userSqlResultSet.setBranchId(resultSet.getInt(AppUserQueryParams.BRANCH_ID.getValue()));
+            userSqlResultSet.setBranchName(resultSet.getString(AppUserQueryParams.BRANCH_NAME.getValue()));
+            userSqlResultSet.setBranchOpeningDate(resultSet.getDate(AppUserQueryParams.BRANCH_OPENING_DATE.getValue()));
+            userSqlResultSet.setBranchStatus(resultSet.getString(AppUserQueryParams.BRANCH_STATUS.getValue()));
+            userSqlResultSet.setRoleId(resultSet.getInt(AppUserQueryParams.ROLE_ID.getValue()));
+            userSqlResultSet.setRoleName(resultSet.getString(AppUserQueryParams.ROLE_NAME.getValue()));
+            userSqlResultSet.setRoleDescription(resultSet.getString(AppUserQueryParams.ROLE_DESCRIPTION.getValue()));
+            userSqlResultSet.setRoleStatus(resultSet.getString(AppUserQueryParams.ROLE_STATUS.getValue()));
+            userSqlResultSet.setPhoneNumber(resultSet.getString(AppUserQueryParams.PHONE_NUMBER.getValue()));
             return userSqlResultSet;
         }
     }
@@ -147,66 +195,111 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
     public enum AppUserQueryParams {
         LIMIT("limit"),
         OFFSET("offset"),
-        ACCOUNT_ID("accountid"),
         ID("id"),
-        LAST_NAME("lastName"),
-        FIRST_NAME("firstName"),
-        SORT_BY("sortBy"),
+        ACCOUNT_ID("accountId"),
+        ACCOUNT_TYPE("accountType"),
+        FULL_NAME("fullName"),
         ADDRESS("address"),
         EMAIL("email"),
-        STATUS("status"),
+        USER_STATUS("userStatus"),
         DATE_OF_BIRTH("dateOfBirth"),
         ID_NUMBER("idNumber"),
         PHONE_NUMBER("phoneNumber"),
-        PASSWORD("password"),
-        COMPANY_NAME("organizationName"),
-        COMPANY_ID("organizationId"),
+        COMPANY_NAME("companyName"),
+        COMPANY_ID("companyId"),
+        COMPANY_IDS("companyIds"),
+        COMPANY_TYPE("companyType"),
+        COMPANY_STATUS("companyStatus"),
         VERIFIED("verified"),
+        BRANCH_ID("branchId"),
+        BRANCH_IDS("branchIds"),
+        BRANCH_NAME("branchName"),
+        BRANCH_OPENING_DATE("branchOpeningDate"),
+        BRANCH_STATUS("branchStatus"),
+        ROLE_ID("roleId"),
+        ROLE_NAME("roleName"),
+        ROLE_DESCRIPTION("roleDescription"),
+        ROLE_STATUS("roleStatus"),
         CREATED_BY_FULL_NAME("createdByFullName"),
-        MODIFIED_BY_FULL_NAME("modifiedByFullName");
+        MODIFIED_BY_FULL_NAME("modifiedByFullName"),
+        FIRST_NAME("firstName"),
+        LAST_NAME("lastName");
         private final String value;
     }
 
-    private String appUserQuery() {
-        return "SELECT appUser.id                                                AS id,\n" +
-                "       appUser.first_name                                       AS firstName,\n" +
-                "       appUser.last_name                                        AS lastName,\n" +
-                "       appUser.address                                          AS address,\n" +
-                "       appUser.email                                            AS email,\n" +
-                "       appUser.record_status                                    AS status,\n" +
-                "       appUser.date_of_birth                                    AS dateOfBirth,\n" +
-                "       appUser.id_number                                        AS idNumber,\n" +
-                "       appUser.phone_number                                     AS phoneNumber,\n" +
-                "       appUser.is_verified                                      AS verified,\n" +
-                "       appUser.password                                         AS password,\n" +
-                "       org.id                                                   AS organizationId,\n" +
-                "       org.name                                                 AS organizationName,\n" +
-                "       CONCAT(createdBy.first_name, ' ', createdBy.last_name)   AS createdByFullName,\n" +
-                "       CONCAT(modifiedBy.first_name, ' ', modifiedBy.last_name) AS modifiedByFullName\n" +
-                "FROM app_user appUser\n" +
-                "         LEFT OUTER JOIN organization org\n" +
-                "                         ON org.id = appUser.org_id\n" +
-                "         INNER JOIN app_user createdBy\n" +
-                "                    ON createdBy.id = appUser.id\n" +
-                "         INNER JOIN app_user modifiedBy\n" +
-                "                    ON modifiedBy.id = appUser.id\n" +
-                "WHERE (appUser.id = :id OR :id IS NULL)\n" +
-                "  AND (LOWER(appUser.first_name) LIKE CONCAT('%', :firstName, '%') OR :firstName IS NULL)\n" +
-                "  AND (LOWER(appUser.last_name) LIKE CONCAT('%', :lastName, '%') OR :lastName IS NULL)\n" +
-                "  AND (LOWER(appUser.address) LIKE CONCAT('%', :address, '%') OR :address IS NULL)\n" +
-                "  AND (LOWER(appUser.email) LIKE CONCAT('%', :email, '%') OR :email IS NULL)\n" +
-                "  AND (appUser.record_status = :status OR :status IS NULL)\n" +
-                "  AND (appUser.date_of_birth = DATE(:dateOfBirth) OR :dateOfBirth IS NULL)\n" +
-                "  AND (LOWER(appUser.id_number) LIKE CONCAT('%', :idNumber, '%') OR :idNumber IS NULL)\n" +
-                "  AND (LOWER(appUser.phone_number) LIKE CONCAT('%', :phoneNumber, '%') OR :phoneNumber IS NULL)\n" +
-                "  AND (appUser.is_verified = :verified OR :verified IS NULL)\n" +
-                "  AND (org.id = :organizationId OR :organizationId IS NULL)\n" +
-                "  AND (LOWER(org.name) LIKE CONCAT('%', :organizationName, '%') OR :organizationName IS NULL)\n" +
-                "  AND (LOWER(CONCAT(createdBy.first_name, ' ', createdBy.last_name)) LIKE CONCAT('%', :createdByFullName, '%') OR\n" +
-                "       :createdByFullName IS NULL)\n" +
-                "  AND (LOWER(CONCAT(modifiedBy.first_name, ' ', modifiedBy.last_name)) LIKE CONCAT('%', :modifiedByFullName, '%') OR\n" +
-                "       :modifiedByFullName IS NULL)\n" +
-                "ORDER BY :sortBy\n" +
-                "LIMIT :limit OFFSET :offset\n";
+    private String BASE_USER_QUERY = """
+            SELECT usr.id            AS id,
+                   usr.first_name    AS firstName,
+                   usr.last_name     AS lastName,
+                   usr.address       AS address,
+                   usr.email         AS email,
+                   usr.record_status AS userStatus,
+                   usr.date_of_birth AS dateOfBirth,
+                   usr.id_number     AS idNumber,
+                   usr.phone_number  AS phoneNumber,
+                   usr.is_verified   AS verified,
+                   com.id            AS companyId,
+                   com.name          AS companyName,
+                   com.company_type  AS companyType,
+                   com.record_status AS companyStatus,
+                   acc.id            AS accountId,
+                   acc.country_code  AS countryCode,
+                   acc.account_type  AS accountType,
+                   br.id             AS branchId,
+                   br.name           AS branchName,
+                   br.created_on     AS branchOpeningDate,
+                   br.record_status  AS branchStatus,
+                   rl.id             AS roleId,
+                   rl.name           AS roleName,
+                   rl.description    AS roleDescription,
+                   rl.record_status  AS roleStatus
+            FROM app_user usr
+                     INNER JOIN account acc
+                                ON acc.id = usr.account_id
+                     LEFT OUTER JOIN role rl
+                                     ON rl.id = usr.role_id
+                     LEFT OUTER JOIN company com
+                                     ON com.id = usr.company_id
+                     LEFT OUTER JOIN branch br
+                                     ON br.id = usr.branch_id
+                     LEFT OUTER JOIN app_user createdBy
+                                     ON createdBy.id = usr.id
+                     LEFT OUTER JOIN app_user modifiedBy
+                                     ON modifiedBy.id = usr.id
+            WHERE (usr.id = :id OR :id IS NULL)
+              AND (CONCAT(usr.first_name, '', usr.last_name) LIKE
+                   CONCAT('%', REPLACE(:fullName, ' ', ''), '%') OR
+                   :fullName IS NULL)
+              AND (usr.address LIKE CONCAT('%', :address, '%') OR :address IS NULL)
+              AND (usr.email LIKE CONCAT('%', :email, '%') OR :email IS NULL)
+              AND (usr.record_status = :userStatus OR :userStatus IS NULL)
+              AND (usr.date_of_birth = DATE(:dateOfBirth) OR :dateOfBirth IS NULL)
+              AND (usr.id_number LIKE CONCAT('%', :idNumber, '%') OR :idNumber IS NULL)
+              AND (usr.phone_number LIKE CONCAT('%', :phoneNumber, '%') OR :phoneNumber IS NULL)
+              AND (usr.is_verified = :verified OR :verified IS NULL)
+              AND (CONCAT(createdBy.first_name, '', createdBy.last_name) LIKE
+                   CONCAT('%', REPLACE(:createdByFullName, ' ', ''), '%') OR
+                   :createdByFullName IS NULL)
+              AND (CONCAT(modifiedBy.first_name, '', modifiedBy.last_name) LIKE
+                   CONCAT('%', REPLACE(:modifiedByFullName, ' ', ''), '%') OR
+                   :modifiedByFullName IS NULL)
+              AND (usr.account_id = :accountId OR :accountId IS NULL)
+              AND (com.name LIKE CONCAT('%', :companyName, '%') OR :companyName IS NULL)
+              AND (br.name LIKE CONCAT('%', :branchName, '%') OR :branchName IS NULL)
+              AND (usr.role_id = :roleId OR :roleId IS NULL)
+              AND (rl.name LIKE CONCAT('%', :roleName, '%') OR :roleName IS NULL)
+            """;
+
+    public String backofficeUserQuery() {
+        return BASE_USER_QUERY + "" +
+                "LIMIT :limit OFFSET :offset";
+    }
+
+    public String companyUserQuery() {
+        return BASE_USER_QUERY + "" +
+                "   AND (usr.company_id IN (:companyIds))\n" +
+                "   AND (usr.branch_id IN (:branchIds))\n" +
+                "LIMIT :limit OFFSET :offset";
+
     }
 }

@@ -2,6 +2,7 @@ package com.mojagap.mojanode.service.account;
 
 import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.account.AccountDto;
+import com.mojagap.mojanode.dto.branch.BranchDto;
 import com.mojagap.mojanode.dto.company.CompanyDto;
 import com.mojagap.mojanode.dto.role.PermissionDto;
 import com.mojagap.mojanode.dto.role.RoleDto;
@@ -74,6 +75,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         PowerValidator.notEmpty(accountDto.getUsers(), ErrorMessages.USER_REQUIRED_WHEN_CREATING_ACCOUNT);
         AppUserDto appUserDto = accountDto.getUsers().get(0);
         appUserDto.isValid();
+        PowerValidator.validPassword(appUserDto.getPassword(), ErrorMessages.INVALID_PASSWORD);
         AppUser appUser = new AppUser(appUserDto);
         AppContext.stamp(appUser);
         appUser.setModifiedBy(appUser);
@@ -135,16 +137,15 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
 
         if (EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(appUser.getAccount().getAccountType())) {
             RoleDto roleDto = modelMapper.map(appUser.getRole(), RoleDto.class);
-            List<PermissionDto> permissionDtoList = appUser.getRole().getPermissions()
-                    .stream()
-                    .map(permission -> modelMapper.map(permission, PermissionDto.class))
-                    .collect(Collectors.toList());
-            roleDto.setPermissions(permissionDtoList);
             appUserDto.setRole(roleDto);
         }
         Company company = appUser.getCompany();
         if (company != null) {
             appUserDto.setCompany(new CompanyDto(company.getId(), company.getName(), company.getCompanyType().name()));
+        }
+        Branch branch = appUser.getBranch();
+        if (branch != null) {
+            appUserDto.setBranch(new BranchDto(branch.getId(), branch.getName(), branch.getCreatedOn(), branch.getRecordStatus().name()));
         }
         Account account = appUser.getAccount();
         appUserDto.setAccount(new AccountDto(account.getId(), account.getAccountType().name(), account.getCountryCode().name()));

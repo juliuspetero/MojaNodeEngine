@@ -21,11 +21,14 @@ import java.util.Map;
 @RequestMapping("/v1/user")
 public class UserController extends BaseController {
 
-    @Autowired
-    private UserCommandHandler userCommandHandler;
+    private final UserCommandHandler userCommandHandler;
+    private final UserQueryHandler userQueryHandler;
 
     @Autowired
-    private UserQueryHandler userQueryHandler;
+    public UserController(UserCommandHandler userCommandHandler, UserQueryHandler userQueryHandler) {
+        this.userCommandHandler = userCommandHandler;
+        this.userQueryHandler = userQueryHandler;
+    }
 
     @GetMapping
     public RecordHolder<AppUserDto> getAppUsers(@RequestParam Map<String, String> queryParams) {
@@ -33,9 +36,27 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ActionResponse createAppUser(@RequestBody AppUserDto appUserDto) {
+    public ActionResponse createUser(@RequestBody AppUserDto appUserDto) {
         return executeAndLogUserActivity(EntityTypeEnum.USER, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             ActionResponse response = userCommandHandler.createUser(appUserDto);
+            log.setEntityId(response.resourceId());
+            return response;
+        });
+    }
+
+    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
+    public ActionResponse updateUser(@RequestBody AppUserDto appUserDto, @PathVariable Integer id) {
+        return executeAndLogUserActivity(EntityTypeEnum.USER, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
+            ActionResponse response = userCommandHandler.updateUser(appUserDto, id);
+            log.setEntityId(response.resourceId());
+            return response;
+        });
+    }
+
+    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+    public ActionResponse removeUser(@PathVariable Integer id) {
+        return executeAndLogUserActivity(EntityTypeEnum.USER, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
+            ActionResponse response = userCommandHandler.removeUser(id);
             log.setEntityId(response.resourceId());
             return response;
         });
@@ -58,7 +79,7 @@ public class UserController extends BaseController {
 
     @GetMapping("/external/all")
     public List<AppUser> getExternalUsers() {
-        return executeHttpGet(() -> userQueryHandler.getExternalUsers());
+        return executeHttpGet(userQueryHandler::getExternalUsers);
     }
 
 }
