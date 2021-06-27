@@ -32,6 +32,10 @@ public class AccountDto {
     private List<AppUserDto> users;
     private List<CompanyDto> companies;
 
+    public AccountDto(Integer accountId) {
+        this.accountId = accountId;
+    }
+
     public AccountDto(Integer accountId, String accountType, String countryCode) {
         this.accountId = accountId;
         this.accountType = accountType;

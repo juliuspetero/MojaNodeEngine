@@ -58,42 +58,18 @@ public interface BranchRepository extends JpaRepository<Branch, Integer> {
             WITH RECURSIVE branchCTE (id, name, parent_branch_id, company_id, created_on, created_by, modified_on, modified_by,
                                       record_status) AS
                                (
-                                   SELECT id,
-                                          name,
-                                          parent_branch_id,
-                                          company_id,
-                                          created_on,
-                                          created_by,
-                                          modified_on,
-                                          modified_by,
-                                          record_status
+                                   SELECT *
                                    FROM branch
                                    WHERE parent_branch_id = :childId
                                       OR id = :childId
                                    UNION
                                    DISTINCT
-                                   SELECT br.id,
-                                          br.name,
-                                          br.parent_branch_id,
-                                          br.company_id,
-                                          br.created_on,
-                                          br.created_by,
-                                          br.modified_on,
-                                          br.modified_by,
-                                          br.record_status
+                                   SELECT br.*
                                    FROM branchCTE AS cte
                                             JOIN branch AS br
                                                  ON br.id = cte.parent_branch_id
                                )
-            SELECT id,
-                   name,
-                   parent_branch_id,
-                   company_id,
-                   created_on,
-                   created_by,
-                   modified_on,
-                   modified_by,
-                   record_status
+            SELECT *
             FROM branchCTE
             """;
 

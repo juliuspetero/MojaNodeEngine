@@ -104,7 +104,7 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
         BeanUtils.copyProperties(resultSet, appUserDto);
         appUserDto.setAccount(new AccountDto(resultSet.getAccountId(), resultSet.getAccountType(), resultSet.getCountryCode()));
         if (resultSet.getCompanyId() != 0 && resultSet.getCompanyId() != null) {
-            appUserDto.setCompany(new CompanyDto(resultSet.getCompanyId(), resultSet.getCompanyName(), resultSet.getCompanyType()));
+            appUserDto.setCompany(new CompanyDto(resultSet.getCompanyId(), resultSet.getCompanyName(), resultSet.getCompanyType(), resultSet.getCompanyStatus()));
         }
         if (resultSet.getBranchId() != 0 && resultSet.getBranchId() != null) {
             appUserDto.setBranch(new BranchDto(resultSet.getBranchId(), resultSet.getBranchName(), resultSet.getBranchOpeningDate(), resultSet.getBranchStatus()));

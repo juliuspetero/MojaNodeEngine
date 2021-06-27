@@ -45,7 +45,7 @@ public class BranchController extends BaseController {
         });
     }
 
-    @RequestMapping(path = "/{id}", method = RequestMethod.POST)
+    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
     public ActionResponse closedBranch(@PathVariable("id") Integer id) {
         return executeAndLogUserActivity(EntityTypeEnum.BRANCH, ActionTypeEnum.CLOSE, (UserActivityLog log) -> {
             ActionResponse response = branchCommandHandler.closeBranch(id);

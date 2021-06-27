@@ -2,6 +2,8 @@ package com.mojagap.mojanode.infrastructure.utility;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 
 public class CommonUtil {
 
@@ -21,6 +23,11 @@ public class CommonUtil {
 
     public static String getRootProjectDirectory() {
         return System.getProperty("user.dir");
+    }
+
+    public static <R> R copyProperties(Object source, R target) {
+        BeanUtils.copyProperties(source, target);
+        return target;
     }
 
 }

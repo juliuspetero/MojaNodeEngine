@@ -69,7 +69,7 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
                                    SELECT com.*
                                    FROM companyCTE AS cte
                                             JOIN company AS com
-                                                 ON com.id = cte.parent_company_ido
+                                                 ON com.id = cte.parent_company_id
                                )
             SELECT *
             FROM companyCTE

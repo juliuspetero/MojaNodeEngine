@@ -75,7 +75,7 @@ public class Company extends AuditEntity {
         return phoneNumber;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     public Account getAccount() {
         return account;

@@ -7,7 +7,6 @@ import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.role.Role;
 import com.mojagap.mojanode.model.user.AppUser;
-import com.mojagap.mojanode.repository.branch.BranchRepository;
 import com.mojagap.mojanode.repository.role.RoleRepository;
 import com.mojagap.mojanode.service.role.handler.RoleQueryHandler;
 import lombok.AllArgsConstructor;
@@ -34,14 +33,12 @@ public class RoleQueryService implements RoleQueryHandler {
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final ModelMapper modelMapper;
     private final RoleRepository roleRepository;
-    private final BranchRepository branchRepository;
 
     @Autowired
-    public RoleQueryService(NamedParameterJdbcTemplate jdbcTemplate, ModelMapper modelMapper, RoleRepository roleRepository, BranchRepository branchRepository) {
+    public RoleQueryService(NamedParameterJdbcTemplate jdbcTemplate, ModelMapper modelMapper, RoleRepository roleRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.modelMapper = modelMapper;
         this.roleRepository = roleRepository;
-        this.branchRepository = branchRepository;
     }
 
 

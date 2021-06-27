@@ -53,7 +53,8 @@ public class AppContext implements ApplicationContextAware {
     public static List<Company> getCompaniesOfLoggedInUser() {
         List<Company> companies = Collections.emptyList();
         if (getLoggedInUser() != null) {
-            companies = getBean(CompanyRepository.class).topBottomHierarchy(getLoggedInUser().getId());
+            Integer companyId = getLoggedInUser().getCompany().getId();
+            companies = getBean(CompanyRepository.class).topBottomHierarchy(companyId);
         }
         return companies;
     }
@@ -61,7 +62,8 @@ public class AppContext implements ApplicationContextAware {
     public static List<Branch> getBranchesOfLoggedInUser() {
         List<Branch> branches = Collections.emptyList();
         if (getLoggedInUser() != null) {
-            branches = getBean(BranchRepository.class).topBottomHierarchy(getLoggedInUser().getId());
+            Integer branchId = getLoggedInUser().getBranch().getId();
+            branches = getBean(BranchRepository.class).topBottomHierarchy(branchId);
         }
         return branches;
     }

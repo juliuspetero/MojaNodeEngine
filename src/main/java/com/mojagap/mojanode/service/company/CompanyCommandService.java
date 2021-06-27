@@ -8,6 +8,7 @@ import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
+import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
 import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.branch.Branch;
@@ -50,8 +51,11 @@ public class CompanyCommandService implements CompanyCommandHandler {
         if (!loggedInUserCompanyIds.contains(companyDto.getParentCompany().getId())) {
             PowerValidator.throwBadRequestException(ErrorMessages.NOT_PERMITTED_TO_PERFORM_ACTION_ON_COMPANY);
         }
-        Company company = modelMapper.map(companyDto, Company.class);
-        company.setParentCompany(company);
+        Company company = CommonUtil.copyProperties(companyDto, new Company());
+        company.setCompanyType(CompanyType.valueOf(companyDto.getCompanyType()));
+        Company parentCompany = companyRepository.findCompanyById(companyDto.getParentCompany().getId())
+                .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Company.class.getSimpleName(), "ID")));
+        company.setParentCompany(parentCompany);
         company.setAccount(account);
         Branch branch = new Branch(ApplicationConstants.DEFAULT_OFFICE_NAME, company);
         AppContext.stamp(branch);
@@ -62,11 +66,12 @@ public class CompanyCommandService implements CompanyCommandHandler {
     }
 
     @Override
+    @Transactional
     public ActionResponse updateCompany(CompanyDto companyDto, Integer id) {
         companyDto.isValid();
         Account account = AppContext.getLoggedInUser().getAccount();
         PowerValidator.iPermittedAccountType(account.getAccountType(), AccountType.COMPANY);
-        Company company = companyRepository.findCompanyById(companyDto.getId())
+        Company company = companyRepository.findCompanyById(id)
                 .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Company.class.getSimpleName(), "ID")));
         List<Integer> loggedInUserCompanyIds = AppContext.getCompaniesOfLoggedInUser().stream().map(Company::getId).collect(Collectors.toList());
         if (!loggedInUserCompanyIds.contains(id)) {
@@ -76,7 +81,7 @@ public class CompanyCommandService implements CompanyCommandHandler {
             if (!loggedInUserCompanyIds.contains(companyDto.getParentCompany().getId())) {
                 PowerValidator.throwBadRequestException(ErrorMessages.NOT_PERMITTED_TO_MIGRATE_COMPANY);
             }
-            Company parentCompany = companyRepository.findCompanyById(companyDto.getId())
+            Company parentCompany = companyRepository.findCompanyById(companyDto.getParentCompany().getId())
                     .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Company.class.getSimpleName(), "ID")));
             company.setParentCompany(parentCompany);
         }
@@ -91,6 +96,7 @@ public class CompanyCommandService implements CompanyCommandHandler {
     }
 
     @Override
+    @Transactional
     public ActionResponse closeCompany(Integer id) {
         AppUser loggedInUser = AppContext.getLoggedInUser();
         Account account = loggedInUser.getAccount();

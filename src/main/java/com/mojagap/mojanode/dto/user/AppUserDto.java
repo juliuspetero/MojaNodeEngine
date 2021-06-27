@@ -44,6 +44,12 @@ public class AppUserDto {
     private AppUserDto createdBy;
     private AppUserDto modifiedBy;
 
+    public AppUserDto(Integer id, String firstName, String lastName) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     @SneakyThrows
     public void isValid() {
         PowerValidator.validStringLength(firstName, 5, 255, ErrorMessages.INVALID_FIRST_NAME);

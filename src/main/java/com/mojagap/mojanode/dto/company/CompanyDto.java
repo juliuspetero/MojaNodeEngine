@@ -17,7 +17,6 @@ import lombok.SneakyThrows;
 import java.util.Date;
 import java.util.List;
 
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
@@ -26,20 +25,29 @@ public class CompanyDto {
     private Integer id;
     private String name;
     private String companyType;
+    private String status;
     @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
     private Date registrationDate;
     private String registrationNumber;
+    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    private Date openingDate;
     private String address;
     private String email;
     private String phoneNumber;
     private AccountDto account;
     private CompanyDto parentCompany;
+    private AppUserDto createdByUser;
     private List<AppUserDto> appUsers;
 
-    public CompanyDto(Integer id, String name, String companyType) {
+    public CompanyDto(Integer id) {
+        this.id = id;
+    }
+
+    public CompanyDto(Integer id, String name, String companyType, String status) {
         this.id = id;
         this.name = name;
         this.companyType = companyType;
+        this.status = status;
     }
 
     @SneakyThrows(NumberParseException.class)

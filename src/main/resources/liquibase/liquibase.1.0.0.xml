@@ -185,9 +185,10 @@
                 -- Account permissions
                 INSERT IGNORE INTO permission(name, action_type, entity_type, category)
                 VALUES ('SUPER_PERMISSION', 'ALL', 'ALL', 'GENERAL'),
-                ('ACTIVATE_USER_ACCOUNTS', 'APPROVE', 'ACCOUNT', 'BACK_OFFICE'),
                 ('READ_USER_ACCOUNTS', 'READ', 'ACCOUNT', 'BACK_OFFICE'),
-                ('UPDATE_USER_ACCOUNTS', 'UPDATE', 'ACCOUNT', 'BACK_OFFICE');
+                ('ACTIVATE_USER_ACCOUNTS', 'ACTIVATE', 'ACCOUNT', 'BACK_OFFICE'),
+                ('UPDATE_USER_ACCOUNTS', 'UPDATE', 'ACCOUNT', 'BACK_OFFICE'),
+                ('CLOSE_USER_ACCOUNTS', 'CLOSE', 'ACCOUNT', 'BACK_OFFICE');
 
                 -- User permissions
                 INSERT IGNORE INTO permission(name, action_type, entity_type, category)
@@ -202,6 +203,20 @@
                 ('CREATE_USER_ROLES', 'CREATE', 'ROLE', 'GENERAL'),
                 ('UPDATE_USER_ROLES', 'UPDATE', 'ROLE', 'GENERAL'),
                 ('READ_USER_PERMISSIONS', 'READ', 'PERMISSION', 'GENERAL');
+
+                -- Branch permissions
+                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
+                VALUES ('READ_BRANCHES', 'READ', 'BRANCH', 'COMPANY'),
+                ('CREATE_BRANCHES', 'CREATE', 'BRANCH', 'COMPANY'),
+                ('UPDATE_BRANCHES', 'UPDATE', 'BRANCH', 'COMPANY'),
+                ('CLOSE_BRANCHES', 'CLOSE', 'BRANCH', 'COMPANY');
+
+                 -- Branch permissions
+                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
+                VALUES ('READ_COMPANIES', 'READ', 'COMPANY', 'COMPANY'),
+                ('CREATE_COMPANIES', 'CREATE', 'COMPANY', 'COMPANY'),
+                ('UPDATE_COMPANIES', 'UPDATE', 'COMPANY', 'COMPANY'),
+                ('CLOSE_COMPANIES', 'CLOSE', 'COMPANY', 'COMPANY');
 
             ]]>
         </sql>

@@ -20,6 +20,7 @@ import com.mojagap.mojanode.model.account.CountryCode;
 import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
+import com.mojagap.mojanode.model.company.CompanyType;
 import com.mojagap.mojanode.model.role.Permission;
 import com.mojagap.mojanode.model.role.PermissionEnum;
 import com.mojagap.mojanode.model.role.Role;
@@ -31,6 +32,7 @@ import com.mojagap.mojanode.service.account.handler.AccountCommandHandler;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import liquibase.pro.packaged.C;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,7 +143,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         }
         Company company = appUser.getCompany();
         if (company != null) {
-            appUserDto.setCompany(new CompanyDto(company.getId(), company.getName(), company.getCompanyType().name()));
+            appUserDto.setCompany(new CompanyDto(company.getId(), company.getName(), company.getCompanyType().name(), company.getRecordStatus().name()));
         }
         Branch branch = appUser.getBranch();
         if (branch != null) {
@@ -202,7 +204,8 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         account.setEmail(companyDto.getEmail());
         account.setContactPhoneNumber(companyDto.getPhoneNumber());
         account.setName(companyDto.getName());
-        Company company = modelMapper.map(companyDto, Company.class);
+        Company company = new Company(companyDto);
+        company.setCompanyType(CompanyType.valueOf(companyDto.getCompanyType()));
         company.setParentCompany(company);
         company.setAccount(account);
         AppContext.stamp(company);

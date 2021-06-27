@@ -10,6 +10,7 @@ public class ErrorMessages {
     public static final String VALID_COUNTRY_REQUIRED = "Please provide a valid country";
     public static final String COMPANY_DETAILS_REQUIRED = "Please provide your company information";
     public static final String INVALID_COMPANY_NAME = "Please provide a valid company name of length 5 to 255";
+    public static final String INVALID_BRANCH_NAME = "Please provide a valid branch name of length 5 to 255";
     public static final String INVALID_FIRST_NAME = "Please provide a first name of length 5 to 100";
     public static final String INVALID_LAST_NAME = "Please provide a first name of length 5 to 100";
     public static final String INVALID_ID_NUMBER_PROVIDED = "Please provide a ID number of length 5 to 100";
@@ -31,6 +32,8 @@ public class ErrorMessages {
     public static final String ACCOUNT_TYPE_NOT_PERMITTED = "%s account type is not permitted here";
     public static final String CANNOT_CREATE_USER_IN_BRANCH = "You are not permitted to create user under this branch";
     public static final String CANNOT_CREATE_USER_UNDER_SUB_COMPANY = "You are not permitted to create user under this sub-company";
+    public static final String NOT_PERMITTED_TO_CREATE_BRANCH_UNDER_PARENT = "You are not allowed to create a branch sub-branch under provided parent";
     public static final String NOT_PERMITTED_TO_PERFORM_ACTION_ON_COMPANY = "You are not permitted perform any action on this company";
+    public static final String NOT_PERMITTED_TO_CLOSE_COMPANY = "You are not permitted to close this company";
     public static final String NOT_PERMITTED_TO_MIGRATE_COMPANY = "You are not permitted to migrate this company to a different parent";
 }
