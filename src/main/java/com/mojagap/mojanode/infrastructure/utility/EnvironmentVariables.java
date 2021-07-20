@@ -1,8 +1,11 @@
 package com.mojagap.mojanode.infrastructure.utility;
 
+/**
+ * All System environment variables must be kept here for auditing purpose
+ */
 public class EnvironmentVariables {
     public static final String MOJA_NODE_JWT_SECRET_KEY = "MOJA_NODE_JWT_SECRET_KEY";
-    public static final String JWT_EXPIRATION_TIME = "JWT_EXPIRATION_TIME";
+    public static final String JWT_EXPIRATION_TIME_MINUTES = "JWT_EXPIRATION_TIME_MINUTES";
     public static final String MOJA_NODE_SERVER_PORT = "MOJA_NODE_SERVER_PORT";
     public static final String MOJA_NODE_DB_HOST = "MOJA_NODE_DB_HOST";
     public static final String MOJA_NODE_DB_PORT = "MOJA_NODE_DB_PORT";
