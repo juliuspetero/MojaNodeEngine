@@ -39,7 +39,7 @@ public class UserController extends BaseController {
     public ActionResponse createUser(@RequestBody AppUserDto appUserDto) {
         return executeAndLogUserActivity(EntityTypeEnum.USER, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             ActionResponse response = userCommandHandler.createUser(appUserDto);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }
@@ -48,7 +48,7 @@ public class UserController extends BaseController {
     public ActionResponse updateUser(@RequestBody AppUserDto appUserDto, @PathVariable Integer id) {
         return executeAndLogUserActivity(EntityTypeEnum.USER, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
             ActionResponse response = userCommandHandler.updateUser(appUserDto, id);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }
@@ -57,7 +57,7 @@ public class UserController extends BaseController {
     public ActionResponse removeUser(@PathVariable Integer id) {
         return executeAndLogUserActivity(EntityTypeEnum.USER, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
             ActionResponse response = userCommandHandler.removeUser(id);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }

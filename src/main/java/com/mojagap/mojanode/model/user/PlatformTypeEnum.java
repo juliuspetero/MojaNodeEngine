@@ -19,12 +19,17 @@ public enum PlatformTypeEnum {
 
     public static PlatformTypeEnum fromInt(Integer id) {
         PowerValidator.notNull(id, ErrorMessages.MISSING_APPLICATION_PLATFORM);
-        return switch (id) {
-            case 1 -> WEB_APP;
-            case 2 -> ANDROID_APP;
-            case 3 -> IOS_APP;
-            case 4 -> THIRD_PARTY_APP;
-            default -> throw new BadRequestException(ErrorMessages.INVALID_PLATFORM_ID);
-        };
+        switch (id) {
+            case 1:
+                return WEB_APP;
+            case 2:
+                return ANDROID_APP;
+            case 3:
+                return IOS_APP;
+            case 4:
+                return THIRD_PARTY_APP;
+            default:
+                throw new BadRequestException(ErrorMessages.INVALID_PLATFORM_ID);
+        }
     }
 }

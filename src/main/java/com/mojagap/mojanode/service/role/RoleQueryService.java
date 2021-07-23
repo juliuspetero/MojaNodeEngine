@@ -89,21 +89,20 @@ public class RoleQueryService implements RoleQueryHandler {
     }
 
     private String permissionQuery() {
-        return """
-                SELECT pm.id          AS id,
-                       pm.name        AS name,
-                       pm.action_type AS actionType,
-                       pm.entity_type AS entityType,
-                       pm.category    AS category
-                FROM permission pm
-                WHERE (pm.category LIKE CONCAT('%', :category, '%')
-                    OR pm.category = 'GENERAL')
-                  AND (pm.id = :id OR :id IS NULL)
-                  AND (pm.name LIKE CONCAT('%', :name, '%') OR :name IS NULL)
-                  AND (pm.action_type LIKE CONCAT('%', :actionType, '%') OR :actionType IS NULL)
-                  AND (pm.entity_type LIKE CONCAT('%', :entityType, '%') OR :entityType IS NULL)
-                LIMIT :limit OFFSET :offset
-                """;
+        return "" +
+                "SELECT pm.id          AS id,\n" +
+                "       pm.name        AS name,\n" +
+                "       pm.action_type AS actionType,\n" +
+                "       pm.entity_type AS entityType,\n" +
+                "       pm.category    AS category\n" +
+                "FROM permission pm\n" +
+                "WHERE (pm.category LIKE CONCAT('%', :category, '%')\n" +
+                "    OR pm.category = 'GENERAL')\n" +
+                "  AND (pm.id = :id OR :id IS NULL)\n" +
+                "  AND (pm.name LIKE CONCAT('%', :name, '%') OR :name IS NULL)\n" +
+                "  AND (pm.action_type LIKE CONCAT('%', :actionType, '%') OR :actionType IS NULL)\n" +
+                "  AND (pm.entity_type LIKE CONCAT('%', :entityType, '%') OR :entityType IS NULL)\n" +
+                "LIMIT :limit OFFSET :offset";
     }
 
     @AllArgsConstructor

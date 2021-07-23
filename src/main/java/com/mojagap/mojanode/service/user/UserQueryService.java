@@ -227,68 +227,67 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
         private final String value;
     }
 
-    private final String BASE_USER_QUERY = """
-            SELECT usr.id            AS id,
-                   usr.first_name    AS firstName,
-                   usr.last_name     AS lastName,
-                   usr.address       AS address,
-                   usr.email         AS email,
-                   usr.record_status AS userStatus,
-                   usr.date_of_birth AS dateOfBirth,
-                   usr.id_number     AS idNumber,
-                   usr.phone_number  AS phoneNumber,
-                   usr.is_verified   AS verified,
-                   com.id            AS companyId,
-                   com.name          AS companyName,
-                   com.company_type  AS companyType,
-                   com.record_status AS companyStatus,
-                   acc.id            AS accountId,
-                   acc.country_code  AS countryCode,
-                   acc.account_type  AS accountType,
-                   br.id             AS branchId,
-                   br.name           AS branchName,
-                   br.created_on     AS branchOpeningDate,
-                   br.record_status  AS branchStatus,
-                   rl.id             AS roleId,
-                   rl.name           AS roleName,
-                   rl.description    AS roleDescription,
-                   rl.record_status  AS roleStatus
-            FROM app_user usr
-                     INNER JOIN account acc
-                                ON acc.id = usr.account_id
-                     LEFT OUTER JOIN role rl
-                                     ON rl.id = usr.role_id
-                     LEFT OUTER JOIN company com
-                                     ON com.id = usr.company_id
-                     LEFT OUTER JOIN branch br
-                                     ON br.id = usr.branch_id
-                     LEFT OUTER JOIN app_user createdBy
-                                     ON createdBy.id = usr.id
-                     LEFT OUTER JOIN app_user modifiedBy
-                                     ON modifiedBy.id = usr.id
-            WHERE (usr.id = :id OR :id IS NULL)
-              AND (CONCAT(usr.first_name, '', usr.last_name) LIKE
-                   CONCAT('%', REPLACE(:fullName, ' ', ''), '%') OR
-                   :fullName IS NULL)
-              AND (usr.address LIKE CONCAT('%', :address, '%') OR :address IS NULL)
-              AND (usr.email LIKE CONCAT('%', :email, '%') OR :email IS NULL)
-              AND (usr.record_status = :userStatus OR :userStatus IS NULL)
-              AND (usr.date_of_birth = DATE(:dateOfBirth) OR :dateOfBirth IS NULL)
-              AND (usr.id_number LIKE CONCAT('%', :idNumber, '%') OR :idNumber IS NULL)
-              AND (usr.phone_number LIKE CONCAT('%', :phoneNumber, '%') OR :phoneNumber IS NULL)
-              AND (usr.is_verified = :verified OR :verified IS NULL)
-              AND (CONCAT(createdBy.first_name, '', createdBy.last_name) LIKE
-                   CONCAT('%', REPLACE(:createdByFullName, ' ', ''), '%') OR
-                   :createdByFullName IS NULL)
-              AND (CONCAT(modifiedBy.first_name, '', modifiedBy.last_name) LIKE
-                   CONCAT('%', REPLACE(:modifiedByFullName, ' ', ''), '%') OR
-                   :modifiedByFullName IS NULL)
-              AND (usr.account_id = :accountId OR :accountId IS NULL)
-              AND (com.name LIKE CONCAT('%', :companyName, '%') OR :companyName IS NULL)
-              AND (br.name LIKE CONCAT('%', :branchName, '%') OR :branchName IS NULL)
-              AND (usr.role_id = :roleId OR :roleId IS NULL)
-              AND (rl.name LIKE CONCAT('%', :roleName, '%') OR :roleName IS NULL)
-            """;
+    private final String BASE_USER_QUERY = "" +
+            "SELECT usr.id            AS id,\n" +
+            "       usr.first_name    AS firstName,\n" +
+            "       usr.last_name     AS lastName,\n" +
+            "       usr.address       AS address,\n" +
+            "       usr.email         AS email,\n" +
+            "       usr.record_status AS userStatus,\n" +
+            "       usr.date_of_birth AS dateOfBirth,\n" +
+            "       usr.id_number     AS idNumber,\n" +
+            "       usr.phone_number  AS phoneNumber,\n" +
+            "       usr.is_verified   AS verified,\n" +
+            "       com.id            AS companyId,\n" +
+            "       com.name          AS companyName,\n" +
+            "       com.company_type  AS companyType,\n" +
+            "       com.record_status AS companyStatus,\n" +
+            "       acc.id            AS accountId,\n" +
+            "       acc.country_code  AS countryCode,\n" +
+            "       acc.account_type  AS accountType,\n" +
+            "       br.id             AS branchId,\n" +
+            "       br.name           AS branchName,\n" +
+            "       br.created_on     AS branchOpeningDate,\n" +
+            "       br.record_status  AS branchStatus,\n" +
+            "       rl.id             AS roleId,\n" +
+            "       rl.name           AS roleName,\n" +
+            "       rl.description    AS roleDescription,\n" +
+            "       rl.record_status  AS roleStatus\n" +
+            "FROM app_user usr\n" +
+            "         INNER JOIN account acc\n" +
+            "                    ON acc.id = usr.account_id\n" +
+            "         LEFT OUTER JOIN role rl\n" +
+            "                         ON rl.id = usr.role_id\n" +
+            "         LEFT OUTER JOIN company com\n" +
+            "                         ON com.id = usr.company_id\n" +
+            "         LEFT OUTER JOIN branch br\n" +
+            "                         ON br.id = usr.branch_id\n" +
+            "         LEFT OUTER JOIN app_user createdBy\n" +
+            "                         ON createdBy.id = usr.id\n" +
+            "         LEFT OUTER JOIN app_user modifiedBy\n" +
+            "                         ON modifiedBy.id = usr.id\n" +
+            "WHERE (usr.id = :id OR :id IS NULL)\n" +
+            "  AND (CONCAT(usr.first_name, '', usr.last_name) LIKE\n" +
+            "       CONCAT('%', REPLACE(:fullName, ' ', ''), '%') OR\n" +
+            "       :fullName IS NULL)\n" +
+            "  AND (usr.address LIKE CONCAT('%', :address, '%') OR :address IS NULL)\n" +
+            "  AND (usr.email LIKE CONCAT('%', :email, '%') OR :email IS NULL)\n" +
+            "  AND (usr.record_status = :userStatus OR :userStatus IS NULL)\n" +
+            "  AND (usr.date_of_birth = DATE(:dateOfBirth) OR :dateOfBirth IS NULL)\n" +
+            "  AND (usr.id_number LIKE CONCAT('%', :idNumber, '%') OR :idNumber IS NULL)\n" +
+            "  AND (usr.phone_number LIKE CONCAT('%', :phoneNumber, '%') OR :phoneNumber IS NULL)\n" +
+            "  AND (usr.is_verified = :verified OR :verified IS NULL)\n" +
+            "  AND (CONCAT(createdBy.first_name, '', createdBy.last_name) LIKE\n" +
+            "       CONCAT('%', REPLACE(:createdByFullName, ' ', ''), '%') OR\n" +
+            "       :createdByFullName IS NULL)\n" +
+            "  AND (CONCAT(modifiedBy.first_name, '', modifiedBy.last_name) LIKE\n" +
+            "       CONCAT('%', REPLACE(:modifiedByFullName, ' ', ''), '%') OR\n" +
+            "       :modifiedByFullName IS NULL)\n" +
+            "  AND (usr.account_id = :accountId OR :accountId IS NULL)\n" +
+            "  AND (com.name LIKE CONCAT('%', :companyName, '%') OR :companyName IS NULL)\n" +
+            "  AND (br.name LIKE CONCAT('%', :branchName, '%') OR :branchName IS NULL)\n" +
+            "  AND (usr.role_id = :roleId OR :roleId IS NULL)\n" +
+            "  AND (rl.name LIKE CONCAT('%', :roleName, '%') OR :roleName IS NULL)";
 
     public final String backofficeUserQuery() {
         return BASE_USER_QUERY + "" +

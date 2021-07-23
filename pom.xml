@@ -14,7 +14,7 @@
     <name>moja-node</name>
     <description>Moja Node for bank transfers across the world</description>
     <properties>
-        <java.version>16</java.version>
+        <java.version>11</java.version>
     </properties>
     <dependencies>
         <dependency>

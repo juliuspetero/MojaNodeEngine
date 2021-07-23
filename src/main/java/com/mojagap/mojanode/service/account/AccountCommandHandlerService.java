@@ -4,7 +4,6 @@ import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.account.AccountDto;
 import com.mojagap.mojanode.dto.branch.BranchDto;
 import com.mojagap.mojanode.dto.company.CompanyDto;
-import com.mojagap.mojanode.dto.role.PermissionDto;
 import com.mojagap.mojanode.dto.role.RoleDto;
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.infrastructure.AppContext;
@@ -32,7 +31,6 @@ import com.mojagap.mojanode.service.account.handler.AccountCommandHandler;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import liquibase.pro.packaged.C;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +42,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Date;
+import java.util.EnumSet;
 
 @Service
 public class AccountCommandHandlerService implements AccountCommandHandler {
@@ -57,10 +58,11 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
     private final ModelMapper modelMapper;
     private final AuthenticationManager authenticationManager;
     protected final HttpServletResponse httpServletResponse;
+    private final HttpServletRequest httpServletRequest;
 
     @Autowired
     public AccountCommandHandlerService(PasswordEncoder passwordEncoder, AccountRepository accountRepository, PermissionRepository permissionRepository,
-                                        AppUserRepository appUserRepository, ModelMapper modelMapper, AuthenticationManager authenticationManager, HttpServletResponse httpServletResponse) {
+                                        AppUserRepository appUserRepository, ModelMapper modelMapper, AuthenticationManager authenticationManager, HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
         this.permissionRepository = permissionRepository;
@@ -68,6 +70,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         this.modelMapper = modelMapper;
         this.authenticationManager = authenticationManager;
         this.httpServletResponse = httpServletResponse;
+        this.httpServletRequest = httpServletRequest;
     }
 
     @Override
@@ -97,13 +100,13 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
 
         AccountType accountType = account.getAccountType();
         switch (accountType) {
-            case INDIVIDUAL -> {
+            case INDIVIDUAL:
                 account.setAddress(appUserDto.getAddress());
                 account.setEmail(appUserDto.getEmail());
                 account.setContactPhoneNumber(appUserDto.getPhoneNumber());
                 account.setName(appUserDto.getFirstName() + " " + appUserDto.getLastName());
-            }
-            case COMPANY -> {
+
+            case COMPANY:
                 // accountDto.isValidCompany();
                 Company company = setCompanyProps(accountDto, account);
                 company.setCreatedBy(appUser);
@@ -118,9 +121,10 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 appUser.setCompany(company);
                 appUser.setRole(createSuperUserRole(account));
                 appUser.setBranch(branch);
-            }
-            case PARTNER, BACK_OFFICE -> throw new UnsupportedOperationException("You cannot create a backoffice or partner account at the moment");
-            default -> throw new UnsupportedOperationException("The account type provided is not accepted here");
+            case PARTNER:
+                throw new UnsupportedOperationException("You cannot create a backoffice account at the moment");
+            case BACK_OFFICE:
+                throw new UnsupportedOperationException("You cannot create a partner account at the moment");
         }
         accountRepository.save(account);
         appUserDto.setPassword(rawPassword);
@@ -129,7 +133,9 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
 
     @Override
     public AppUserDto authenticateUser(AppUserDto appUserDto) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUserDto.getEmail(), appUserDto.getPassword()));
+        String email = httpServletRequest.getHeader(ApplicationConstants.EMAIL_HEADER_KEY);
+        String password = httpServletRequest.getHeader(ApplicationConstants.PASSWORD_HEADER_KEY);
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         AppUser appUser = ((AppUserDetails) authentication.getPrincipal()).getAppUser();
         String authenticationToken = generateAuthenticationToken(appUser);
@@ -172,7 +178,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         account.setCountryCode(CountryCode.valueOf(accountDto.getCountryCode()));
         AccountType accountType = account.getAccountType();
         switch (accountType) {
-            case INDIVIDUAL -> {
+            case INDIVIDUAL:
                 if (accountDto.getAccountType().equals(AccountType.COMPANY.name())) {
                     account.setAccountType(AccountType.valueOf(accountDto.getAccountType()));
                     Company company = setCompanyProps(accountDto, account);
@@ -187,9 +193,11 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                     loggedInUser.setAccount(account);
                     account.getAppUsers().add(loggedInUser);
                 }
-            }
-            case COMPANY -> setAccountProperties(account, accountDto);
-            default -> throw new UnsupportedOperationException(ErrorMessages.ACCOUNT_TYPE_NOT_PERMITTED);
+            case COMPANY:
+                setAccountProperties(account, accountDto);
+            case BACK_OFFICE:
+            case PARTNER:
+                throw new UnsupportedOperationException(ErrorMessages.ACCOUNT_TYPE_NOT_PERMITTED);
         }
         AppContext.stamp(account);
         accountRepository.save(account);

@@ -12,7 +12,6 @@ import com.mojagap.mojanode.service.branch.handler.BranchQueryHandler;
 import com.mojagap.mojanode.service.role.RoleQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -30,12 +29,10 @@ import java.util.stream.Collectors;
 @Service
 public class BranchQueryService implements BranchQueryHandler {
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final ModelMapper modelMapper;
 
     @Autowired
-    public BranchQueryService(NamedParameterJdbcTemplate jdbcTemplate, ModelMapper modelMapper) {
+    public BranchQueryService(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -86,33 +83,31 @@ public class BranchQueryService implements BranchQueryHandler {
 
 
     private String branchQuery() {
-        return """
-                SELECT br.id                AS id,
-                       br.name              AS name,
-                       br.record_status     AS Status,
-                       br.created_on        AS openingDate,
-                       com.id               AS companyId,
-                       com.name             AS companyName,
-                       com.record_status    AS companyStatus,
-                       parent.id            AS parentBranchId,
-                       parent.name          AS parentBranchName,
-                       parent.record_status AS parentBranchStatus,
-                       createdBy.id         AS createdById,
-                       createdBy.first_name AS createdByFirstName,
-                       createdBy.last_name  AS createdByLastName
-                FROM branch br
-                         INNER JOIN company com
-                                    ON com.id = br.company_id
-                         INNER JOIN branch parent
-                                    ON parent.id = br.parent_branch_id
-                         INNER JOIN app_user createdBy
-                                    ON createdBy.id = br.created_by
-                WHERE (br.id = :id OR :id IS NULL)
-                  AND (br.name LIKE CONCAT('%', :name, '%') OR :name IS NULL)
-                  AND (br.company_id = :companyId OR :companyId IS NULL)
-                  AND (br.parent_branch_id = :parentBranchId OR :parentBranchId IS NULL)
-                  AND (br.id IN (:branchIds))
-                """;
+        return "SELECT br.id                AS id,\n" +
+                "       br.name              AS name,\n" +
+                "       br.record_status     AS Status,\n" +
+                "       br.created_on        AS openingDate,\n" +
+                "       com.id               AS companyId,\n" +
+                "       com.name             AS companyName,\n" +
+                "       com.record_status    AS companyStatus,\n" +
+                "       parent.id            AS parentBranchId,\n" +
+                "       parent.name          AS parentBranchName,\n" +
+                "       parent.record_status AS parentBranchStatus,\n" +
+                "       createdBy.id         AS createdById,\n" +
+                "       createdBy.first_name AS createdByFirstName,\n" +
+                "       createdBy.last_name  AS createdByLastName\n" +
+                "FROM branch br\n" +
+                "         INNER JOIN company com\n" +
+                "                    ON com.id = br.company_id\n" +
+                "         INNER JOIN branch parent\n" +
+                "                    ON parent.id = br.parent_branch_id\n" +
+                "         INNER JOIN app_user createdBy\n" +
+                "                    ON createdBy.id = br.created_by\n" +
+                "WHERE (br.id = :id OR :id IS NULL)\n" +
+                "  AND (br.name LIKE CONCAT('%', :name, '%') OR :name IS NULL)\n" +
+                "  AND (br.company_id = :companyId OR :companyId IS NULL)\n" +
+                "  AND (br.parent_branch_id = :parentBranchId OR :parentBranchId IS NULL)\n" +
+                "  AND (br.id IN (:branchIds))";
     }
 
     @AllArgsConstructor

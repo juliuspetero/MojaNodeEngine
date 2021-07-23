@@ -33,7 +33,7 @@ public class RoleController extends BaseController {
     public ActionResponse createRole(@RequestBody RoleDto roleDto) {
         return executeAndLogUserActivity(EntityTypeEnum.ROLE, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             ActionResponse response = roleCommandHandler.createRole(roleDto);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }
@@ -42,7 +42,7 @@ public class RoleController extends BaseController {
     public ActionResponse updateRole(@RequestBody RoleDto roleDto, @PathVariable("roleId") Integer roleId) {
         return executeAndLogUserActivity(EntityTypeEnum.ROLE, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             ActionResponse response = roleCommandHandler.updateRole(roleDto, roleId);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }
@@ -51,7 +51,7 @@ public class RoleController extends BaseController {
     public ActionResponse removeRole(@PathVariable("roleId") Integer roleId) {
         return executeAndLogUserActivity(EntityTypeEnum.ROLE, ActionTypeEnum.REMOVE, (UserActivityLog log) -> {
             ActionResponse response = roleCommandHandler.removeRole(roleId);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }

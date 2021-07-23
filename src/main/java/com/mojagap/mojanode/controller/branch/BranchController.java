@@ -31,7 +31,7 @@ public class BranchController extends BaseController {
     public ActionResponse createBranch(@RequestBody BranchDto branchDto) {
         return executeAndLogUserActivity(EntityTypeEnum.ACCOUNT, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             ActionResponse response = branchCommandHandler.createBranch(branchDto);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }
@@ -40,7 +40,7 @@ public class BranchController extends BaseController {
     public ActionResponse updateBranch(@RequestBody BranchDto branchDto, @PathVariable("id") Integer id) {
         return executeAndLogUserActivity(EntityTypeEnum.BRANCH, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
             ActionResponse response = branchCommandHandler.updateBranch(branchDto, id);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }
@@ -49,7 +49,7 @@ public class BranchController extends BaseController {
     public ActionResponse closedBranch(@PathVariable("id") Integer id) {
         return executeAndLogUserActivity(EntityTypeEnum.BRANCH, ActionTypeEnum.CLOSE, (UserActivityLog log) -> {
             ActionResponse response = branchCommandHandler.closeBranch(id);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }

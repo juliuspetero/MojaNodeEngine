@@ -5,6 +5,8 @@ import com.mojagap.mojanode.infrastructure.utility.EnvironmentVariables;
 
 public class ApplicationConstants {
     public static final String PLATFORM_TYPE_HEADER_KEY = "PLATFORM-TYPE";
+    public static final String EMAIL_HEADER_KEY = "email";
+    public static final String PASSWORD_HEADER_KEY = "password";
     public static final String BANK_TRANSFER_BASE_URL = "https://jsonplaceholder.typicode.com";
     public static final String JWT_SECRET_KEY = CommonUtil.getEnvProperty(EnvironmentVariables.MOJA_NODE_JWT_SECRET_KEY, "q3t6w9z$C&F)J@NcQfTjWnZr4u7x!A%D*G-KaPdSgUkXp2s5v8y/B?E(H+MbQeTh");
     public static final String AUTHENTICATION_HEADER_NAME = "authentication";

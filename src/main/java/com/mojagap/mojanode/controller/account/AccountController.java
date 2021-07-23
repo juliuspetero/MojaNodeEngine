@@ -46,7 +46,7 @@ public class AccountController extends BaseController {
     public ActionResponse updateAccount(@RequestBody AccountDto accountDto) {
         return executeAndLogUserActivity(EntityTypeEnum.ACCOUNT, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
             ActionResponse actionResponse = accountCommandHandler.updateAccount(accountDto);
-            log.setEntityId(actionResponse.resourceId());
+            log.setEntityId(actionResponse.getResourceId());
             return actionResponse;
         });
     }
@@ -55,7 +55,7 @@ public class AccountController extends BaseController {
     public ActionResponse activateAccount(@PathVariable("id") Integer accountId) {
         return executeAndLogUserActivity(EntityTypeEnum.ACCOUNT, ActionTypeEnum.APPROVE, (UserActivityLog log) -> {
             ActionResponse actionResponse = accountCommandHandler.activateAccount(accountId);
-            log.setEntityId(actionResponse.resourceId());
+            log.setEntityId(actionResponse.getResourceId());
             return actionResponse;
         });
     }

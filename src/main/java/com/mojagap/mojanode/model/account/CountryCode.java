@@ -1382,11 +1382,14 @@ public enum CountryCode {
             return null;
         }
 
-        return switch (code.length()) {
-            case 2 -> getByAlpha2Code(code);
-            case 3 -> getByAlpha3Code(code);
-            default -> null;
-        };
+        switch (code.length()) {
+            case 2:
+                return getByAlpha2Code(code);
+            case 3:
+                return getByAlpha3Code(code);
+            default:
+                return null;
+        }
     }
 
 

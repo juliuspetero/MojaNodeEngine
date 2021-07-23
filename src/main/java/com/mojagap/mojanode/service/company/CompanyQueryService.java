@@ -91,44 +91,43 @@ public class CompanyQueryService implements CompanyQueryHandler {
 
 
     private String companyQuery() {
-        return """
-                SELECT com.id                  AS id,
-                       com.name                AS name,
-                       com.record_status       AS status,
-                       com.company_type        AS companyType,
-                       com.email               AS email,
-                       com.phone_number        AS phoneNumber,
-                       com.registration_date AS registrationDate,
-                       com.registration_number   AS registrationNumber,
-                       com.address             AS address,
-                       com.account_id          AS accountId,
-                       com.created_on          AS openingDate,
-                       parent.id               AS parentCompanyId,
-                       parent.name             AS parentCompanyName,
-                       parent.record_status    AS parentCompanyStatus,
-                       parent.company_type     AS parentCompanyType,
-                       createdBy.id            AS createdById,
-                       createdBy.first_name    AS createdByFirstName,
-                       createdBy.last_name     AS createdByLastName
-                FROM company com
-                         INNER JOIN company parent
-                                    ON parent.id = com.parent_company_id
-                         INNER JOIN app_user createdBy
-                                    ON createdBy.id = com.created_by
-                WHERE (com.id = :id OR :id IS NULL)
-                  AND (com.name LIKE CONCAT('%', :name, '%') OR :name IS NULL)
-                  AND (com.record_status LIKE CONCAT('%', :status, '%') OR :status IS NULL)
-                  AND (com.company_type LIKE CONCAT('%', :companyType, '%') OR :companyType IS NULL)
-                  AND (com.parent_company_id = :parentCompanyId OR :parentCompanyId IS NULL)
-                  AND (com.registration_date = DATE(:registrationDate) OR :registrationDate IS NULL)
-                  AND (com.registration_number LIKE CONCAT('%', :registrationNumber, '%') OR :registrationNumber IS NULL)
-                  AND (com.account_id = :accountId OR :accountId IS NULL)
-                  AND (com.email LIKE CONCAT('%', :email, '%') OR :email IS NULL)
-                  AND (com.phone_number LIKE CONCAT('%', :phoneNumber, '%') OR :phoneNumber IS NULL)
-                  AND (com.address LIKE CONCAT('%', :address, '%') OR :address IS NULL)
-                  AND (com.parent_company_id = :parentCompanyId OR :parentCompanyId IS NULL)
-                  AND (com.id IN (:companyIds))
-                """;
+        return "" +
+                "SELECT com.id                  AS id,\n" +
+                "       com.name                AS name,\n" +
+                "       com.record_status       AS status,\n" +
+                "       com.company_type        AS companyType,\n" +
+                "       com.email               AS email,\n" +
+                "       com.phone_number        AS phoneNumber,\n" +
+                "       com.registration_date   AS registrationDate,\n" +
+                "       com.registration_number AS registrationNumber,\n" +
+                "       com.address             AS address,\n" +
+                "       com.account_id          AS accountId,\n" +
+                "       com.created_on          AS openingDate,\n" +
+                "       parent.id               AS parentCompanyId,\n" +
+                "       parent.name             AS parentCompanyName,\n" +
+                "       parent.record_status    AS parentCompanyStatus,\n" +
+                "       parent.company_type     AS parentCompanyType,\n" +
+                "       createdBy.id            AS createdById,\n" +
+                "       createdBy.first_name    AS createdByFirstName,\n" +
+                "       createdBy.last_name     AS createdByLastName\n" +
+                "FROM company com\n" +
+                "         INNER JOIN company parent\n" +
+                "                    ON parent.id = com.parent_company_id\n" +
+                "         INNER JOIN app_user createdBy\n" +
+                "                    ON createdBy.id = com.created_by\n" +
+                "WHERE (com.id = :id OR :id IS NULL)\n" +
+                "  AND (com.name LIKE CONCAT('%', :name, '%') OR :name IS NULL)\n" +
+                "  AND (com.record_status LIKE CONCAT('%', :status, '%') OR :status IS NULL)\n" +
+                "  AND (com.company_type LIKE CONCAT('%', :companyType, '%') OR :companyType IS NULL)\n" +
+                "  AND (com.parent_company_id = :parentCompanyId OR :parentCompanyId IS NULL)\n" +
+                "  AND (com.registration_date = DATE(:registrationDate) OR :registrationDate IS NULL)\n" +
+                "  AND (com.registration_number LIKE CONCAT('%', :registrationNumber, '%') OR :registrationNumber IS NULL)\n" +
+                "  AND (com.account_id = :accountId OR :accountId IS NULL)\n" +
+                "  AND (com.email LIKE CONCAT('%', :email, '%') OR :email IS NULL)\n" +
+                "  AND (com.phone_number LIKE CONCAT('%', :phoneNumber, '%') OR :phoneNumber IS NULL)\n" +
+                "  AND (com.address LIKE CONCAT('%', :address, '%') OR :address IS NULL)\n" +
+                "  AND (com.parent_company_id = :parentCompanyId OR :parentCompanyId IS NULL)\n" +
+                "  AND (com.id IN (:companyIds))";
     }
 
     @AllArgsConstructor

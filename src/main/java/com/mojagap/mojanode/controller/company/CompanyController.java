@@ -3,14 +3,11 @@ package com.mojagap.mojanode.controller.company;
 
 import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.controller.BaseController;
-import com.mojagap.mojanode.dto.branch.BranchDto;
 import com.mojagap.mojanode.dto.company.CompanyDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
 import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.user.UserActivityLog;
-import com.mojagap.mojanode.service.company.CompanyCommandService;
-import com.mojagap.mojanode.service.company.CompanyQueryService;
 import com.mojagap.mojanode.service.company.handler.CompanyCommandHandler;
 import com.mojagap.mojanode.service.company.handler.CompanyQueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +31,7 @@ public class CompanyController extends BaseController {
     public ActionResponse createCompany(@RequestBody CompanyDto companyDto) {
         return executeAndLogUserActivity(EntityTypeEnum.COMPANY, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             ActionResponse response = companyCommandHandler.createCompany(companyDto);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }
@@ -43,7 +40,7 @@ public class CompanyController extends BaseController {
     public ActionResponse updateCompany(@RequestBody CompanyDto companyDto, @PathVariable Integer id) {
         return executeAndLogUserActivity(EntityTypeEnum.COMPANY, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
             ActionResponse response = companyCommandHandler.updateCompany(companyDto, id);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }
@@ -52,7 +49,7 @@ public class CompanyController extends BaseController {
     public ActionResponse closedCompany(@PathVariable Integer id) {
         return executeAndLogUserActivity(EntityTypeEnum.COMPANY, ActionTypeEnum.CLOSE, (UserActivityLog log) -> {
             ActionResponse response = companyCommandHandler.closeCompany(id);
-            log.setEntityId(response.resourceId());
+            log.setEntityId(response.getResourceId());
             return response;
         });
     }

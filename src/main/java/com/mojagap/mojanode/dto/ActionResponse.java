@@ -5,5 +5,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record ActionResponse(Integer resourceId) {
+public final class ActionResponse {
+    private final Integer resourceId;
+
+    public ActionResponse(Integer resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public Integer getResourceId() {
+        return resourceId;
+    }
+
 }
