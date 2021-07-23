@@ -135,7 +135,14 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
     public AppUserDto authenticateUser(AppUserDto appUserDto) {
         String email = httpServletRequest.getHeader(ApplicationConstants.EMAIL_HEADER_KEY);
         String password = httpServletRequest.getHeader(ApplicationConstants.PASSWORD_HEADER_KEY);
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+
+        Authentication authentication = null;
+        try {
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        } catch (Exception ex) {
+            PowerValidator.throwBadRequestException(ex.getMessage());
+        }
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         AppUser appUser = ((AppUserDetails) authentication.getPrincipal()).getAppUser();
         String authenticationToken = generateAuthenticationToken(appUser);

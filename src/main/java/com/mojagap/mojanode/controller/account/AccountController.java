@@ -38,8 +38,8 @@ public class AccountController extends BaseController {
     }
 
     @RequestMapping(path = "/authenticate", method = RequestMethod.GET)
-    public AppUserDto authenticateUser(@RequestBody AppUserDto appUserDto) {
-        return executeHttpGet(() -> accountCommandHandler.authenticateUser(appUserDto));
+    public AppUserDto authenticateUser() {
+        return executeHttpGet(() -> accountCommandHandler.authenticateUser(new AppUserDto()));
     }
 
     @RequestMapping(method = RequestMethod.PUT)
