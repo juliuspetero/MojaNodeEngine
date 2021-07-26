@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.mojagap</groupId>
-    <artifactId>moja-node</artifactId>
+    <artifactId>MojaNodeEngine</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>moja-node</name>
-    <description>Moja Node for bank transfers across the world</description>
+    <name>MojaNodeEngine</name>
+    <description>Moja Node back-end application for bank transfers across the world</description>
     <properties>
         <java.version>11</java.version>
     </properties>
