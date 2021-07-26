@@ -21,7 +21,7 @@ import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
-import com.mojagap.mojanode.model.user.IdentificationEnum;
+import com.mojagap.mojanode.model.common.IdTypeEnum;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
 import com.mojagap.mojanode.service.user.handler.UserQueryHandler;
@@ -149,7 +149,7 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
             appUser.setPassword("PASSWORD");
             appUser.setVerified(Boolean.FALSE);
             appUser.setDateOfBirth(DateUtil.now());
-            appUser.setIdNumber(IdentificationEnum.NATIONAL_ID.name());
+            appUser.setIdNumber(IdTypeEnum.NATIONAL_ID.name());
             AppContext.stamp(appUser);
             return appUser;
         }).collect(Collectors.toList());

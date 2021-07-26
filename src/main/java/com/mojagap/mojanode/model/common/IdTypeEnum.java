@@ -1,6 +1,6 @@
-package com.mojagap.mojanode.model.user;
+package com.mojagap.mojanode.model.common;
 
-public enum IdentificationEnum {
+public enum IdTypeEnum {
     NATIONAL_ID,
     PASSPORT,
     DRIVER_LICENCE,

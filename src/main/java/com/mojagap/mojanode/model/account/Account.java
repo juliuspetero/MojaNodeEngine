@@ -79,7 +79,6 @@ public class Account extends AuditEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type")
-    @NotNull(message = "Account Type cannot be empty")
     public AccountType getAccountType() {
         return accountType;
     }
