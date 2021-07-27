@@ -4,14 +4,12 @@ import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
-import com.mojagap.mojanode.model.role.Permission;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -53,10 +51,10 @@ public class Wallet extends AuditEntity {
         return branch;
     }
 
-    @JoinTable(name = "wallet_wallet_charge_charge", joinColumns = {
-            @JoinColumn(name = "", referencedColumnName = "id")}, inverseJoinColumns = {
-            @JoinColumn(name = "permission_id", referencedColumnName = "id")})
-    @OneToMany(targetEntity = Permission.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "wallet_wallet_charge", joinColumns = {
+            @JoinColumn(name = "wallet_id", referencedColumnName = "id")}, inverseJoinColumns = {
+            @JoinColumn(name = "wallet_charge_id", referencedColumnName = "id")})
+    @OneToMany(targetEntity = WalletCharge.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     public Set<WalletCharge> getWalletCharges() {
         return walletCharges;
     }

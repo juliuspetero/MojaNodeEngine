@@ -17,10 +17,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class RecipientTransaction extends AuditEntity {
     private Recipient recipient;
-    private String bankAccountNumber;
-    private String phoneNumber;
     private WalletTransaction walletTransaction;
     private BigDecimal amount;
+    private String bankAccountNumber;
+    private String phoneNumber;
     private TransactionStatus transactionStatus;
     private TransactionType transactionType;
     private PaymentMethodType paymentMethodType;
@@ -32,16 +32,6 @@ public class RecipientTransaction extends AuditEntity {
         return recipient;
     }
 
-    @Column(name = "bank_account_number")
-    public String getBankAccountNumber() {
-        return bankAccountNumber;
-    }
-
-    @Column(name = "phone_number")
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "wallet_transaction_id")
     public WalletTransaction getWalletTransaction() {
@@ -51,6 +41,16 @@ public class RecipientTransaction extends AuditEntity {
     @Column(name = "amount")
     public BigDecimal getAmount() {
         return amount;
+    }
+
+    @Column(name = "bank_account_number")
+    public String getBankAccountNumber() {
+        return bankAccountNumber;
+    }
+
+    @Column(name = "phone_number")
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     @Enumerated(EnumType.STRING)

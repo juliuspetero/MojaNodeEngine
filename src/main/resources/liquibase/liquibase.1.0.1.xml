@@ -1,0 +1,324 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="create-table-wallet" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="wallet"/>
+            </not>
+        </preConditions>
+        <comment>Create table for customer wallets</comment>
+        <createTable tableName="wallet">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="actual_balance" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="available_balance" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="27072021_FK_account_id"
+                             references="account(id)"/>
+            </column>
+            <column name="company_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="18062021_FK_recipient_company_id"
+                             references="company(id)"/>
+            </column>
+            <column name="branch_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="27072021_FK_recipient_branch_id"
+                             references="branch(id)"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-wallet_charge" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="wallet_charge"/>
+            </not>
+        </preConditions>
+        <comment>Create table for wallet charge</comment>
+        <createTable tableName="wallet_charge">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="unique_wallet_charge_name"/>
+            </column>
+            <column name="description" type="longtext">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fee_type_enum" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="charge_type_enum" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency_code" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-wallet_wallet_charge" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="wallet_wallet_charge"/>
+            </not>
+        </preConditions>
+        <comment>Create join table for wallet and wallet charge</comment>
+        <createTable tableName="wallet_wallet_charge">
+            <column name="wallet_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="27072021_FK_wwc_wallet_id"
+                             references="wallet(id)"/>
+            </column>
+            <column name="wallet_charge_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="27072021_FK_role_27072021_FK_wwc_wallet_charge_id"
+                             references="wallet_charge_id(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-wallet_transaction" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="wallet_transaction"/>
+            </not>
+        </preConditions>
+        <comment>Create table for keeping wallet transactions</comment>
+        <createTable tableName="wallet_transaction">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="wallet_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="27072021_FK_recipient_id"
+                             references="wallet(id)"/>
+            </column>
+            <column name="transaction_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-recipient_bank_detail" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="recipient_bank_detail"/>
+            </not>
+        </preConditions>
+        <comment>Create table for keeping all the recipient bank information</comment>
+        <createTable tableName="recipient_bank_detail">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="bank_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="branch_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="swift_code" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-recipient" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="recipient"/>
+            </not>
+        </preConditions>
+        <comment>Create table for keeping all the recipients</comment>
+        <createTable tableName="recipient">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="first_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_of_birth" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_type_enum" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_bank_detail_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="27072021_FK_recipient_bank_detail_id"
+                             references="recipient_bank_detail(id)"/>
+            </column>
+            <column name="company_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="18062021_FK_recipient_company_id"
+                             references="company(id)"/>
+            </column>
+            <column name="branch_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="27072021_FK_recipient_branch_id"
+                             references="branch(id)"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-recipient_transaction" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="recipient_transaction"/>
+            </not>
+        </preConditions>
+        <comment>Create table for keeping recipient transactions</comment>
+        <createTable tableName="recipient_transaction">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="recipient_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="27072021_FK_recipient_id"
+                             references="recipient(id)"/>
+            </column>
+            <column name="wallet_transaction_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="27072021_FK_wallet_transaction_id"
+                             references="wallet_transaction(id)"/>
+            </column>
+            <column name="amount" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="transaction_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_method_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="platform_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

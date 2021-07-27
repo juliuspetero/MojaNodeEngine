@@ -124,7 +124,7 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true" uniqueConstraintName="unique_branch_name"/>
             </column>
             <column name="company_id" type="bigint">
                 <constraints nullable="true" foreignKeyName="25062021_FK_branch_company_id"
@@ -181,9 +181,9 @@
         <comment>Create commonly used permissions for all users</comment>
         <sql>
             <![CDATA[
-
-                -- Account permissions
-                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
+            -- Account permissions
+            INSERT
+            IGNORE INTO permission(name, action_type, entity_type, category)
                 VALUES ('SUPER_PERMISSION', 'ALL', 'ALL', 'GENERAL'),
                 ('READ_USER_ACCOUNTS', 'READ', 'ACCOUNT', 'BACK_OFFICE'),
                 ('ACTIVATE_USER_ACCOUNTS', 'ACTIVATE', 'ACCOUNT', 'BACK_OFFICE'),
@@ -191,33 +191,36 @@
                 ('CLOSE_USER_ACCOUNTS', 'CLOSE', 'ACCOUNT', 'BACK_OFFICE');
 
                 -- User permissions
-                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
+                INSERT
+            IGNORE INTO permission(name, action_type, entity_type, category)
                 VALUES ('READ_APPLICATION_USERS', 'READ', 'USER', 'GENERAL'),
                 ('UPDATE_APPLICATION_USERS', 'UPDATE', 'USER', 'GENERAL'),
                 ('CREATE_APPLICATION_USERS', 'CREATE', 'USER', 'GENERAL'),
                 ('REMOVE_APPLICATION_USERS', 'REMOVE', 'USER', 'GENERAL');
 
                 -- Role permissions
-                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
+                INSERT
+            IGNORE INTO permission(name, action_type, entity_type, category)
                 VALUES ('READ_USER_ROLES', 'READ', 'ROLE', 'GENERAL'),
                 ('CREATE_USER_ROLES', 'CREATE', 'ROLE', 'GENERAL'),
                 ('UPDATE_USER_ROLES', 'UPDATE', 'ROLE', 'GENERAL'),
                 ('READ_USER_PERMISSIONS', 'READ', 'PERMISSION', 'GENERAL');
 
                 -- Branch permissions
-                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
+                INSERT
+            IGNORE INTO permission(name, action_type, entity_type, category)
                 VALUES ('READ_BRANCHES', 'READ', 'BRANCH', 'COMPANY'),
                 ('CREATE_BRANCHES', 'CREATE', 'BRANCH', 'COMPANY'),
                 ('UPDATE_BRANCHES', 'UPDATE', 'BRANCH', 'COMPANY'),
                 ('CLOSE_BRANCHES', 'CLOSE', 'BRANCH', 'COMPANY');
 
                  -- Branch permissions
-                INSERT IGNORE INTO permission(name, action_type, entity_type, category)
+                INSERT
+            IGNORE INTO permission(name, action_type, entity_type, category)
                 VALUES ('READ_COMPANIES', 'READ', 'COMPANY', 'COMPANY'),
                 ('CREATE_COMPANIES', 'CREATE', 'COMPANY', 'COMPANY'),
                 ('UPDATE_COMPANIES', 'UPDATE', 'COMPANY', 'COMPANY'),
                 ('CLOSE_COMPANIES', 'CLOSE', 'COMPANY', 'COMPANY');
-
             ]]>
         </sql>
     </changeSet>
@@ -234,7 +237,7 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true" uniqueConstraintName="unique_role_name"/>
             </column>
             <column name="description" type="longtext">
                 <constraints nullable="false"/>
@@ -374,24 +377,28 @@
         <comment>Insert operations/backoffice account for management</comment>
         <sql>
             <![CDATA[
-                INSERT IGNORE INTO account(name, address, country_code, email, contact_phone_number, account_type, record_status)
+            INSERT
+            IGNORE INTO account(name, address, country_code, email, contact_phone_number, account_type, record_status)
                 VALUES ('Mojagap Uganda Ltd', 'Kampala/Uganda', 'UG', 'admin@mojagap.io', '+256780000000', 'BACK_OFFICE', 'ACTIVE');
             ]]>
 
             <![CDATA[
-                INSERT IGNORE INTO role(name, description, account_id, record_status)
+                INSERT
+            IGNORE INTO role(name, description, account_id, record_status)
                 VALUES ('Super Administrator', 'This role provides all application permissions',
                         (SELECT account.id FROM account LIMIT 1), 'ACTIVE');
             ]]>
 
             <![CDATA[
-                INSERT IGNORE INTO role_permission(role_id, permission_id)
+                INSERT
+            IGNORE INTO role_permission(role_id, permission_id)
                 VALUES ((SELECT role.id FROM role LIMIT 1),
                         (SELECT permission.id FROM permission WHERE permission.name = 'SUPER_PERMISSION' LIMIT 1));
             ]]>
 
             <![CDATA[
-                INSERT IGNORE INTO app_user(first_name, last_name, date_of_birth, id_number, address, email, phone_number, password,
+                INSERT
+            IGNORE INTO app_user(first_name, last_name, date_of_birth, id_number, address, email, phone_number, password,
                                 is_verified, account_id, role_id, record_status)
                 VALUES ('Super', 'Admin', CURDATE(), 'U000040', 'Uganda/Kampala', 'admin@mojagap.io', '+256780000000',
                         '$2a$10$IfZ8QYCUfBRqseoKLEAelOPoa0QTpVl431amtf6R59ZgXpTD.6G3a', TRUE, (SELECT account.id FROM account LIMIT 1), (SELECT role.id FROM role LIMIT 1), 'ACTIVE');
