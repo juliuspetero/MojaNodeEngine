@@ -105,7 +105,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 account.setEmail(appUserDto.getEmail());
                 account.setContactPhoneNumber(appUserDto.getPhoneNumber());
                 account.setName(appUserDto.getFirstName() + " " + appUserDto.getLastName());
-
+                break;
             case COMPANY:
                 // accountDto.isValidCompany();
                 Company company = setCompanyProps(accountDto, account);
@@ -121,9 +121,10 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 appUser.setCompany(company);
                 appUser.setRole(createSuperUserRole(account));
                 appUser.setBranch(branch);
-            case PARTNER:
-                throw new UnsupportedOperationException("You cannot create a backoffice account at the moment");
+                break;
             case BACK_OFFICE:
+                throw new UnsupportedOperationException("You cannot create a backoffice account at the moment");
+            case PARTNER:
                 throw new UnsupportedOperationException("You cannot create a partner account at the moment");
         }
         accountRepository.save(account);
@@ -138,6 +139,10 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
 
         Authentication authentication = null;
         try {
+            if (email == null && password == null) {
+                email = appUserDto.getEmail();
+                password = appUserDto.getPassword();
+            }
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         } catch (Exception ex) {
             PowerValidator.throwBadRequestException(ex.getMessage());

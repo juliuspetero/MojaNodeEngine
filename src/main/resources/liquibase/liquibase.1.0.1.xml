@@ -20,15 +20,15 @@
                 <constraints nullable="false"/>
             </column>
             <column name="account_id" type="bigint">
-                <constraints nullable="true" foreignKeyName="27072021_FK_account_id"
+                <constraints nullable="true" foreignKeyName="27072021_FK_wallet_account_id"
                              references="account(id)"/>
             </column>
             <column name="company_id" type="bigint">
-                <constraints nullable="true" foreignKeyName="18062021_FK_recipient_company_id"
+                <constraints nullable="true" foreignKeyName="27072021_FK_wallet_company_id"
                              references="company(id)"/>
             </column>
             <column name="branch_id" type="bigint">
-                <constraints nullable="true" foreignKeyName="27072021_FK_recipient_branch_id"
+                <constraints nullable="true" foreignKeyName="27072021_FK_wallet_branch_id"
                              references="branch(id)"/>
             </column>
             <column name="created_on" type="timestamp" defaultValueComputed="now()">
@@ -111,7 +111,7 @@
             <column name="wallet_charge_id" type="bigint">
                 <constraints nullable="false"
                              foreignKeyName="27072021_FK_role_27072021_FK_wwc_wallet_charge_id"
-                             references="wallet_charge_id(id)"/>
+                             references="wallet_charge(id)"/>
             </column>
         </createTable>
     </changeSet>
@@ -242,7 +242,7 @@
                              references="recipient_bank_detail(id)"/>
             </column>
             <column name="company_id" type="bigint">
-                <constraints nullable="true" foreignKeyName="18062021_FK_recipient_company_id"
+                <constraints nullable="true" foreignKeyName="27072021_FK_recipient_company_id"
                              references="company(id)"/>
             </column>
             <column name="branch_id" type="bigint">
@@ -279,11 +279,11 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="recipient_id" type="bigint">
-                <constraints nullable="false" foreignKeyName="27072021_FK_recipient_id"
+                <constraints nullable="false" foreignKeyName="27072021_FK_rt_recipient_id"
                              references="recipient(id)"/>
             </column>
             <column name="wallet_transaction_id" type="bigint">
-                <constraints nullable="false" foreignKeyName="27072021_FK_wallet_transaction_id"
+                <constraints nullable="false" foreignKeyName="27072021_FK_rt_wallet_transaction_id"
                              references="wallet_transaction(id)"/>
             </column>
             <column name="amount" type="decimal(19,4)">

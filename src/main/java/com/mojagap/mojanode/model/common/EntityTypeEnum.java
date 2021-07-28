@@ -8,7 +8,7 @@ public enum EntityTypeEnum {
     PERMISSION,
     ACCOUNT,
     COMPANY,
-    BENEFICIARY,
+    RECIPIENT,
     DEPARTMENT,
     WALLET,
     BANK,

@@ -6,6 +6,5 @@ import com.mojagap.mojanode.model.common.RecordHolder;
 import java.util.Map;
 
 public interface BranchQueryHandler {
-
     RecordHolder<BranchDto> getBranches(Map<String, String> queryParams);
 }
