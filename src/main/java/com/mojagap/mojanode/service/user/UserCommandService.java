@@ -79,7 +79,7 @@ public class UserCommandService implements UserCommandHandler {
     public ActionResponse updateUser(AppUserDto appUserDto, Integer id) {
         appUserDto.isValid();
         Account account = AppContext.getLoggedInUser().getAccount();
-        AppUser appUser = appUserRepository.findByIdAndAcountId(id, account.getId()).orElseThrow(() ->
+        AppUser appUser = appUserRepository.findByIdAndAccountId(id, account.getId()).orElseThrow(() ->
                 new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, "User", "ID")));
         PowerValidator.isTrue(EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(account.getAccountType()), String.format(ErrorMessages.ACCOUNT_TYPE_NOT_PERMITTED, account.getAccountType()));
         PowerValidator.notNull(appUserDto.getRole().getId(), String.format(ErrorMessages.ENTITY_REQUIRED, "role ID"));
@@ -122,7 +122,7 @@ public class UserCommandService implements UserCommandHandler {
         PowerValidator.notNull(userId, String.format(ErrorMessages.ENTITY_REQUIRED, "User ID"));
         Account account = AppContext.getLoggedInUser().getAccount();
         AccountType accountType = account.getAccountType();
-        AppUser appUser = appUserRepository.findByIdAndAcountId(userId, account.getId()).orElseThrow(() ->
+        AppUser appUser = appUserRepository.findByIdAndAccountId(userId, account.getId()).orElseThrow(() ->
                 new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, "User", "ID")));
         PowerValidator.isTrue(EnumSet.of(AccountType.BACK_OFFICE, AccountType.COMPANY).contains(accountType), String.format(ErrorMessages.ACCOUNT_TYPE_NOT_PERMITTED, accountType));
         appUser.setRecordStatus(AuditEntity.RecordStatus.DELETED);

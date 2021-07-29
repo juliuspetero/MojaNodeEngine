@@ -36,4 +36,12 @@ public class ErrorMessages {
     public static final String NOT_PERMITTED_TO_PERFORM_ACTION_ON_COMPANY = "You are not permitted perform any action on this company";
     public static final String NOT_PERMITTED_TO_CLOSE_COMPANY = "You are not permitted to close this company";
     public static final String NOT_PERMITTED_TO_MIGRATE_COMPANY = "You are not permitted to migrate this company to a different parent";
+    public static final String RECIPIENT_BANK_DETAIL_REQUIRED = "Recipient bank information is required";
+    public static final String BANK_NAME_REQUIRED = "A valid name of the bank is required";
+    public static final String BANK_ACCOUNT_NAME_REQUIRED = "A valid bank account name is required";
+    public static final String BANK_ACCOUNT_NUMBER_REQUIRED = "A valid bank account number is required";
+    public static final String BANK_BRANCH_NAME_REQUIRED = "A valid bank branch name is required";
+    public static final String BANK_SWIFT_CODE_REQUIRED = "A valid bank swift code is required";
+    public static final String CANNOT_UPDATE_RECORD_IN_STATUS = "%s in status %s cannot be updated";
+    public static final String CANNOT_CREATE_OR_UPDATE_RECIPIENT_IN_BRANCH = "You are not permitted to create or update a recipient under this branch";
 }

@@ -18,7 +18,6 @@ import com.mojagap.mojanode.model.company.CompanyType;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.repository.company.CompanyRepository;
 import com.mojagap.mojanode.service.company.handler.CompanyCommandHandler;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,13 +28,10 @@ import java.util.stream.Collectors;
 @Service
 public class CompanyCommandService implements CompanyCommandHandler {
     private final CompanyRepository companyRepository;
-    private final ModelMapper modelMapper;
 
     @Autowired
-    public CompanyCommandService(CompanyRepository companyRepository,
-                                 ModelMapper modelMapper) {
+    public CompanyCommandService(CompanyRepository companyRepository) {
         this.companyRepository = companyRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Transactional
@@ -43,7 +39,7 @@ public class CompanyCommandService implements CompanyCommandHandler {
     public ActionResponse createCompany(CompanyDto companyDto) {
         companyDto.isValid();
         Account account = AppContext.getLoggedInUser().getAccount();
-        PowerValidator.iPermittedAccountType(account.getAccountType(), AccountType.COMPANY);
+        PowerValidator.isPermittedAccountType(account.getAccountType(), AccountType.COMPANY);
         List<Integer> loggedInUserCompanyIds = AppContext.getCompaniesOfLoggedInUser().stream().map(Company::getId).collect(Collectors.toList());
         if (companyDto.getParentCompany() == null || companyDto.getParentCompany().getId() == null) {
             PowerValidator.throwBadRequestException(String.format(ErrorMessages.ENTITY_REQUIRED, "Parent company ID"));
@@ -70,7 +66,7 @@ public class CompanyCommandService implements CompanyCommandHandler {
     public ActionResponse updateCompany(CompanyDto companyDto, Integer id) {
         companyDto.isValid();
         Account account = AppContext.getLoggedInUser().getAccount();
-        PowerValidator.iPermittedAccountType(account.getAccountType(), AccountType.COMPANY);
+        PowerValidator.isPermittedAccountType(account.getAccountType(), AccountType.COMPANY);
         Company company = companyRepository.findCompanyById(id)
                 .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Company.class.getSimpleName(), "ID")));
         List<Integer> loggedInUserCompanyIds = AppContext.getCompaniesOfLoggedInUser().stream().map(Company::getId).collect(Collectors.toList());
@@ -100,7 +96,7 @@ public class CompanyCommandService implements CompanyCommandHandler {
     public ActionResponse closeCompany(Integer id) {
         AppUser loggedInUser = AppContext.getLoggedInUser();
         Account account = loggedInUser.getAccount();
-        PowerValidator.iPermittedAccountType(account.getAccountType(), AccountType.COMPANY);
+        PowerValidator.isPermittedAccountType(account.getAccountType(), AccountType.COMPANY);
         Company company = companyRepository.findCompanyById(id)
                 .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Company.class.getSimpleName(), "ID")));
         List<Integer> loggedInUserCompanyIds = AppContext.getCompaniesOfLoggedInUser().stream().map(Company::getId).collect(Collectors.toList());

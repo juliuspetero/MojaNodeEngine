@@ -23,5 +23,5 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
 
     @Query(value = "SELECT * FROM app_user r WHERE r.record_status='ACTIVE' AND r.id =:id AND r.account_id = :accountId",
             nativeQuery = true)
-    Optional<AppUser> findByIdAndAcountId(Integer id, Integer accountId);
+    Optional<AppUser> findByIdAndAccountId(Integer id, Integer accountId);
 }

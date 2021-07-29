@@ -1,5 +1,6 @@
 package com.mojagap.mojanode.model.recipient;
 
+import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.common.IdTypeEnum;
@@ -23,6 +24,7 @@ public class Recipient extends AuditEntity {
     private String email;
     private String phoneNumber;
     private RecipientBankDetail recipientBankDetail;
+    private Account account;
     private Company company;
     private Branch branch;
 
@@ -47,6 +49,7 @@ public class Recipient extends AuditEntity {
     }
 
     @Column(name = "id_type_enum")
+    @Enumerated(EnumType.STRING)
     public IdTypeEnum getIdTypeEnum() {
         return idTypeEnum;
     }
@@ -70,6 +73,12 @@ public class Recipient extends AuditEntity {
     @JoinColumn(name = "recipient_bank_detail_id")
     public RecipientBankDetail getRecipientBankDetail() {
         return recipientBankDetail;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    public Account getAccount() {
+        return account;
     }
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

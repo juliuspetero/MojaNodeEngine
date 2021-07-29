@@ -241,6 +241,10 @@
                 <constraints nullable="false" foreignKeyName="27072021_FK_recipient_bank_detail_id"
                              references="recipient_bank_detail(id)"/>
             </column>
+            <column name="account_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="29072021_FK_recipient_account_id"
+                             references="account(id)"/>
+            </column>
             <column name="company_id" type="bigint">
                 <constraints nullable="true" foreignKeyName="27072021_FK_recipient_company_id"
                              references="company(id)"/>

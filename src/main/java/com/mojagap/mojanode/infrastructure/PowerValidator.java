@@ -90,7 +90,7 @@ public class PowerValidator {
         }
     }
 
-    public static void iPermittedAccountType(AccountType providedType, AccountType... accountTypes) {
+    public static void isPermittedAccountType(AccountType providedType, AccountType... accountTypes) {
         List<AccountType> accountTypeList = List.of(accountTypes);
         if (!accountTypeList.contains(providedType)) {
             throw new BadRequestException(providedType.name() + " user is not permitted to access this resource");

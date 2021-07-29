@@ -214,13 +214,21 @@
                 ('UPDATE_BRANCHES', 'UPDATE', 'BRANCH', 'COMPANY'),
                 ('CLOSE_BRANCHES', 'CLOSE', 'BRANCH', 'COMPANY');
 
-                 -- Branch permissions
+                 -- Company permissions
                 INSERT
             IGNORE INTO permission(name, action_type, entity_type, category)
                 VALUES ('READ_COMPANIES', 'READ', 'COMPANY', 'COMPANY'),
                 ('CREATE_COMPANIES', 'CREATE', 'COMPANY', 'COMPANY'),
                 ('UPDATE_COMPANIES', 'UPDATE', 'COMPANY', 'COMPANY'),
                 ('CLOSE_COMPANIES', 'CLOSE', 'COMPANY', 'COMPANY');
+
+                -- Recipient permissions
+                INSERT
+            IGNORE INTO permission(name, action_type, entity_type, category)
+                VALUES ('READ_RECIPIENTS', 'READ', 'RECIPIENT', 'GENERAL'),
+                ('CREATE_RECIPIENTS', 'CREATE', 'RECIPIENT', 'GENERAL'),
+                ('UPDATE_RECIPIENTS', 'UPDATE', 'RECIPIENT', 'GENERAL'),
+                ('CLOSE_RECIPIENTS', 'CLOSE', 'RECIPIENT', 'GENERAL');
             ]]>
         </sql>
     </changeSet>

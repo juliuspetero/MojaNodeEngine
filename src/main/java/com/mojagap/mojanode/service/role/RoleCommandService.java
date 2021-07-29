@@ -49,7 +49,7 @@ public class RoleCommandService implements RoleCommandHandler {
     public ActionResponse createRole(RoleDto roleDto) {
         roleDto.isValid();
         Account account = AppContext.getLoggedInUser().getAccount();
-        PowerValidator.iPermittedAccountType(account.getAccountType(), AccountType.COMPANY, AccountType.BACK_OFFICE);
+        PowerValidator.isPermittedAccountType(account.getAccountType(), AccountType.COMPANY, AccountType.BACK_OFFICE);
         List<Role> existingRoles = roleRepository.findByAccountIdAndName(roleDto.getName(), account.getId());
         PowerValidator.isEmpty(existingRoles, String.format(ErrorMessages.ENTITY_ALREADY_EXISTS, Role.class.getSimpleName(), "name"));
         List<Permission> permissions = validatePermissions(roleDto, account);
@@ -63,7 +63,7 @@ public class RoleCommandService implements RoleCommandHandler {
     public ActionResponse updateRole(RoleDto roleDto, Integer roleId) {
         roleDto.isValid();
         Account account = AppContext.getLoggedInUser().getAccount();
-        PowerValidator.iPermittedAccountType(account.getAccountType(), AccountType.COMPANY, AccountType.BACK_OFFICE);
+        PowerValidator.isPermittedAccountType(account.getAccountType(), AccountType.COMPANY, AccountType.BACK_OFFICE);
         Role role = roleRepository.findById(roleId).orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Role.class.getSimpleName(), "id")));
         if (!roleDto.getName().equals(role.getName())) {
             List<Role> existingRoles = roleRepository.findByAccountIdAndName(roleDto.getName(), account.getId());
