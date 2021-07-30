@@ -22,9 +22,10 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class AccountDto {
-    private Integer accountId;
+    private Integer id;
     private String name;
     private String address;
+    private String status;
     private String countryCode;
     private String email;
     private String contactPhoneNumber;
@@ -32,14 +33,21 @@ public class AccountDto {
     private List<AppUserDto> users;
     private List<CompanyDto> companies;
 
-    public AccountDto(Integer accountId) {
-        this.accountId = accountId;
+    public AccountDto(Integer id) {
+        this.id = id;
     }
 
-    public AccountDto(Integer accountId, String accountType, String countryCode) {
-        this.accountId = accountId;
+    public AccountDto(Integer id, String accountType, String countryCode) {
+        this.id = id;
         this.accountType = accountType;
         this.countryCode = countryCode;
+    }
+
+    public AccountDto(Integer id, String accountType, String countryCode, String status) {
+        this.id = id;
+        this.accountType = accountType;
+        this.countryCode = countryCode;
+        this.status = status;
     }
 
     public void isValid() {

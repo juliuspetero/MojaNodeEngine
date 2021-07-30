@@ -32,7 +32,7 @@ public class AccountController extends BaseController {
     public AppUserDto createAccount(@RequestBody AccountDto accountDto) {
         return executeAndLogUserActivity(EntityTypeEnum.ACCOUNT, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             AppUserDto response = accountCommandHandler.createAccount(accountDto);
-            log.setEntityId(response.getAccount().getAccountId());
+            log.setEntityId(response.getAccount().getId());
             return response;
         });
     }

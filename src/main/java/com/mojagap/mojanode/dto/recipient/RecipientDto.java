@@ -33,9 +33,9 @@ public class RecipientDto {
     private String email;
     private String phoneNumber;
     private RecipientBankDetailDto recipientBankDetail;
+    private AccountDto account;
     private CompanyDto company;
     private BranchDto branch;
-    private AccountDto account;
 
     @SneakyThrows
     public void isValid() {

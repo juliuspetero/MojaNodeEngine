@@ -85,4 +85,8 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
     @Query(value = "SELECT * FROM company WHERE record_status = 'ACTIVE' AND id = :companyId",
             nativeQuery = true)
     Optional<Company> findCompanyById(Integer companyId);
+
+    @Query(value = "SELECT * FROM company m WHERE m.record_status = 'ACTIVE' AND m.account_id = :accountId",
+            nativeQuery = true)
+    List<Company> findByAccountId(Integer accountId);
 }

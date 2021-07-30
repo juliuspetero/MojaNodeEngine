@@ -85,7 +85,7 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
 
         if (queryParams.get(AppUserQueryParams.DATE_OF_BIRTH.getValue()) != null) {
             Date dateOfBirth = DateUtil.DefaultDateFormat().parse(queryParams.get(AppUserQueryParams.DATE_OF_BIRTH.getValue()));
-            mapSqlParameterSource.addValue(AppUserQueryParams.DATE_OF_BIRTH.getValue(), dateOfBirth, Types.BOOLEAN);
+            mapSqlParameterSource.addValue(AppUserQueryParams.DATE_OF_BIRTH.getValue(), dateOfBirth, Types.DATE);
         }
         if (queryParams.get(AppUserQueryParams.VERIFIED.getValue()) != null) {
             mapSqlParameterSource.addValue(AppUserQueryParams.VERIFIED.getValue(), Boolean.parseBoolean(queryParams.get(AppUserQueryParams.VERIFIED.getValue())), Types.BOOLEAN);

@@ -50,6 +50,14 @@ public class CompanyDto {
         this.status = status;
     }
 
+    public CompanyDto(Integer id, String name, String companyType, Date opeingdate, String status) {
+        this.id = id;
+        this.name = name;
+        this.companyType = companyType;
+        this.openingDate = opeingdate;
+        this.status = status;
+    }
+
     @SneakyThrows(NumberParseException.class)
     public void isValid() {
         PowerValidator.ValidEnum(CompanyType.class, companyType, ErrorMessages.VALID_COMPANY_TYPE);

@@ -2,7 +2,6 @@ package com.mojagap.mojanode.controller.recipient;
 
 import com.mojagap.mojanode.controller.BaseController;
 import com.mojagap.mojanode.dto.ActionResponse;
-import com.mojagap.mojanode.dto.branch.BranchDto;
 import com.mojagap.mojanode.dto.recipient.RecipientDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
@@ -55,7 +54,7 @@ public class RecipientController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public RecordHolder<BranchDto> getRecipients(@RequestParam Map<String, String> queryParams) {
+    public RecordHolder<RecipientDto> getRecipients(@RequestParam Map<String, String> queryParams) {
         return executeHttpGet(() -> recipientQueryHandler.getRecipients(queryParams));
     }
 

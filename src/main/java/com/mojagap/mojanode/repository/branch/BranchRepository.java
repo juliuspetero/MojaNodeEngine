@@ -83,4 +83,8 @@ public interface BranchRepository extends JpaRepository<Branch, Integer> {
     @Query(value = "SELECT * FROM branch WHERE record_status = 'ACTIVE' AND id = :branchId",
             nativeQuery = true)
     Optional<Branch> findById(Integer branchId);
+
+    @Query(value = "SELECT * FROM branch m WHERE m.record_status = 'ACTIVE' AND m.account_id = :accountId",
+            nativeQuery = true)
+    List<Branch> findByAccountId(Integer accountId);
 }

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
-import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.recipient.RecipientBankDetail;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class RecipientBankDetailDto {
     private Integer id;
     private String bankName;
