@@ -13,7 +13,7 @@ public class BranchSqlResultSet {
     private Integer id;
     private String name;
     private String status;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date openingDate;
     private Integer companyId;
     private String companyName;

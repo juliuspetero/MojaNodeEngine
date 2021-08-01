@@ -26,10 +26,10 @@ public class CompanyDto {
     private String name;
     private String companyType;
     private String status;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date registrationDate;
     private String registrationNumber;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date openingDate;
     private String address;
     private String email;

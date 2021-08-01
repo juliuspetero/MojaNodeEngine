@@ -15,4 +15,6 @@ public class ApplicationConstants {
     public static final String DEFAULT_ROLE_DESCRIPTION = "This role provides all application permissions";
     public static final String DEFAULT_OFFICE_NAME = "Head Office";
     public static final String APP_USER_ID = "userId";
+    public static final String CSV_CONTENT_TYPE = "text/csv";
+
 }

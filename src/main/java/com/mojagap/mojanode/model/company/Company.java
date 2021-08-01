@@ -22,7 +22,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class Company extends AuditEntity {
     private String name;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date registrationDate;
     private CompanyType companyType;
     private String registrationNumber;

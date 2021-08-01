@@ -20,7 +20,7 @@ import java.util.Date;
 public class BranchDto {
     private Integer id;
     private String name;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date openingDate;
     private String status;
     private BranchDto parentBranch;

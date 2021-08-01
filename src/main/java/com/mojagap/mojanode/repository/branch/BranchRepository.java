@@ -12,49 +12,25 @@ import java.util.Optional;
 public interface BranchRepository extends JpaRepository<Branch, Integer> {
 
     String topBottomQuery = "" +
-            "WITH RECURSIVE branchCTE (id, name, parent_branch_id, company_id, created_on, created_by, modified_on, modified_by,\n" +
+            "WITH RECURSIVE branchCTE (id, name, account_id, company_id, parent_branch_id, created_on, modified_on, created_by, modified_by,\n" +
             "                          record_status) AS\n" +
             "                   (\n" +
-            "                       SELECT id,\n" +
-            "                              name,\n" +
-            "                              parent_branch_id,\n" +
-            "                              company_id,\n" +
-            "                              created_on,\n" +
-            "                              created_by,\n" +
-            "                              modified_on,\n" +
-            "                              modified_by,\n" +
-            "                              record_status\n" +
+            "                       SELECT *\n" +
             "                       FROM branch\n" +
             "                       WHERE parent_branch_id = :parentId\n" +
             "                          OR id = :parentId\n" +
             "                       UNION\n" +
             "                       DISTINCT\n" +
-            "                       SELECT br.id,\n" +
-            "                              br.name,\n" +
-            "                              br.parent_branch_id,\n" +
-            "                              br.company_id,\n" +
-            "                              br.created_on,\n" +
-            "                              br.created_by,\n" +
-            "                              br.modified_on,\n" +
-            "                              br.modified_by,\n" +
-            "                              br.record_status\n" +
+            "                       SELECT br.*\n" +
             "                       FROM branchCTE AS cte\n" +
             "                                JOIN branch AS br\n" +
             "                                     ON br.parent_branch_id = cte.id\n" +
             "                   )\n" +
-            "SELECT id,\n" +
-            "       name,\n" +
-            "       parent_branch_id,\n" +
-            "       company_id,\n" +
-            "       created_on,\n" +
-            "       created_by,\n" +
-            "       modified_on,\n" +
-            "       modified_by,\n" +
-            "       record_status\n" +
+            "SELECT * \n" +
             "FROM branchCTE";
 
     String bottomUpQuery = "" +
-            "WITH RECURSIVE branchCTE (id, name, parent_branch_id, company_id, created_on, created_by, modified_on, modified_by,\n" +
+            "WITH RECURSIVE branchCTE (id, name, account_id, company_id, parent_branch_id, created_on, modified_on, created_by, modified_by, " +
             "                          record_status) AS\n" +
             "                   (\n" +
             "                       SELECT *\n" +

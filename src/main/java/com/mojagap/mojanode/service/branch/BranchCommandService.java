@@ -18,6 +18,7 @@ import com.mojagap.mojanode.service.branch.handler.BranchCommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ public class BranchCommandService implements BranchCommandHandler {
 
 
     @Override
+    @Transactional
     public ActionResponse createBranch(BranchDto branchDto) {
         branchDto.isValid();
         AppUser loggedInUser = AppContext.getLoggedInUser();
@@ -39,7 +41,7 @@ public class BranchCommandService implements BranchCommandHandler {
         PowerValidator.isPermittedAccountType(account.getAccountType(), AccountType.COMPANY);
         Branch parentBranch = getParentBranch(branchDto);
         Company company = loggedInUser.getCompany();
-        Branch branch = new Branch(branchDto.getName(), company);
+        Branch branch = new Branch(branchDto.getName(), company, account);
         branch.setParentBranch(parentBranch);
         AppContext.stamp(branch);
         company.getBranches().add(branch);
@@ -48,6 +50,7 @@ public class BranchCommandService implements BranchCommandHandler {
     }
 
     @Override
+    @Transactional
     public ActionResponse updateBranch(BranchDto branchDto, Integer id) {
         Account account = AppContext.getLoggedInUser().getAccount();
         PowerValidator.isPermittedAccountType(account.getAccountType(), AccountType.COMPANY);
@@ -74,6 +77,7 @@ public class BranchCommandService implements BranchCommandHandler {
     }
 
     @Override
+    @Transactional
     public ActionResponse closeBranch(Integer id) {
         AppUser loggedInUser = AppContext.getLoggedInUser();
         Account account = loggedInUser.getAccount();

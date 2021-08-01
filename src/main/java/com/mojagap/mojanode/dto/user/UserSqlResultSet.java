@@ -17,7 +17,7 @@ public class UserSqlResultSet {
     private String address;
     private String email;
     private String userStatus;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date dateOfBirth;
     private String idNumber;
     private String phoneNumber;
@@ -31,7 +31,7 @@ public class UserSqlResultSet {
     private String accountType;
     private Integer branchId;
     private String branchName;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date branchOpeningDate;
     private String branchStatus;
     private Integer roleId;

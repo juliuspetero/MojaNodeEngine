@@ -2,11 +2,13 @@ package com.mojagap.mojanode.service.recipient;
 
 import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.recipient.RecipientBankDetailDto;
+import com.mojagap.mojanode.dto.recipient.RecipientCsvDto;
 import com.mojagap.mojanode.dto.recipient.RecipientDto;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
+import com.mojagap.mojanode.infrastructure.utility.CsvUtil;
 import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.branch.Branch;
@@ -23,6 +25,7 @@ import com.mojagap.mojanode.repository.recipient.RecipientRepository;
 import com.mojagap.mojanode.service.recipient.handler.RecipientCommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -44,6 +47,7 @@ public class RecipientCommandService implements RecipientCommandHandler {
     }
 
     @Override
+    @Transactional
     public ActionResponse createRecipient(RecipientDto recipientDto) {
         recipientDto.isValid();
         AppUser loggedInUser = AppContext.getLoggedInUser();
@@ -63,7 +67,51 @@ public class RecipientCommandService implements RecipientCommandHandler {
         }
         recipient = recipientRepository.save(recipient);
         return new ActionResponse(recipient.getId());
+    }
 
+    @Override
+    @Transactional
+    public ActionResponse createRecipientViaCsv(MultipartFile multipartFile) {
+        AppUser loggedInUser = AppContext.getLoggedInUser();
+        Account account = loggedInUser.getAccount();
+        AccountType accountType = account.getAccountType();
+        PowerValidator.isPermittedAccountType(accountType, AccountType.INDIVIDUAL, AccountType.COMPANY);
+        List<RecipientCsvDto> recipientCsvDtos = CsvUtil.parseMultipartCsv(multipartFile, RecipientCsvDto.class);
+        List<Recipient> recipients = recipientCsvDtos.stream().map(dto -> toRecipientEntity(dto, loggedInUser)).collect(Collectors.toList());
+        recipientRepository.saveAll(recipients);
+        return new ActionResponse("Uploaded the file successfully: " + multipartFile.getOriginalFilename());
+    }
+
+    private Recipient toRecipientEntity(RecipientCsvDto recipientCsvDto, AppUser loggedInUser) {
+        recipientCsvDto.isValid();
+        Account account = loggedInUser.getAccount();
+        AccountType accountType = account.getAccountType();
+        Recipient recipient = new Recipient();
+        recipient.setFirstName(recipientCsvDto.getFirstName());
+        recipient.setLastName(recipientCsvDto.getLastName());
+        recipient.setDateOfBirth(recipientCsvDto.getDateOfBirth());
+        recipient.setIdTypeEnum(IdTypeEnum.valueOf(recipientCsvDto.getIdTypeEnum()));
+        recipient.setIdNumber(recipientCsvDto.getIdNumber());
+        recipient.setAddress(recipientCsvDto.getAddress());
+        recipient.setEmail(recipientCsvDto.getEmail());
+        recipient.setPhoneNumber(recipientCsvDto.getPhoneNumber());
+        recipient.setAccount(loggedInUser.getAccount());
+        AppContext.stamp(recipient);
+        if (AccountType.COMPANY.equals(accountType)) {
+            Company company = companyRepository.getById(loggedInUser.getCompany().getId());
+            Branch branch = branchRepository.getById(loggedInUser.getBranch().getId());
+            recipient.setCompany(company);
+            recipient.setBranch(branch);
+        }
+        RecipientBankDetail recipientBankDetail = new RecipientBankDetail();
+        recipientBankDetail.setBankName(recipientCsvDto.getBankName());
+        recipientBankDetail.setAccountName(recipientCsvDto.getAccountName());
+        recipientBankDetail.setAccountNumber(recipientCsvDto.getAccountNumber());
+        recipientBankDetail.setBranchName(recipientCsvDto.getBranchName());
+        recipientBankDetail.setSwiftCode(recipientCsvDto.getSwiftCode());
+        AppContext.stamp(recipientBankDetail);
+        recipient.setRecipientBankDetail(recipientBankDetail);
+        return recipient;
     }
 
     private void updateRecipientDetails(RecipientDto recipientDto, Recipient recipient) {

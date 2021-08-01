@@ -53,7 +53,7 @@ public class CompanyCommandService implements CompanyCommandHandler {
                 .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Company.class.getSimpleName(), "ID")));
         company.setParentCompany(parentCompany);
         company.setAccount(account);
-        Branch branch = new Branch(ApplicationConstants.DEFAULT_OFFICE_NAME, company);
+        Branch branch = new Branch(ApplicationConstants.DEFAULT_OFFICE_NAME, company, account);
         AppContext.stamp(branch);
         company.getBranches().add(branch);
         AppContext.stamp(company);

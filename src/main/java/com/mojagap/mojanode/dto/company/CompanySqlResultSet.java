@@ -16,9 +16,9 @@ public class CompanySqlResultSet {
     private String companyType;
     private String email;
     private String phoneNumber;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date registrationDate;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date openingDate;
     private String registrationNumber;
     private String address;

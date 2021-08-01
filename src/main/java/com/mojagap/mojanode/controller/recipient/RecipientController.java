@@ -11,6 +11,7 @@ import com.mojagap.mojanode.service.recipient.handler.RecipientCommandHandler;
 import com.mojagap.mojanode.service.recipient.handler.RecipientQueryHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -30,6 +31,15 @@ public class RecipientController extends BaseController {
     public ActionResponse createRecipient(@RequestBody RecipientDto recipientDto) {
         return executeAndLogUserActivity(EntityTypeEnum.RECIPIENT, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
             ActionResponse response = recipientCommandHandler.createRecipient(recipientDto);
+            log.setEntityId(response.getResourceId());
+            return response;
+        });
+    }
+
+    @RequestMapping(path = "/csv", method = RequestMethod.POST)
+    public ActionResponse createRecipientViaCsv(@RequestParam("csvFile") MultipartFile multipartFile) {
+        return executeAndLogUserActivity(EntityTypeEnum.RECIPIENT, ActionTypeEnum.CREATE, (UserActivityLog log) -> {
+            ActionResponse response = recipientCommandHandler.createRecipientViaCsv(multipartFile);
             log.setEntityId(response.getResourceId());
             return response;
         });

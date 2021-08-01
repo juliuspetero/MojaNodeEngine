@@ -107,11 +107,10 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 account.setName(appUserDto.getFirstName() + " " + appUserDto.getLastName());
                 break;
             case COMPANY:
-                // accountDto.isValidCompany();
                 Company company = setCompanyProps(accountDto, account);
                 company.setCreatedBy(appUser);
                 company.setModifiedBy(appUser);
-                Branch branch = new Branch("Head Office", company);
+                Branch branch = new Branch("Head Office", company, account);
                 branch.setParentBranch(branch);
                 AppContext.stamp(branch);
                 branch.setCreatedBy(appUser);
@@ -194,7 +193,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 if (accountDto.getAccountType().equals(AccountType.COMPANY.name())) {
                     account.setAccountType(AccountType.valueOf(accountDto.getAccountType()));
                     Company company = setCompanyProps(accountDto, account);
-                    Branch branch = new Branch("Head Office", company);
+                    Branch branch = new Branch("Head Office", company, account);
                     branch.setParentBranch(branch);
                     AppContext.stamp(branch);
                     company.getBranches().add(branch);

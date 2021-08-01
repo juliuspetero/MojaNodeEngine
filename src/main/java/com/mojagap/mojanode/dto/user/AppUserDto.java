@@ -26,7 +26,7 @@ public class AppUserDto {
     private String authentication;
     private String firstName;
     private String lastName;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date dateOfBirth;
     private String idNumber;
     private String idType;

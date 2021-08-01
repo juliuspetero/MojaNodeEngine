@@ -13,9 +13,9 @@ public class RecipientSqlResultSet {
     private Integer id;
     private String firstName;
     private String lastName;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date dateOfBirth;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date registrationDate;
     private String idNumber;
     private String idTypeEnum;
@@ -32,13 +32,13 @@ public class RecipientSqlResultSet {
     private Integer companyId;
     private String companyName;
     private String companyType;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date companyOpeningDate;
     private String companyStatus;
 
     private Integer branchId;
     private String branchName;
-    @JsonFormat(pattern = DateUtil.DD_MMM_YYY)
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
     private Date branchOpeningDate;
     private String branchStatus;
 

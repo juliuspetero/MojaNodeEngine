@@ -44,4 +44,5 @@ public class ErrorMessages {
     public static final String BANK_SWIFT_CODE_REQUIRED = "A valid bank swift code is required";
     public static final String CANNOT_UPDATE_RECORD_IN_STATUS = "%s in status %s cannot be updated";
     public static final String CANNOT_CREATE_OR_UPDATE_RECIPIENT_IN_BRANCH = "You are not permitted to create or update a recipient under this branch";
+    public static final String CSV_FILE_TYPE_REQUIRED = "Please upload a valid csv file type";
 }
