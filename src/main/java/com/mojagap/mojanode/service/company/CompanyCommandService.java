@@ -16,12 +16,14 @@ import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.company.CompanyType;
 import com.mojagap.mojanode.model.user.AppUser;
+import com.mojagap.mojanode.model.wallet.Wallet;
 import com.mojagap.mojanode.repository.company.CompanyRepository;
 import com.mojagap.mojanode.service.company.handler.CompanyCommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +59,15 @@ public class CompanyCommandService implements CompanyCommandHandler {
         AppContext.stamp(branch);
         company.getBranches().add(branch);
         AppContext.stamp(company);
+
+        Wallet wallet = new Wallet();
+        wallet.setAvailableBalance(BigDecimal.ZERO);
+        wallet.setActualBalance(BigDecimal.ZERO);
+        wallet.setAccount(account);
+        wallet.setBranch(branch);
+        wallet.setCompany(company);
+        AppContext.stamp(wallet);
+        company.getWallets().add(wallet);
         companyRepository.save(company);
         return new ActionResponse(company.getId());
     }

@@ -124,7 +124,7 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="name" type="varchar(255)">
-                <constraints nullable="false" unique="true" uniqueConstraintName="unique_branch_name"/>
+                <constraints nullable="false"/>
             </column>
             <column name="account_id" type="bigint">
                 <constraints nullable="true" foreignKeyName="01082021_FK_branch_account_id"

@@ -13,12 +13,14 @@ import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.user.AppUser;
+import com.mojagap.mojanode.model.wallet.Wallet;
 import com.mojagap.mojanode.repository.branch.BranchRepository;
 import com.mojagap.mojanode.service.branch.handler.BranchCommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +47,14 @@ public class BranchCommandService implements BranchCommandHandler {
         branch.setParentBranch(parentBranch);
         AppContext.stamp(branch);
         company.getBranches().add(branch);
+        Wallet wallet = new Wallet();
+        wallet.setAvailableBalance(BigDecimal.ZERO);
+        wallet.setActualBalance(BigDecimal.ZERO);
+        wallet.setAccount(account);
+        wallet.setBranch(branch);
+        wallet.setCompany(company);
+        AppContext.stamp(wallet);
+        branch.getWallets().add(wallet);
         branchRepository.save(branch);
         return new ActionResponse(branch.getId());
     }

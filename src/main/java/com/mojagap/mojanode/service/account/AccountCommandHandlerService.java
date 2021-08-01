@@ -24,6 +24,7 @@ import com.mojagap.mojanode.model.role.Permission;
 import com.mojagap.mojanode.model.role.PermissionEnum;
 import com.mojagap.mojanode.model.role.Role;
 import com.mojagap.mojanode.model.user.AppUser;
+import com.mojagap.mojanode.model.wallet.Wallet;
 import com.mojagap.mojanode.repository.account.AccountRepository;
 import com.mojagap.mojanode.repository.role.PermissionRepository;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
@@ -44,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
@@ -98,6 +100,15 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         account.getAppUsers().add(appUser);
         appUser.setAccount(account);
 
+        Wallet wallet = new Wallet();
+        wallet.setAvailableBalance(BigDecimal.ZERO);
+        wallet.setActualBalance(BigDecimal.ZERO);
+        wallet.setAccount(account);
+        account.getWallets().add(wallet);
+        AppContext.stamp(wallet);
+        wallet.setCreatedBy(appUser);
+        wallet.setModifiedBy(appUser);
+
         AccountType accountType = account.getAccountType();
         switch (accountType) {
             case INDIVIDUAL:
@@ -120,6 +131,8 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
                 appUser.setCompany(company);
                 appUser.setRole(createSuperUserRole(account));
                 appUser.setBranch(branch);
+                wallet.setCompany(company);
+                wallet.setBranch(branch);
                 break;
             case BACK_OFFICE:
                 throw new UnsupportedOperationException("You cannot create a backoffice account at the moment");

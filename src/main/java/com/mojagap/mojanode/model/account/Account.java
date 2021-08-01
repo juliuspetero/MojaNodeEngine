@@ -5,6 +5,7 @@ import com.mojagap.mojanode.dto.account.AccountDto;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.user.AppUser;
+import com.mojagap.mojanode.model.wallet.Wallet;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -30,6 +31,7 @@ public class Account extends AuditEntity {
     private AccountType accountType;
     private Set<AppUser> appUsers = new HashSet<>();
     private Set<Company> companies = new HashSet<>();
+    private Set<Wallet> wallets = new HashSet<>();
 
     public Account(AccountDto accountDto) {
         this.countryCode = CountryCode.getByCode(accountDto.getCountryCode());
@@ -91,6 +93,11 @@ public class Account extends AuditEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "account", fetch = FetchType.LAZY)
     public Set<Company> getCompanies() {
         return companies;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "account", fetch = FetchType.LAZY)
+    public Set<Wallet> getWallets() {
+        return wallets;
     }
 }
 

@@ -6,6 +6,7 @@ import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
+import com.mojagap.mojanode.model.wallet.Wallet;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +33,7 @@ public class Company extends AuditEntity {
     private Account account;
     private Company parentCompany;
     private Set<Branch> branches = new HashSet<>();
+    private Set<Wallet> wallets = new HashSet<>();
 
     public Company(CompanyDto companyDto) {
         BeanUtils.copyProperties(companyDto, this);
@@ -90,5 +92,10 @@ public class Company extends AuditEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "company", fetch = FetchType.LAZY)
     public Set<Branch> getBranches() {
         return branches;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "company", fetch = FetchType.LAZY)
+    public Set<Wallet> getWallets() {
+        return wallets;
     }
 }
