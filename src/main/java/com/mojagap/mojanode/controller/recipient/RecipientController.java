@@ -68,4 +68,9 @@ public class RecipientController extends BaseController {
         return executeHttpGet(() -> recipientQueryHandler.getRecipients(queryParams));
     }
 
+    @RequestMapping(path = "/transaction", method = RequestMethod.GET)
+    public RecordHolder<RecipientDto> getRecipientTransactions(@RequestParam Map<String, String> queryParams) {
+        return executeHttpGet(() -> recipientQueryHandler.getRecipientTransactions(queryParams));
+    }
+
 }

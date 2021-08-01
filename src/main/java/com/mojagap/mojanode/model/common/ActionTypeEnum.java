@@ -15,6 +15,8 @@ public enum ActionTypeEnum {
     CLOSE,
     REJECT,
     ACTIVATE,
+    DEACTIVATE,
+    TOP_UP,
     API_POLL_REQUEST,
     API_POST_REQUEST;
 }

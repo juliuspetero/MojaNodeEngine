@@ -7,4 +7,6 @@ import java.util.Map;
 
 public interface RecipientQueryHandler {
     RecordHolder<RecipientDto> getRecipients(Map<String, String> queryParams);
+
+    RecordHolder<RecipientDto> getRecipientTransactions(Map<String, String> queryParams);
 }

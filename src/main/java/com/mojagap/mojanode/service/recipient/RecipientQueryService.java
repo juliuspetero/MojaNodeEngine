@@ -110,6 +110,11 @@ public class RecipientQueryService implements RecipientQueryHandler {
         return new RecordHolder<>(recipientDtos.size(), recipientDtos);
     }
 
+    @Override
+    public RecordHolder<RecipientDto> getRecipientTransactions(Map<String, String> queryParams) {
+        return null;
+    }
+
     private RecipientDto fromSqlResultSet(RecipientSqlResultSet resultSet) {
         RecipientDto recipientDto = new RecipientDto();
         BeanUtils.copyProperties(resultSet, recipientDto);
