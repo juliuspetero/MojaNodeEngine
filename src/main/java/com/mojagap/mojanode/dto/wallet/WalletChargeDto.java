@@ -11,9 +11,12 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor
-public class WalletTransferDto {
-    private Integer fromWalletId;
-    private Integer toWalletId;
+public class WalletChargeDto {
+    private Integer id;
+    private String name;
+    private String description;
+    private String feeTypeEnum;
     private BigDecimal amount;
-    private String comment;
+    private String chargeTypeEnum;
+    private String currencyCode;
 }

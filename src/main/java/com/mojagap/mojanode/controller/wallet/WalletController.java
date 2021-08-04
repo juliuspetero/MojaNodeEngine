@@ -3,8 +3,10 @@ package com.mojagap.mojanode.controller.wallet;
 import com.mojagap.mojanode.controller.BaseController;
 import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.recipient.RecipientTransactionDto;
+import com.mojagap.mojanode.dto.wallet.ApplyWalletChargeDto;
 import com.mojagap.mojanode.dto.wallet.WalletDto;
 import com.mojagap.mojanode.dto.wallet.WalletTransactionDto;
+import com.mojagap.mojanode.dto.wallet.WalletTransferDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
 import com.mojagap.mojanode.model.common.RecordHolder;
@@ -37,10 +39,19 @@ public class WalletController extends BaseController {
         });
     }
 
-    @RequestMapping(path = "/activate", method = RequestMethod.POST)
+    @RequestMapping(path = "/deactivate", method = RequestMethod.POST)
     public ActionResponse deactivateWallet(Integer id) {
         return executeAndLogUserActivity(EntityTypeEnum.WALLET, ActionTypeEnum.DEACTIVATE, (UserActivityLog log) -> {
             ActionResponse response = walletCommandHandler.deactivateWallet(id);
+            log.setEntityId(response.getResourceId());
+            return response;
+        });
+    }
+
+    @RequestMapping(path = "/applyCharge", method = RequestMethod.POST)
+    public ActionResponse applyWalletCharge(ApplyWalletChargeDto applyWalletChargeDto) {
+        return executeAndLogUserActivity(EntityTypeEnum.WALLET, ActionTypeEnum.APPLY_CHARGE, (UserActivityLog log) -> {
+            ActionResponse response = walletCommandHandler.applyWalletCharge(applyWalletChargeDto);
             log.setEntityId(response.getResourceId());
             return response;
         });
@@ -50,6 +61,15 @@ public class WalletController extends BaseController {
     public ActionResponse topUpWallet(@RequestBody WalletTransactionDto walletTransactionDto, @PathVariable("walletId") Integer walletId) {
         return executeAndLogUserActivity(EntityTypeEnum.WALLET, ActionTypeEnum.TOP_UP, (UserActivityLog log) -> {
             ActionResponse response = walletCommandHandler.topUpWallet(walletTransactionDto, walletId);
+            log.setEntityId(response.getResourceId());
+            return response;
+        });
+    }
+
+    @RequestMapping(path = "/transfer", method = RequestMethod.POST)
+    public ActionResponse topUpWallet(@RequestBody WalletTransferDto walletTransferDto) {
+        return executeAndLogUserActivity(EntityTypeEnum.WALLET, ActionTypeEnum.TRANSFER, (UserActivityLog log) -> {
+            ActionResponse response = walletCommandHandler.transferFund(walletTransferDto);
             log.setEntityId(response.getResourceId());
             return response;
         });
