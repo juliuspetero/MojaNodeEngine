@@ -45,4 +45,11 @@ public class ErrorMessages {
     public static final String CANNOT_UPDATE_RECORD_IN_STATUS = "%s in status %s cannot be updated";
     public static final String CANNOT_CREATE_OR_UPDATE_RECIPIENT_IN_BRANCH = "You are not permitted to create or update a recipient under this branch";
     public static final String CSV_FILE_TYPE_REQUIRED = "Please upload a valid csv file type";
+    public static final String INVALID_WALLET_CHARGE_NAME = "Please provide a wallet name of length 5 to 100";
+    public static final String INVALID_WALLET_CHARGE_DESCRIPTION = "Wallet charge description should be between 10 to 255 characters";
+    public static final String INVALID_FEE_TYPE = "Please provide a correct fee type";
+    public static final String INVALID_WALLET_CHARGE_TYPE = "Please provide a valid wallet charge type";
+    public static final String VALID_CURRENCY_CODE_REQUIRED = "Please provide a valid currency code";
+    public static final String WALLET_CHARGE_AMOUNT_LESS_THAN_ZERO = "Wallet charge amount must be greater than zero";
+
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 
 @Service
 public class WalletChargeQueryService implements WalletChargeQueryHandler {
+
     @Override
     public RecordHolder<WalletChargeDto> getWalletCharges(Map<String, String> queryParams) {
         return null;

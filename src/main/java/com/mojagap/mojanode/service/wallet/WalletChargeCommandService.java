@@ -3,28 +3,78 @@ package com.mojagap.mojanode.service.wallet;
 
 import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.wallet.WalletChargeDto;
+import com.mojagap.mojanode.infrastructure.AppContext;
+import com.mojagap.mojanode.infrastructure.ErrorMessages;
+import com.mojagap.mojanode.infrastructure.PowerValidator;
+import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
+import com.mojagap.mojanode.model.account.AccountType;
+import com.mojagap.mojanode.model.common.AuditEntity;
+import com.mojagap.mojanode.model.wallet.WalletCharge;
+import com.mojagap.mojanode.repository.wallet.WalletChargeRepository;
 import com.mojagap.mojanode.service.wallet.handler.WalletChargeCommandHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class WalletChargeCommandService implements WalletChargeCommandHandler {
+
+    private final WalletChargeRepository walletChargeRepository;
+
+    @Autowired
+    public WalletChargeCommandService(WalletChargeRepository walletChargeRepository) {
+        this.walletChargeRepository = walletChargeRepository;
+    }
+
+
     @Override
     public ActionResponse createWalletCharge(WalletChargeDto walletChargeDto) {
-        return null;
+        walletChargeDto.isValid();
+        AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
+        List<WalletCharge> walletCharges = walletChargeRepository.findAllByName(walletChargeDto.getName());
+        PowerValidator.isEmpty(walletCharges, String.format(ErrorMessages.ENTITY_ALREADY_EXISTS, WalletCharge.class.getSimpleName(), "name"));
+        WalletCharge walletCharge = walletChargeDto.toWalletChargeEntity(new WalletCharge());
+        AppContext.stamp(walletCharge);
+        walletChargeRepository.save(walletCharge);
+        return new ActionResponse(walletCharge.getId());
+
     }
 
     @Override
     public ActionResponse updateWalletCharge(WalletChargeDto walletChargeDto, Integer id) {
-        return null;
+        walletChargeDto.isValid();
+        AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
+        WalletCharge walletCharge = walletChargeRepository.findById(id).orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, WalletCharge.class.getSimpleName(), "id")));
+        if (!walletChargeDto.getName().equals(walletCharge.getName())) {
+            List<WalletCharge> walletCharges = walletChargeRepository.findAllByName(walletChargeDto.getName());
+            PowerValidator.isEmpty(walletCharges, String.format(ErrorMessages.ENTITY_ALREADY_EXISTS, WalletCharge.class.getSimpleName(), "name"));
+        }
+        walletCharge = walletChargeDto.toWalletChargeEntity(walletCharge);
+        AppContext.stamp(walletCharge);
+        walletChargeRepository.save(walletCharge);
+        return new ActionResponse(walletCharge.getId());
     }
 
     @Override
     public ActionResponse activateWalletCharge(Integer id) {
-        return null;
+        AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
+        WalletCharge walletCharge = walletChargeRepository.findById(id).orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, WalletCharge.class.getSimpleName(), "id")));
+        PowerValidator.isFalse(AuditEntity.RecordStatus.ACTIVE.equals(walletCharge.getRecordStatus()), "Wallet charge is already active");
+        walletCharge.setRecordStatus(AuditEntity.RecordStatus.ACTIVE);
+        AppContext.stamp(walletCharge);
+        walletChargeRepository.save(walletCharge);
+        return new ActionResponse(id);
     }
 
     @Override
     public ActionResponse deactivateWalletCharge(Integer id) {
-        return null;
+        AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
+        WalletCharge walletCharge = walletChargeRepository.findById(id).orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, WalletCharge.class.getSimpleName(), "id")));
+        PowerValidator.isFalse(AuditEntity.RecordStatus.INACTIVE.equals(walletCharge.getRecordStatus()), "Wallet charge is already active");
+        walletCharge.setRecordStatus(AuditEntity.RecordStatus.INACTIVE);
+        AppContext.stamp(walletCharge);
+        walletChargeRepository.save(walletCharge);
+        return new ActionResponse(id);
     }
 }

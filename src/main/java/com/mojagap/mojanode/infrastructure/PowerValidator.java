@@ -9,6 +9,7 @@ import com.mojagap.mojanode.model.account.AccountType;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
@@ -28,6 +29,12 @@ public class PowerValidator {
 
     public static void isNull(Object object, String message) {
         if (object != null) {
+            throw new BadRequestException(message);
+        }
+    }
+
+    public static void isGreaterThanZero(BigDecimal value, String message) {
+        if (value == null || value.compareTo(BigDecimal.ZERO) < 1) {
             throw new BadRequestException(message);
         }
     }

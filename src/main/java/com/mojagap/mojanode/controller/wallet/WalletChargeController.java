@@ -2,7 +2,6 @@ package com.mojagap.mojanode.controller.wallet;
 
 import com.mojagap.mojanode.controller.BaseController;
 import com.mojagap.mojanode.dto.ActionResponse;
-import com.mojagap.mojanode.dto.branch.BranchDto;
 import com.mojagap.mojanode.dto.wallet.WalletChargeDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
@@ -64,7 +63,7 @@ public class WalletChargeController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public RecordHolder<WalletChargeDto> getBranches(@RequestParam Map<String, String> queryParams) {
+    public RecordHolder<WalletChargeDto> getWalletCharges(@RequestParam Map<String, String> queryParams) {
         return executeHttpGet(() -> walletChargeQueryHandler.getWalletCharges(queryParams));
     }
 

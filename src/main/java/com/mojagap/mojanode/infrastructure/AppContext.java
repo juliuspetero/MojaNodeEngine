@@ -2,6 +2,8 @@ package com.mojagap.mojanode.infrastructure;
 
 import com.mojagap.mojanode.infrastructure.security.JwtAuthorizationFilter;
 import com.mojagap.mojanode.infrastructure.utility.DateUtil;
+import com.mojagap.mojanode.model.account.Account;
+import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
@@ -79,5 +81,11 @@ public class AppContext implements ApplicationContextAware {
         if (entity.getCreatedOn() == null) {
             entity.setCreatedOn(now);
         }
+    }
+
+    public static void isPermittedAccountTyp(AccountType... accountTypes) {
+        AppUser loggedInUser = getLoggedInUser();
+        Account account = loggedInUser.getAccount();
+        PowerValidator.isPermittedAccountType(account.getAccountType(), accountTypes);
     }
 }
