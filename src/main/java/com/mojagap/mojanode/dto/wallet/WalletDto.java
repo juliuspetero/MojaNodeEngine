@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 public class WalletDto {
+    private Integer id;
     private BigDecimal actualBalance;
     private BigDecimal availableBalance;
     private AccountDto account;
