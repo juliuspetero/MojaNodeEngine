@@ -52,5 +52,6 @@ public class ErrorMessages {
     public static final String VALID_CURRENCY_CODE_REQUIRED = "Please provide a valid currency code";
     public static final String WALLET_CHARGE_AMOUNT_LESS_THAN_ZERO = "Wallet charge amount must be greater than zero";
     public static final String TOP_UP_AMOUNT_LESS_THAN_ZERO = "Top up amount must be greater than zero";
+    public static final String AWS_IS_DISABLED = "AWS is disabled on this environment";
 
 }

@@ -6,15 +6,13 @@ import com.mojagap.mojanode.dto.company.CompanyDto;
 import com.mojagap.mojanode.dto.company.CompanySqlResultSet;
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.infrastructure.AppContext;
-import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
+import com.mojagap.mojanode.infrastructure.utility.Util;
 import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.service.company.handler.CompanyQueryHandler;
-import liquibase.pro.packaged.C;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -56,7 +54,7 @@ public class CompanyQueryService implements CompanyQueryHandler {
     }
 
     private CompanyDto toCompanyDto(CompanySqlResultSet companySqlResultSet) {
-        CompanyDto companyDto = CommonUtil.copyProperties(companySqlResultSet, new CompanyDto());
+        CompanyDto companyDto = Util.copyProperties(companySqlResultSet, new CompanyDto());
         companyDto.setParentCompany(new CompanyDto(companySqlResultSet.getParentCompanyId(), companySqlResultSet.getParentCompanyName(), null, companySqlResultSet.getParentCompanyStatus()));
         companyDto.setCreatedByUser(new AppUserDto(companySqlResultSet.getCreatedById(), companySqlResultSet.getCreatedByFirstName(), companySqlResultSet.getCreatedByLastName()));
         companyDto.setAccount(new AccountDto(companySqlResultSet.getAccountId()));

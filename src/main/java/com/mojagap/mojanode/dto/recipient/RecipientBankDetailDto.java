@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
-import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
+import com.mojagap.mojanode.infrastructure.utility.Util;
 import com.mojagap.mojanode.model.recipient.RecipientBankDetail;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,6 +32,6 @@ public class RecipientBankDetailDto {
     }
 
     public RecipientBankDetail toRecipientBankDetailEntity() {
-        return CommonUtil.copyProperties(this, new RecipientBankDetail());
+        return Util.copyProperties(this, new RecipientBankDetail());
     }
 }

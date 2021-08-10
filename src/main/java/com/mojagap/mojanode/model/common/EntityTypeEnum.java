@@ -14,5 +14,6 @@ public enum EntityTypeEnum {
     WALLET_CHARGE,
     BANK,
     PARTNER,
-    BANK_TRANSFER;
+    BANK_TRANSFER,
+    FILE
 }

@@ -11,9 +11,7 @@ import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.common.IdTypeEnum;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.*;
 
 import java.util.Date;
 
@@ -21,6 +19,8 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class AppUserDto {
     private Integer id;
     private String authentication;

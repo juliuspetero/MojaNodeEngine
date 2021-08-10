@@ -5,7 +5,7 @@ import com.mojagap.mojanode.dto.branch.BranchSqlResultSet;
 import com.mojagap.mojanode.dto.company.CompanyDto;
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.infrastructure.AppContext;
-import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
+import com.mojagap.mojanode.infrastructure.utility.Util;
 import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.service.branch.handler.BranchQueryHandler;
@@ -52,7 +52,7 @@ public class BranchQueryService implements BranchQueryHandler {
     }
 
     private BranchDto toBranchDto(BranchSqlResultSet branchSqlResultSet) {
-        BranchDto branchDto = CommonUtil.copyProperties(branchSqlResultSet, new BranchDto());
+        BranchDto branchDto = Util.copyProperties(branchSqlResultSet, new BranchDto());
         branchDto.setParentBranch(new BranchDto(branchSqlResultSet.getParentBranchId(), branchSqlResultSet.getParentBranchName(), null, branchSqlResultSet.getParentBranchStatus()));
         branchDto.setCompany(new CompanyDto(branchSqlResultSet.getCompanyId(), branchSqlResultSet.getCompanyName(), null, branchSqlResultSet.getCompanyStatus()));
         branchDto.setCreatedBy(new AppUserDto(branchSqlResultSet.getCreatedById(), branchSqlResultSet.getCreatedByFirstName(), branchSqlResultSet.getCreatedByLastName()));

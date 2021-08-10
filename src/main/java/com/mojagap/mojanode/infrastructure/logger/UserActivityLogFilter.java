@@ -4,7 +4,7 @@ package com.mojagap.mojanode.infrastructure.logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mojagap.mojanode.controller.BaseController;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
-import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
+import com.mojagap.mojanode.infrastructure.utility.Util;
 import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.user.PlatformTypeEnum;
 import com.mojagap.mojanode.model.user.UserActivityLog;
@@ -106,6 +106,6 @@ public class UserActivityLogFilter implements Filter {
             String value = responseWrapper.getHeader(key);
             headerMap.put(key, value);
         }
-        return CommonUtil.OBJECT_MAPPER.writeValueAsString(headerMap);
+        return Util.OBJECT_MAPPER.writeValueAsString(headerMap);
     }
 }

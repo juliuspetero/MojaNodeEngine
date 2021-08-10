@@ -20,5 +20,7 @@ public enum ActionTypeEnum {
     TOP_UP,
     TRANSFER,
     API_POLL_REQUEST,
-    API_POST_REQUEST;
+    API_POST_REQUEST,
+    UPLOAD,
+    DOWNLOAD
 }

@@ -296,6 +296,9 @@
             <column name="phone_number" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
+            <column name="bank_account_number" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
             <column name="transaction_status" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
@@ -325,4 +328,51 @@
             </column>
         </createTable>
     </changeSet>
+
+    <changeSet id="create-table-s3_document" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="s3_document"/>
+            </not>
+        </preConditions>
+        <comment>Create table for keeping s3 uploaded documents</comment>
+        <createTable tableName="s3_document">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mime_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="upload_type_enum" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="wallet_transaction_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="08082021_FK_doc_wallet_transaction_id"
+                             references="wallet_transaction(id)"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

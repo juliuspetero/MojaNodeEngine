@@ -26,17 +26,19 @@ import java.util.logging.Logger;
 
 @Service
 public class RestTemplateService {
-
     private static final Logger LOG = Logger.getLogger(RestTemplateService.class.getName());
-
     @Autowired
     private RestTemplate restTemplate;
 
-    @Autowired
-    protected HttpServletRequest httpServletRequest;
+    private final HttpServletRequest httpServletRequest;
+    private final HttpCallLogRepository httpCallLogRepository;
 
     @Autowired
-    public HttpCallLogRepository httpCallLogRepository;
+    public RestTemplateService(HttpServletRequest httpServletRequest, HttpCallLogRepository httpCallLogRepository) {
+        this.httpServletRequest = httpServletRequest;
+        this.httpCallLogRepository = httpCallLogRepository;
+    }
+
 
     @Bean
     public RestTemplate getRestTemplate() {

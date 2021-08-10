@@ -4,7 +4,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
-import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
+import com.mojagap.mojanode.infrastructure.utility.Util;
 import com.mojagap.mojanode.model.account.AccountType;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.util.CollectionUtils;
@@ -86,7 +86,7 @@ public class PowerValidator {
     }
 
     public static void validPhoneNumber(String phoneNumber, String message) throws NumberParseException {
-        PhoneNumberUtil phoneNumberUtil = CommonUtil.PHONE_NUMBER_UTIL;
+        PhoneNumberUtil phoneNumberUtil = Util.PHONE_NUMBER_UTIL;
         try {
             if (phoneNumber == null || phoneNumberUtil.isValidNumber(phoneNumberUtil.parse(phoneNumber, Phonenumber.PhoneNumber.CountryCodeSource.UNSPECIFIED.name()))) {
                 throw new BadRequestException(message);

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ApplicationConstants;
 import com.mojagap.mojanode.infrastructure.logger.UserActivityLogFilter;
-import com.mojagap.mojanode.infrastructure.utility.CommonUtil;
+import com.mojagap.mojanode.infrastructure.utility.Util;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
 import com.mojagap.mojanode.model.http.HttpResponseStatusEnum;
@@ -109,7 +109,7 @@ public abstract class BaseController {
             String value = httpServletRequest.getHeader(key);
             headerMap.put(key, value);
         }
-        return CommonUtil.OBJECT_MAPPER.writeValueAsString(headerMap);
+        return Util.OBJECT_MAPPER.writeValueAsString(headerMap);
     }
 
 }

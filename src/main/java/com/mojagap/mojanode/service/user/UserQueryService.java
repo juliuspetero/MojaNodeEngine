@@ -17,11 +17,11 @@ import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.AuditEntity;
+import com.mojagap.mojanode.model.common.IdTypeEnum;
 import com.mojagap.mojanode.model.common.RecordHolder;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.http.ExternalUser;
 import com.mojagap.mojanode.model.user.AppUser;
-import com.mojagap.mojanode.model.common.IdTypeEnum;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
 import com.mojagap.mojanode.service.httpgateway.RestTemplateService;
 import com.mojagap.mojanode.service.user.handler.UserQueryHandler;
@@ -48,6 +48,7 @@ import java.sql.Types;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserQueryService implements UserDetailsService, UserQueryHandler {
@@ -138,14 +139,14 @@ public class UserQueryService implements UserDetailsService, UserQueryHandler {
     @Override
     public List<AppUser> getExternalUsers() {
         ExternalUser[] externalUsers = restTemplateService.doHttpGet(ApplicationConstants.BANK_TRANSFER_BASE_URL + "/users", null, ExternalUser[].class);
-        List<AppUser> appUsers = List.of(externalUsers).stream().map(x -> {
+        List<AppUser> appUsers = Stream.of(externalUsers).map(x -> {
             AppUser appUser = new AppUser();
             appUser.setId(x.getId());
             appUser.setLastName(x.getName());
             appUser.setFirstName(x.getUsername());
             appUser.setPhoneNumber(x.getPhone());
             appUser.setEmail(x.getEmail());
-            appUser.setAddress("XXXXXXXXX");
+            appUser.setAddress("STOXX");
             appUser.setPassword("PASSWORD");
             appUser.setVerified(Boolean.FALSE);
             appUser.setDateOfBirth(DateUtil.now());
