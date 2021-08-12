@@ -53,5 +53,7 @@ public class ErrorMessages {
     public static final String WALLET_CHARGE_AMOUNT_LESS_THAN_ZERO = "Wallet charge amount must be greater than zero";
     public static final String TOP_UP_AMOUNT_LESS_THAN_ZERO = "Top up amount must be greater than zero";
     public static final String AWS_IS_DISABLED = "AWS is disabled on this environment";
+    public static final String PAYMENT_METHOD_TYPE_NOT_PERMITTED = "%s payment method type is not permitted here";
+    public static final String TOP_UP_CHARGES_GREATER_AMOUNT = "Top up charges is greater than the actual charge amount";
 
 }

@@ -1,5 +1,6 @@
 package com.mojagap.mojanode.dto.wallet;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -7,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,8 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class ApplyWalletChargeDto {
-    private List<Integer> walletIds;
-    private List<Integer> walletChargeIds;
-    private Boolean applyToAll;
+public class WalletBalanceDto {
+    private BigDecimal actualBalance;
+    private BigDecimal availableBalance;
+    private BigDecimal onHoldBalance;
+    private Integer numberOfTransactions;
 }

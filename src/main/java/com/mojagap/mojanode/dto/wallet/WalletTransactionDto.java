@@ -24,10 +24,4 @@ public class WalletTransactionDto {
     private BigDecimal amount;
     private String transactionStatus;
     private String paymentMethodType;
-
-
-    public void isValidTopUp() {
-        PowerValidator.isTrue(wallet != null && wallet.getId() != null, String.format(ErrorMessages.ENTITY_REQUIRED, "Wallet ID"));
-        PowerValidator.isGreaterThanZero(amount, ErrorMessages.TOP_UP_AMOUNT_LESS_THAN_ZERO);
-    }
 }

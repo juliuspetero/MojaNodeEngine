@@ -19,6 +19,12 @@
             <column name="available_balance" type="decimal(19,4)">
                 <constraints nullable="false"/>
             </column>
+            <column name="on_hold_balance" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number_of_transactions" type="bigint">
+                <constraints nullable="false"/>
+            </column>
             <column name="account_id" type="bigint">
                 <constraints nullable="true" foreignKeyName="27072021_FK_wallet_account_id"
                              references="account(id)"/>
@@ -139,6 +145,12 @@
             </column>
             <column name="transaction_status" type="varchar(255)">
                 <constraints nullable="false"/>
+            </column>
+            <column name="wallet_transaction_request_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bank_deposit_transaction_id" type="bigint">
+                <constraints nullable="true"/>
             </column>
             <column name="created_on" type="timestamp" defaultValueComputed="now()">
                 <constraints nullable="false"/>
@@ -353,9 +365,8 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="wallet_transaction_id" type="bigint">
-                <constraints nullable="true" foreignKeyName="08082021_FK_doc_wallet_transaction_id"
-                             references="wallet_transaction(id)"/>
+            <column name="wallet_transaction_request_id" type="bigint">
+                <constraints nullable="true"/>
             </column>
             <column name="created_on" type="timestamp" defaultValueComputed="now()">
                 <constraints nullable="false"/>
@@ -373,6 +384,117 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-bank_deposit_transaction" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bank_deposit_transaction"/>
+            </not>
+        </preConditions>
+        <comment>Create table for keeping all the topup bank details</comment>
+        <createTable tableName="bank_deposit_transaction">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="receiver_bank_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="receiver_bank_branch" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="receiver_account_number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="receiver_account_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="depositor_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deposit_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-wallet_transaction_request" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="wallet_transaction_request"/>
+            </not>
+        </preConditions>
+        <comment>Create table for keeping all the transaction requests</comment>
+        <createTable tableName="wallet_transaction_request">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="wallet_id" type="bigint">
+                <constraints nullable="true" foreignKeyName="1308_FK_deposit_wallet_id"
+                             references="wallet(id)"/>
+            </column>
+            <column name="transaction_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="decimal(19,4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="approved_by" type="bigint">
+                <constraints nullable="true" foreignKeyName="1308_FK_deposit_approved_by"
+                             references="app_user(id)"/>
+            </column>
+            <column name="approved_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_on" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_by" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="record_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="wallet_transaction" baseColumnNames="wallet_transaction_request_id"
+                                 constraintName="1308021_FK_wallet_transaction_request_id"
+                                 referencedTableName="wallet_transaction_request"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="wallet_transaction" baseColumnNames="bank_deposit_transaction_id"
+                                 constraintName="1308021_FK_bank_deposit_transaction_id"
+                                 referencedTableName="bank_deposit_transaction"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
 </databaseChangeLog>

@@ -42,6 +42,7 @@ public class WalletCharge extends AuditEntity {
         return amount;
     }
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "charge_type_enum")
     public ChargeTypeEnum getChargeTypeEnum() {
         return chargeTypeEnum;

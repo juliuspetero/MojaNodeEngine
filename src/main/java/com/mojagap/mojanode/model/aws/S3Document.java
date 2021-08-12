@@ -1,7 +1,7 @@
 package com.mojagap.mojanode.model.aws;
 
 import com.mojagap.mojanode.model.common.AuditEntity;
-import com.mojagap.mojanode.model.wallet.WalletTransaction;
+import com.mojagap.mojanode.model.wallet.WalletTransactionRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ public class S3Document extends AuditEntity {
     private String mimeType;
     private String path;
     private S3UploadTypeEnum uploadType;
-    private WalletTransaction walletTransaction;
+    private WalletTransactionRequest walletTransactionRequest;
 
     @Column(name = "name")
     public String getName() {
@@ -44,8 +44,8 @@ public class S3Document extends AuditEntity {
     }
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "wallet_transaction_id")
-    public WalletTransaction getWalletTransaction() {
-        return walletTransaction;
+    @JoinColumn(name = "wallet_transaction_request_id")
+    public WalletTransactionRequest getWalletTransactionRequest() {
+        return walletTransactionRequest;
     }
 }

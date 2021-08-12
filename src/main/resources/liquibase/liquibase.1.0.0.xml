@@ -359,7 +359,6 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-
         <addForeignKeyConstraint baseTableName="company" baseColumnNames="created_by"
                                  constraintName="01062021_FK_company_created_by"
                                  referencedTableName="app_user"

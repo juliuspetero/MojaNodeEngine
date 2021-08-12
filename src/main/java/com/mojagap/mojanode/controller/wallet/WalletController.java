@@ -5,7 +5,7 @@ import com.mojagap.mojanode.dto.ActionResponse;
 import com.mojagap.mojanode.dto.recipient.RecipientTransactionDto;
 import com.mojagap.mojanode.dto.wallet.ApplyWalletChargeDto;
 import com.mojagap.mojanode.dto.wallet.WalletDto;
-import com.mojagap.mojanode.dto.wallet.WalletTransactionDto;
+import com.mojagap.mojanode.dto.wallet.WalletTransactionRequestDto;
 import com.mojagap.mojanode.dto.wallet.WalletTransferDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
@@ -49,7 +49,7 @@ public class WalletController extends BaseController {
     }
 
     @RequestMapping(path = "/applyCharge", method = RequestMethod.POST)
-    public ActionResponse applyWalletCharge(ApplyWalletChargeDto applyWalletChargeDto) {
+    public ActionResponse applyWalletCharge(@RequestBody ApplyWalletChargeDto applyWalletChargeDto) {
         return executeAndLogUserActivity(EntityTypeEnum.WALLET, ActionTypeEnum.APPLY_CHARGE, (UserActivityLog log) -> {
             ActionResponse response = walletCommandHandler.applyWalletCharge(applyWalletChargeDto);
             log.setEntityId(response.getResourceId());
@@ -58,9 +58,9 @@ public class WalletController extends BaseController {
     }
 
     @RequestMapping(path = "/topUp/{walletId}", method = RequestMethod.POST)
-    public ActionResponse topUpWallet(@RequestBody WalletTransactionDto walletTransactionDto, @PathVariable("walletId") Integer walletId) {
+    public ActionResponse topUpWallet(@RequestBody WalletTransactionRequestDto walletTransactionRequestDto, @PathVariable("walletId") Integer walletId) {
         return executeAndLogUserActivity(EntityTypeEnum.WALLET, ActionTypeEnum.TOP_UP, (UserActivityLog log) -> {
-            ActionResponse response = walletCommandHandler.topUpWallet(walletTransactionDto, walletId);
+            ActionResponse response = walletCommandHandler.topUpWallet(walletTransactionRequestDto, walletId);
             log.setEntityId(response.getResourceId());
             return response;
         });

@@ -19,7 +19,7 @@ public class S3DocumentDto {
     private String mimeType;
     private String path;
     private String uploadType;
-    private WalletTransactionDto walletTransaction;
+    private WalletTransactionDto walletTransactionRequest;
     private AppUserDto createdBy;
 
     public S3DocumentDto(S3Document s3Document) {
@@ -28,7 +28,7 @@ public class S3DocumentDto {
         this.mimeType = s3Document.getMimeType();
         this.path = s3Document.getPath();
         this.uploadType = s3Document.getUploadType().name();
-        this.walletTransaction = WalletTransactionDto.builder().id(s3Document.getWalletTransaction() != null ? s3Document.getWalletTransaction().getId() : null).build();
+        this.walletTransactionRequest = walletTransactionRequest.builder().id(s3Document.getWalletTransactionRequest() != null ? s3Document.getWalletTransactionRequest().getId() : null).build();
         AppUser appUser = s3Document.getCreatedBy();
         this.createdBy = AppUserDto.builder().id(appUser.getId()).firstName(appUser.getFirstName()).lastName(appUser.getLastName()).build();
     }

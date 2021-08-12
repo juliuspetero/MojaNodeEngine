@@ -103,6 +103,8 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         Wallet wallet = new Wallet();
         wallet.setAvailableBalance(BigDecimal.ZERO);
         wallet.setActualBalance(BigDecimal.ZERO);
+        wallet.setOnHoldBalance(BigDecimal.ZERO);
+        wallet.setNumberOfTransactions(0);
         wallet.setAccount(account);
         account.getWallets().add(wallet);
         AppContext.stamp(wallet);

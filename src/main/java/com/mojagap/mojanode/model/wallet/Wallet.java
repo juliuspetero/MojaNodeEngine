@@ -18,6 +18,8 @@ import java.util.Set;
 public class Wallet extends AuditEntity {
     private BigDecimal actualBalance;
     private BigDecimal availableBalance;
+    private BigDecimal onHoldBalance;
+    private Integer numberOfTransactions;
     private Account account;
     private Company company;
     private Branch branch;
@@ -31,6 +33,16 @@ public class Wallet extends AuditEntity {
     @Column(name = "available_balance")
     public BigDecimal getAvailableBalance() {
         return availableBalance;
+    }
+
+    @Column(name = "on_hold_balance")
+    public BigDecimal getOnHoldBalance() {
+        return onHoldBalance;
+    }
+
+    @Column(name = "number_of_transactions")
+    public Integer getNumberOfTransactions() {
+        return numberOfTransactions;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
