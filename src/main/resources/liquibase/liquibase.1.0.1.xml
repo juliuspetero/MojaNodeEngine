@@ -497,4 +497,51 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
+    <changeSet id="add-wallet-permissions" author="juliuspetero@outlook.com">
+        <comment>Create wallet permissions for all users</comment>
+        <sql>
+            <![CDATA[
+            -- Wallet permissions
+            INSERT
+            IGNORE INTO permission(name, action_type, entity_type, category)
+                VALUES ('READ_WALLETS', 'READ', 'WALLET', 'GENERAL'),
+                ('CREATE_WALLETS', 'CREATE', 'WALLET', 'BACK_OFFICE'),
+                ('UPDATE_WALLETS', 'UPDATE', 'WALLET', 'BACK_OFFICE'),
+                ('ACTIVATE_WALLETS', 'ACTIVATE', 'WALLET', 'BACK_OFFICE'),
+                ('DEACTIVATE_WALLETS', 'DEACTIVATE', 'WALLET', 'BACK_OFFICE'),
+                ('TOP_UP_WALLETS', 'TOP_UP', 'WALLET', 'GENERAL'),
+                ('APPLY_WALLET_CHARGES', 'APPLY_CHARGE', 'WALLET', 'BACK_OFFICE');
+
+            -- Wallet charge permissions
+            INSERT
+            IGNORE INTO permission(name, action_type, entity_type, category)
+                VALUES ('READ_WALLET_CHARGES', 'READ', 'WALLET_CHARGE', 'BACK_OFFICE'),
+                ('CREATE_WALLET_CHARGES', 'CREATE', 'WALLET_CHARGE', 'BACK_OFFICE'),
+                ('UPDATE_WALLET_CHARGES', 'UPDATE', 'WALLET_CHARGE', 'BACK_OFFICE'),
+                ('ACTIVATE_WALLET_CHARGES', 'ACTIVATE', 'WALLET_CHARGE', 'BACK_OFFICE'),
+                ('DEACTIVATE_WALLET_CHARGES', 'DEACTIVATE', 'WALLET_CHARGE', 'BACK_OFFICE');
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="insert_operation/backoffice_account" author="juliuspetero@outlook.com">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM wallet_charge;
+            </sqlCheck>
+        </preConditions>
+
+        <comment>Insert default wallet charge</comment>
+        <sql>
+            <![CDATA[
+            INSERT
+            IGNORE INTO wallet_charge (name, description, amount, fee_type_enum, charge_type_enum, currency_code, created_by,
+                                  modified_by, record_status)
+            VALUES ('Default Disbursement Charge', 'This charge is attached to all wallet created', 1000.0000, 'FLAT',
+                    'DISBURSEMENT_CHARGE', 'UGX', (SELECT app_user.id FROM app_user LIMIT 1),
+                    (SELECT app_user.id FROM app_user LIMIT 1), 'ACTIVE');
+            ]]>
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
