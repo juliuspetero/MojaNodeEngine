@@ -25,9 +25,11 @@ import com.mojagap.mojanode.model.role.PermissionEnum;
 import com.mojagap.mojanode.model.role.Role;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.wallet.Wallet;
+import com.mojagap.mojanode.model.wallet.WalletCharge;
 import com.mojagap.mojanode.repository.account.AccountRepository;
 import com.mojagap.mojanode.repository.role.PermissionRepository;
 import com.mojagap.mojanode.repository.user.AppUserRepository;
+import com.mojagap.mojanode.repository.wallet.WalletRepository;
 import com.mojagap.mojanode.service.account.handler.AccountCommandHandler;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -46,10 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumSet;
+import java.util.*;
 
 @Service
 public class AccountCommandHandlerService implements AccountCommandHandler {
@@ -61,10 +60,11 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
     private final AuthenticationManager authenticationManager;
     protected final HttpServletResponse httpServletResponse;
     private final HttpServletRequest httpServletRequest;
+    private final WalletRepository walletRepository;
 
     @Autowired
     public AccountCommandHandlerService(PasswordEncoder passwordEncoder, AccountRepository accountRepository, PermissionRepository permissionRepository,
-                                        AppUserRepository appUserRepository, ModelMapper modelMapper, AuthenticationManager authenticationManager, HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
+                                        AppUserRepository appUserRepository, ModelMapper modelMapper, AuthenticationManager authenticationManager, HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest, WalletRepository walletRepository) {
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
         this.permissionRepository = permissionRepository;
@@ -73,6 +73,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         this.authenticationManager = authenticationManager;
         this.httpServletResponse = httpServletResponse;
         this.httpServletRequest = httpServletRequest;
+        this.walletRepository = walletRepository;
     }
 
     @Override
@@ -101,6 +102,11 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         appUser.setAccount(account);
 
         Wallet wallet = new Wallet();
+        Optional<Wallet> defaultWallet = walletRepository.findDefaultWallet();
+        if (defaultWallet.isPresent()) {
+            Set<WalletCharge> walletCharges = defaultWallet.get().getWalletCharges();
+            wallet.setWalletCharges(walletCharges);
+        }
         wallet.setAvailableBalance(BigDecimal.ZERO);
         wallet.setActualBalance(BigDecimal.ZERO);
         wallet.setOnHoldBalance(BigDecimal.ZERO);

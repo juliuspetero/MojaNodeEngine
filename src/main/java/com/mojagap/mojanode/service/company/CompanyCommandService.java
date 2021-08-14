@@ -17,7 +17,9 @@ import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.company.CompanyType;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.wallet.Wallet;
+import com.mojagap.mojanode.model.wallet.WalletCharge;
 import com.mojagap.mojanode.repository.company.CompanyRepository;
+import com.mojagap.mojanode.repository.wallet.WalletRepository;
 import com.mojagap.mojanode.service.company.handler.CompanyCommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,15 +27,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class CompanyCommandService implements CompanyCommandHandler {
     private final CompanyRepository companyRepository;
+    private final WalletRepository walletRepository;
 
     @Autowired
-    public CompanyCommandService(CompanyRepository companyRepository) {
+    public CompanyCommandService(CompanyRepository companyRepository, WalletRepository walletRepository) {
         this.companyRepository = companyRepository;
+        this.walletRepository = walletRepository;
     }
 
     @Transactional
@@ -59,8 +65,12 @@ public class CompanyCommandService implements CompanyCommandHandler {
         AppContext.stamp(branch);
         company.getBranches().add(branch);
         AppContext.stamp(company);
-
         Wallet wallet = new Wallet();
+        Optional<Wallet> defaultWallet = walletRepository.findDefaultWallet();
+        if (defaultWallet.isPresent()) {
+            Set<WalletCharge> walletCharges = defaultWallet.get().getWalletCharges();
+            wallet.setWalletCharges(walletCharges);
+        }
         wallet.setAvailableBalance(BigDecimal.ZERO);
         wallet.setActualBalance(BigDecimal.ZERO);
         wallet.setAccount(account);

@@ -14,7 +14,10 @@ import com.mojagap.mojanode.model.common.AuditEntity;
 import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.user.AppUser;
 import com.mojagap.mojanode.model.wallet.Wallet;
+import com.mojagap.mojanode.model.wallet.WalletCharge;
 import com.mojagap.mojanode.repository.branch.BranchRepository;
+import com.mojagap.mojanode.repository.wallet.WalletChargeRepository;
+import com.mojagap.mojanode.repository.wallet.WalletRepository;
 import com.mojagap.mojanode.service.branch.handler.BranchCommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,15 +25,19 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class BranchCommandService implements BranchCommandHandler {
     private final BranchRepository branchRepository;
+    private final WalletRepository walletRepository;
 
     @Autowired
-    public BranchCommandService(BranchRepository branchRepository) {
+    public BranchCommandService(BranchRepository branchRepository, WalletRepository walletRepository) {
         this.branchRepository = branchRepository;
+        this.walletRepository = walletRepository;
     }
 
 
@@ -48,6 +55,11 @@ public class BranchCommandService implements BranchCommandHandler {
         AppContext.stamp(branch);
         company.getBranches().add(branch);
         Wallet wallet = new Wallet();
+        Optional<Wallet> defaultWallet = walletRepository.findDefaultWallet();
+        if (defaultWallet.isPresent()) {
+            Set<WalletCharge> walletCharges = defaultWallet.get().getWalletCharges();
+            wallet.setWalletCharges(walletCharges);
+        }
         wallet.setAvailableBalance(BigDecimal.ZERO);
         wallet.setActualBalance(BigDecimal.ZERO);
         wallet.setAccount(account);

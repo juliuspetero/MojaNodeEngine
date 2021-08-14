@@ -3,7 +3,10 @@ package com.mojagap.mojanode.repository.wallet;
 
 import com.mojagap.mojanode.model.wallet.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public interface WalletRepository extends JpaRepository<Wallet, Integer> {
@@ -34,4 +37,14 @@ public interface WalletRepository extends JpaRepository<Wallet, Integer> {
                 "WHERE wt.wallet_id = :walletId\n" +
                 "  AND wt.transaction_status NOT IN ('FAILED', 'REJECTED')";
     }
+
+    @Query(value = "" +
+            "SELECT w.* FROM wallet w " +
+            "INNER JOIN account acc " +
+            "   ON acc.id = w.account_id " +
+            "WHERE w.record_status = 'ACTIVE' " +
+            "   AND acc.account_type = 'BACK_OFFICE' " +
+            "LIMIT 1",
+            nativeQuery = true)
+    Optional<Wallet> findDefaultWallet();
 }
