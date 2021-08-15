@@ -1,6 +1,7 @@
 package com.mojagap.mojanode.service.wallet.handler;
 
 import com.mojagap.mojanode.dto.ActionResponse;
+import com.mojagap.mojanode.dto.wallet.ApplyWalletChargeDto;
 import com.mojagap.mojanode.dto.wallet.WalletChargeDto;
 
 public interface WalletChargeCommandHandler {
@@ -12,4 +13,6 @@ public interface WalletChargeCommandHandler {
     ActionResponse activateWalletCharge(Integer id);
 
     ActionResponse deactivateWalletCharge(Integer id);
+
+    ActionResponse updateDefaultWalletCharge(ApplyWalletChargeDto applyWalletChargeDto);
 }

@@ -35,7 +35,7 @@ public class AppUserDto {
     private String phoneNumber;
     private String status;
     private String password;
-    private Boolean verified = Boolean.FALSE;
+    private Boolean verified;
     private CompanyDto company;
     private AccountDto account;
     private BranchDto branch;

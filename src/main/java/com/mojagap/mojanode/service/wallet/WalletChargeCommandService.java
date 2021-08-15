@@ -2,6 +2,7 @@ package com.mojagap.mojanode.service.wallet;
 
 
 import com.mojagap.mojanode.dto.ActionResponse;
+import com.mojagap.mojanode.dto.wallet.ApplyWalletChargeDto;
 import com.mojagap.mojanode.dto.wallet.WalletChargeDto;
 import com.mojagap.mojanode.infrastructure.AppContext;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
@@ -9,22 +10,27 @@ import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
 import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.common.AuditEntity;
+import com.mojagap.mojanode.model.wallet.Wallet;
 import com.mojagap.mojanode.model.wallet.WalletCharge;
 import com.mojagap.mojanode.repository.wallet.WalletChargeRepository;
+import com.mojagap.mojanode.repository.wallet.WalletRepository;
 import com.mojagap.mojanode.service.wallet.handler.WalletChargeCommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
 public class WalletChargeCommandService implements WalletChargeCommandHandler {
 
     private final WalletChargeRepository walletChargeRepository;
+    private final WalletRepository walletRepository;
 
     @Autowired
-    public WalletChargeCommandService(WalletChargeRepository walletChargeRepository) {
+    public WalletChargeCommandService(WalletChargeRepository walletChargeRepository, WalletRepository walletRepository) {
         this.walletChargeRepository = walletChargeRepository;
+        this.walletRepository = walletRepository;
     }
 
 
@@ -76,5 +82,17 @@ public class WalletChargeCommandService implements WalletChargeCommandHandler {
         AppContext.stamp(walletCharge);
         walletChargeRepository.save(walletCharge);
         return new ActionResponse(id);
+    }
+
+    @Override
+    public ActionResponse updateDefaultWalletCharge(ApplyWalletChargeDto applyWalletChargeDto) {
+        AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
+        Wallet wallet = walletRepository.findDefaultWallet().orElseThrow(() ->
+                new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, "Default Wallet", "ID")));
+        List<WalletCharge> walletCharges = walletChargeRepository.findAllById(applyWalletChargeDto.getWalletChargeIds());
+        wallet.setWalletCharges(new HashSet<>(walletCharges));
+        AppContext.stamp(wallet);
+        walletRepository.save(wallet);
+        return new ActionResponse(wallet.getId());
     }
 }

@@ -537,9 +537,19 @@
             INSERT
             IGNORE INTO wallet_charge (name, description, amount, fee_type_enum, charge_type_enum, currency_code, created_by,
                                   modified_by, record_status)
-            VALUES ('Default Disbursement Charge', 'This charge is attached to all wallet created', 1000.0000, 'FLAT',
-                    'DISBURSEMENT_CHARGE', 'UGX', (SELECT app_user.id FROM app_user LIMIT 1),
-                    (SELECT app_user.id FROM app_user LIMIT 1), 'ACTIVE');
+                VALUES ('Default Disbursement Charge', 'This charge is attached to all wallet created', 1000.0000, 'FLAT',
+                        'DISBURSEMENT_CHARGE', 'UGX', (SELECT app_user.id FROM app_user LIMIT 1),
+                        (SELECT app_user.id FROM app_user LIMIT 1), 'ACTIVE');
+
+            INSERT
+            IGNORE INTO wallet(actual_balance, available_balance, on_hold_balance, number_of_transactions, account_id,
+                                          created_by, modified_by, record_status)
+                VALUES (0.0000, 0.0000, 0.0000, 0, (SELECT account.id FROM account WHERE account.account_type = 'BACK_OFFICE' LIMIT 1),
+                        (SELECT app_user.id FROM app_user LIMIT 1), (SELECT app_user.id FROM app_user LIMIT 1), 'ACTIVE');
+
+            INSERT
+            IGNORE INTO wallet_wallet_charge(wallet_id, wallet_charge_id)
+                VALUES ((SELECT wallet.id FROM wallet LIMIT 1), (SELECT wallet_charge.id FROM wallet_charge LIMIT 1));
             ]]>
         </sql>
     </changeSet>

@@ -2,6 +2,7 @@ package com.mojagap.mojanode.controller.wallet;
 
 import com.mojagap.mojanode.controller.BaseController;
 import com.mojagap.mojanode.dto.ActionResponse;
+import com.mojagap.mojanode.dto.wallet.ApplyWalletChargeDto;
 import com.mojagap.mojanode.dto.wallet.WalletChargeDto;
 import com.mojagap.mojanode.model.common.ActionTypeEnum;
 import com.mojagap.mojanode.model.common.EntityTypeEnum;
@@ -42,6 +43,20 @@ public class WalletChargeController extends BaseController {
             log.setEntityId(response.getResourceId());
             return response;
         });
+    }
+
+    @RequestMapping(path = "/default", method = RequestMethod.PUT)
+    public ActionResponse updateDefaultWalletCharge(@RequestBody ApplyWalletChargeDto applyWalletChargeDto) {
+        return executeAndLogUserActivity(EntityTypeEnum.WALLET_CHARGE, ActionTypeEnum.UPDATE, (UserActivityLog log) -> {
+            ActionResponse response = walletChargeCommandHandler.updateDefaultWalletCharge(applyWalletChargeDto);
+            log.setEntityId(response.getResourceId());
+            return response;
+        });
+    }
+
+    @RequestMapping(path = "/default", method = RequestMethod.GET)
+    public RecordHolder<WalletChargeDto> getDefaultWalletCharges() {
+        return executeHttpGet(walletChargeQueryHandler::getDefaultWalletCharges);
     }
 
     @RequestMapping(path = "/activate/{id}", method = RequestMethod.DELETE)

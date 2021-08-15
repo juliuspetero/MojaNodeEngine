@@ -8,4 +8,6 @@ import java.util.Map;
 public interface WalletChargeQueryHandler {
 
     RecordHolder<WalletChargeDto> getWalletCharges(Map<String, String> queryParams);
+
+    RecordHolder<WalletChargeDto> getDefaultWalletCharges();
 }

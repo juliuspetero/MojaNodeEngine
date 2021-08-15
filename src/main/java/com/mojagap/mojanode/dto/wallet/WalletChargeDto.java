@@ -2,12 +2,15 @@ package com.mojagap.mojanode.dto.wallet;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.model.wallet.ChargeTypeEnum;
 import com.mojagap.mojanode.model.wallet.CurrencyCode;
 import com.mojagap.mojanode.model.wallet.FeeTypeEnum;
 import com.mojagap.mojanode.model.wallet.WalletCharge;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +20,8 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class WalletChargeDto {
     private Integer id;
     private String name;
@@ -25,6 +30,7 @@ public class WalletChargeDto {
     private BigDecimal amount;
     private String chargeTypeEnum;
     private String currencyCode;
+    private AppUserDto createdBy;
 
     public void isValid() {
         PowerValidator.validStringLength(name, 5, 100, ErrorMessages.INVALID_WALLET_CHARGE_NAME);

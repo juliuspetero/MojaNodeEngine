@@ -22,7 +22,6 @@ import com.mojagap.mojanode.repository.wallet.WalletRepository;
 import com.mojagap.mojanode.repository.wallet.WalletTransactionRepository;
 import com.mojagap.mojanode.repository.wallet.WalletTransactionRequestRepository;
 import com.mojagap.mojanode.service.wallet.handler.WalletCommandHandler;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -37,7 +36,6 @@ import java.util.List;
 
 @Service
 public class WalletCommandService implements WalletCommandHandler {
-
     private final WalletRepository walletRepository;
     private final WalletChargeRepository walletChargeRepository;
     private final WalletTransactionRepository walletTransactionRepository;
@@ -83,15 +81,13 @@ public class WalletCommandService implements WalletCommandHandler {
     @Transactional
     public ActionResponse applyWalletCharge(ApplyWalletChargeDto applyWalletChargeDto) {
         AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
-        if (CollectionUtils.isNotEmpty(applyWalletChargeDto.getWalletIds()) && CollectionUtils.isNotEmpty(applyWalletChargeDto.getWalletChargeIds())) {
-            List<WalletCharge> walletCharges = walletChargeRepository.findAllById(applyWalletChargeDto.getWalletChargeIds());
-            List<Wallet> wallets = applyWalletChargeDto.getApplyToAll() ? walletRepository.findAll() : walletRepository.findAllById(applyWalletChargeDto.getWalletIds());
-            for (Wallet wallet : wallets) {
-                wallet.setWalletCharges(new HashSet<>(walletCharges));
-                AppContext.stamp(wallet);
-            }
-            walletRepository.saveAll(wallets);
+        List<WalletCharge> walletCharges = walletChargeRepository.findAllById(applyWalletChargeDto.getWalletChargeIds());
+        List<Wallet> wallets = applyWalletChargeDto.getApplyToAll() ? walletRepository.findAll() : walletRepository.findAllById(applyWalletChargeDto.getWalletIds());
+        for (Wallet wallet : wallets) {
+            wallet.setWalletCharges(new HashSet<>(walletCharges));
+            AppContext.stamp(wallet);
         }
+        walletRepository.saveAll(wallets);
         return new ActionResponse("Charges successfully applied to wallets");
     }
 
