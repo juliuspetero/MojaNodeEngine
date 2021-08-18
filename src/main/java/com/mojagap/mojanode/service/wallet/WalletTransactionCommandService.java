@@ -10,9 +10,12 @@ import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
 import com.mojagap.mojanode.infrastructure.exception.BadRequestException;
 import com.mojagap.mojanode.infrastructure.utility.Util;
+import com.mojagap.mojanode.model.account.Account;
 import com.mojagap.mojanode.model.account.AccountType;
 import com.mojagap.mojanode.model.aws.S3Document;
+import com.mojagap.mojanode.model.branch.Branch;
 import com.mojagap.mojanode.model.common.RecordHolder;
+import com.mojagap.mojanode.model.company.Company;
 import com.mojagap.mojanode.model.transaction.PaymentMethodType;
 import com.mojagap.mojanode.model.transaction.TransactionStatus;
 import com.mojagap.mojanode.model.transaction.TransactionType;
@@ -32,6 +35,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class WalletTransactionCommandService implements WalletTransactionCommandHandler {
@@ -54,14 +58,35 @@ public class WalletTransactionCommandService implements WalletTransactionCommand
     @Override
     @Transactional
     public ActionResponse approveTransactionRequest(Integer id) {
+        AppContext.isPermittedAccountTypes(AccountType.BACK_OFFICE);
         WalletTransactionRequest walletTransactionRequest = walletTransactionRequestRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, WalletTransactionRequest.class.getSimpleName(), "id")));
         PowerValidator.isFalse(TransactionStatus.APPROVED.equals(walletTransactionRequest.getTransactionStatus()), "Transaction request already approved");
+        walletTransactionRequest.setTransactionStatus(TransactionStatus.APPROVED);
         Set<WalletTransaction> walletTransactions = walletTransactionRequest.getWalletTransactions();
         walletTransactions.forEach(t -> t.setTransactionStatus(TransactionStatus.APPROVED));
-        walletCommandHandler.recalculateWalletDerivedBalances(walletTransactionRequest.getWallet());
         walletTransactionRequestRepository.saveAndFlush(walletTransactionRequest);
+        walletCommandHandler.recalculateWalletDerivedBalances(walletTransactionRequest.getWallet());
         return new ActionResponse(id);
+    }
+
+
+    public void isPermittedToTransactOnWallet(Wallet wallet) {
+        Account account = AppContext.getLoggedInUser().getAccount();
+        AccountType accountType = account.getAccountType();
+        if (AccountType.INDIVIDUAL.equals(accountType) && !wallet.getAccount().getId().equals(account.getId())) {
+            PowerValidator.throwBadRequestException(ErrorMessages.CANNOT_TRANSACT_WITH_WALLET);
+        }
+        if (AccountType.COMPANY.equals(accountType)) {
+            List<Integer> loggedInUserBranches = AppContext.getBranchesOfLoggedInUser().stream().map(Branch::getId).collect(Collectors.toList());
+            if (wallet.getBranch() == null || !loggedInUserBranches.contains(wallet.getBranch().getId())) {
+                PowerValidator.throwBadRequestException(ErrorMessages.CANNOT_TRANSACT_WITH_WALLET);
+            }
+            List<Integer> loggedInUserCompanies = AppContext.getCompaniesOfLoggedInUser().stream().map(Company::getId).collect(Collectors.toList());
+            if (wallet.getCompany() == null || !loggedInUserCompanies.contains(wallet.getCompany().getId())) {
+                PowerValidator.throwBadRequestException(ErrorMessages.CANNOT_TRANSACT_WITH_WALLET);
+            }
+        }
     }
 
     @Override
@@ -69,6 +94,7 @@ public class WalletTransactionCommandService implements WalletTransactionCommand
     public ActionResponse topUpWallet(WalletTransactionRequestDto walletTransactionRequestDto, Integer walletId) {
         AppContext.isPermittedAccountTypes(AccountType.INDIVIDUAL, AccountType.COMPANY);
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, Wallet.class.getSimpleName(), "id")));
+        isPermittedToTransactOnWallet(wallet);
         walletTransactionRequestDto.isValidBankCashPayment();
         WalletTransactionRequest walletTransactionRequest = WalletTransactionRequest.builder()
                 .wallet(wallet)

@@ -113,6 +113,7 @@ public class WalletChargeQueryService implements WalletChargeQueryHandler {
             "       wc.amount            AS amount,\n" +
             "       wc.charge_type_enum  AS chargeTypeEnum,\n" +
             "       wc.currency_code     AS currencyCode,\n" +
+            "       wc.created_on        AS creationDate,\n" +
             "       createdBy.id         AS createdById,\n" +
             "       createdBy.first_name AS createdByFirstName,\n" +
             "       createdBy.last_name  AS createdByLastName\n" +
@@ -137,11 +138,13 @@ public class WalletChargeQueryService implements WalletChargeQueryHandler {
     private String getWalletChargeQuery() {
         return BASE_WALLET_CHARGE_QUERY +
                 "  AND (wl.id IN (:walletIds))\n" +
+                "GROUP BY wc.id\n" +
                 "LIMIT :limit OFFSET :offset";
     }
 
     private String getWalletChargeQueryWithoutWalletIds() {
         return BASE_WALLET_CHARGE_QUERY +
+                "GROUP BY wc.id\n" +
                 "LIMIT :limit OFFSET :offset";
     }
 
@@ -153,13 +156,14 @@ public class WalletChargeQueryService implements WalletChargeQueryHandler {
         ID("id"),
         NAME("name"),
         DESCRIPTION("description"),
-        FEE_TYPE_ENUM("onHoldBalance"),
+        FEE_TYPE_ENUM("feeTypeEnum"),
         AMOUNT("amount"),
         CHARGE_TYPE_ENUM("chargeTypeEnum"),
         CURRENCY_CODE("currencyCode"),
         CREATED_BY_ID("createdById"),
         CREATED_BY_FIRST_NAME("createdByFirstName"),
         CREATED_BY_LAST_NAME("createdByLastName"),
+        CREATED_BY_FULL_NAME("createdByFullName"),
         CREATION_DATE("creationDate"),
         WALLET_ID("walletId"),
         WALLET_IDS("walletIds");

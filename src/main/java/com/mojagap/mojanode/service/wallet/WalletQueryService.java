@@ -157,6 +157,7 @@ public class WalletQueryService implements WalletQueryHandler {
             "       wl.available_balance      AS availableBalance,\n" +
             "       wl.on_hold_balance        AS onHoldBalance,\n" +
             "       wl.number_of_transactions AS numberOfTransactions,\n" +
+            "       wl.created_on             AS creationDate,\n" +
             "       acc.id                    AS accountId,\n" +
             "       acc.country_code          AS countryCode,\n" +
             "       acc.account_type          AS accountType,\n" +
@@ -164,6 +165,7 @@ public class WalletQueryService implements WalletQueryHandler {
             "       com.id                    AS companyId,\n" +
             "       com.name                  AS companyName,\n" +
             "       com.company_type          AS companyType,\n" +
+            "       com.created_on            AS companyOpeningDate,\n" +
             "       com.record_status         AS companyStatus,\n" +
             "       br.id                     AS branchId,\n" +
             "       br.name                   AS branchName,\n" +
@@ -180,6 +182,7 @@ public class WalletQueryService implements WalletQueryHandler {
             "         LEFT OUTER JOIN branch br\n" +
             "                         ON br.id = wl.branch_id\n" +
             "WHERE (wl.id = :id OR :id IS NULL)\n" +
+            "  AND (acc.account_type != 'BACK_OFFICE')\n" +
             "  AND (wl.actual_balance LIKE CONCAT('%', :actualBalance, '%') OR :actualBalance IS NULL)\n" +
             "  AND (wl.available_balance LIKE CONCAT('%', :availableBalance, '%') OR :availableBalance IS NULL)\n" +
             "  AND (wl.on_hold_balance LIKE CONCAT('%', :onHoldBalance, '%') OR :onHoldBalance IS NULL)\n" +
@@ -214,6 +217,7 @@ public class WalletQueryService implements WalletQueryHandler {
         ON_HOLD_BALANCE("onHoldBalance"),
         NUMBER_OF_TRANSACTIONS("numberOfTransactions"),
         CREATION_DATE("creationDate"),
+        CREATED_BY_FULL_NAME("createdByFullName"),
 
         ACCOUNT_IDS("accountIds"),
         ACCOUNT_ID("accountId"),

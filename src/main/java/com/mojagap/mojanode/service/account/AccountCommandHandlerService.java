@@ -105,7 +105,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
         Optional<Wallet> defaultWallet = walletRepository.findDefaultWallet();
         if (defaultWallet.isPresent()) {
             Set<WalletCharge> walletCharges = defaultWallet.get().getWalletCharges();
-            wallet.setWalletCharges(walletCharges);
+            wallet.setWalletCharges(new HashSet<>(walletCharges));
         }
         wallet.setAvailableBalance(BigDecimal.ZERO);
         wallet.setActualBalance(BigDecimal.ZERO);
@@ -147,7 +147,7 @@ public class AccountCommandHandlerService implements AccountCommandHandler {
             case PARTNER:
                 throw new UnsupportedOperationException("You cannot create a partner account at the moment");
         }
-        accountRepository.save(account);
+        accountRepository.saveAndFlush(account);
         appUserDto.setPassword(rawPassword);
         return authenticateUser(appUserDto);
     }
