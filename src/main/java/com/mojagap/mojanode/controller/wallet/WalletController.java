@@ -57,32 +57,6 @@ public class WalletController extends BaseController {
         });
     }
 
-    @RequestMapping(path = "/topUp/{walletId}", method = RequestMethod.POST)
-    public ActionResponse topUpWallet(@RequestBody WalletTransactionRequestDto walletTransactionRequestDto, @PathVariable("walletId") Integer walletId) {
-        return executeAndLogUserActivity(EntityTypeEnum.WALLET, ActionTypeEnum.TOP_UP, (UserActivityLog log) -> {
-            ActionResponse response = walletCommandHandler.topUpWallet(walletTransactionRequestDto, walletId);
-            log.setEntityId(response.getResourceId());
-            return response;
-        });
-    }
-
-    @RequestMapping(path = "/transfer", method = RequestMethod.POST)
-    public ActionResponse topUpWallet(@RequestBody WalletTransferDto walletTransferDto) {
-        return executeAndLogUserActivity(EntityTypeEnum.WALLET, ActionTypeEnum.TRANSFER, (UserActivityLog log) -> {
-            ActionResponse response = walletCommandHandler.transferFund(walletTransferDto);
-            log.setEntityId(response.getResourceId());
-            return response;
-        });
-    }
-
-    @RequestMapping(path = "/sendMoney/{walletId}", method = RequestMethod.POST)
-    public ActionResponse sendMoney(@RequestBody RecordHolder<RecipientTransactionDto> records, @PathVariable("walletId") Integer walletId) {
-        return executeAndLogUserActivity(EntityTypeEnum.WALLET, ActionTypeEnum.TOP_UP, (UserActivityLog log) -> {
-            ActionResponse response = walletCommandHandler.sendMoney(records, walletId);
-            log.setEntityId(response.getResourceId());
-            return response;
-        });
-    }
 
     @RequestMapping(method = RequestMethod.GET)
     public RecordHolder<WalletDto> getWallets(@RequestParam Map<String, String> queryParams) {

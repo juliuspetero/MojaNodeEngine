@@ -18,6 +18,7 @@ public enum ActionTypeEnum {
     DEACTIVATE,
     APPLY_CHARGE,
     TOP_UP,
+    APPROVE_REQUEST,
     TRANSFER,
     API_POLL_REQUEST,
     API_POST_REQUEST,

@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -45,6 +46,7 @@ public class RecipientQueryService implements RecipientQueryHandler {
     private final AccountRepository accountRepository;
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
+    @Autowired
     public RecipientQueryService(BranchRepository branchRepository, CompanyRepository companyRepository, AccountRepository accountRepository, NamedParameterJdbcTemplate jdbcTemplate) {
         this.branchRepository = branchRepository;
         this.companyRepository = companyRepository;

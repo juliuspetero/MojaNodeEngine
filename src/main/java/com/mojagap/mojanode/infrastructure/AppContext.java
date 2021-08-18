@@ -83,7 +83,7 @@ public class AppContext implements ApplicationContextAware {
         }
     }
 
-    public static void isPermittedAccountTyp(AccountType... accountTypes) {
+    public static void isPermittedAccountTypes(AccountType... accountTypes) {
         AppUser loggedInUser = getLoggedInUser();
         Account account = loggedInUser.getAccount();
         PowerValidator.isPermittedAccountType(account.getAccountType(), accountTypes);

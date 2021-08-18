@@ -12,6 +12,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Entity(name = "wallet_transaction_request")
@@ -25,6 +27,7 @@ public class WalletTransactionRequest extends AuditEntity {
     private TransactionStatus transactionStatus;
     private AppUser approvedBy;
     private Date approvedOn;
+    Set<WalletTransaction> walletTransactions = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id")
@@ -59,5 +62,10 @@ public class WalletTransactionRequest extends AuditEntity {
     @Temporal(TemporalType.TIMESTAMP)
     public Date getApprovedOn() {
         return approvedOn;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "walletTransactionRequest", fetch = FetchType.LAZY)
+    public Set<WalletTransaction> getWalletTransactions() {
+        return walletTransactions;
     }
 }

@@ -1,10 +1,12 @@
 package com.mojagap.mojanode.dto.wallet;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mojagap.mojanode.dto.user.AppUserDto;
 import com.mojagap.mojanode.infrastructure.ErrorMessages;
 import com.mojagap.mojanode.infrastructure.PowerValidator;
+import com.mojagap.mojanode.infrastructure.utility.DateUtil;
 import com.mojagap.mojanode.model.wallet.ChargeTypeEnum;
 import com.mojagap.mojanode.model.wallet.CurrencyCode;
 import com.mojagap.mojanode.model.wallet.FeeTypeEnum;
@@ -15,6 +17,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,6 +33,8 @@ public class WalletChargeDto {
     private BigDecimal amount;
     private String chargeTypeEnum;
     private String currencyCode;
+    @JsonFormat(pattern = DateUtil.DATE_FORMAT_BY_SLASH)
+    private Date creationDate;
     private AppUserDto createdBy;
 
     public void isValid() {

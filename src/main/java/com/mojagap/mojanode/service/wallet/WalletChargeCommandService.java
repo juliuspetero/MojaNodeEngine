@@ -37,7 +37,7 @@ public class WalletChargeCommandService implements WalletChargeCommandHandler {
     @Override
     public ActionResponse createWalletCharge(WalletChargeDto walletChargeDto) {
         walletChargeDto.isValid();
-        AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
+        AppContext.isPermittedAccountTypes(AccountType.BACK_OFFICE);
         List<WalletCharge> walletCharges = walletChargeRepository.findAllByName(walletChargeDto.getName());
         PowerValidator.isEmpty(walletCharges, String.format(ErrorMessages.ENTITY_ALREADY_EXISTS, WalletCharge.class.getSimpleName(), "name"));
         WalletCharge walletCharge = walletChargeDto.toWalletChargeEntity(new WalletCharge());
@@ -50,7 +50,7 @@ public class WalletChargeCommandService implements WalletChargeCommandHandler {
     @Override
     public ActionResponse updateWalletCharge(WalletChargeDto walletChargeDto, Integer id) {
         walletChargeDto.isValid();
-        AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
+        AppContext.isPermittedAccountTypes(AccountType.BACK_OFFICE);
         WalletCharge walletCharge = walletChargeRepository.findById(id).orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, WalletCharge.class.getSimpleName(), "id")));
         if (!walletChargeDto.getName().equals(walletCharge.getName())) {
             List<WalletCharge> walletCharges = walletChargeRepository.findAllByName(walletChargeDto.getName());
@@ -64,7 +64,7 @@ public class WalletChargeCommandService implements WalletChargeCommandHandler {
 
     @Override
     public ActionResponse activateWalletCharge(Integer id) {
-        AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
+        AppContext.isPermittedAccountTypes(AccountType.BACK_OFFICE);
         WalletCharge walletCharge = walletChargeRepository.findById(id).orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, WalletCharge.class.getSimpleName(), "id")));
         PowerValidator.isFalse(AuditEntity.RecordStatus.ACTIVE.equals(walletCharge.getRecordStatus()), "Wallet charge is already active");
         walletCharge.setRecordStatus(AuditEntity.RecordStatus.ACTIVE);
@@ -75,7 +75,7 @@ public class WalletChargeCommandService implements WalletChargeCommandHandler {
 
     @Override
     public ActionResponse deactivateWalletCharge(Integer id) {
-        AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
+        AppContext.isPermittedAccountTypes(AccountType.BACK_OFFICE);
         WalletCharge walletCharge = walletChargeRepository.findById(id).orElseThrow(() -> new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, WalletCharge.class.getSimpleName(), "id")));
         PowerValidator.isFalse(AuditEntity.RecordStatus.INACTIVE.equals(walletCharge.getRecordStatus()), "Wallet charge is already active");
         walletCharge.setRecordStatus(AuditEntity.RecordStatus.INACTIVE);
@@ -86,7 +86,7 @@ public class WalletChargeCommandService implements WalletChargeCommandHandler {
 
     @Override
     public ActionResponse updateDefaultWalletCharge(ApplyWalletChargeDto applyWalletChargeDto) {
-        AppContext.isPermittedAccountTyp(AccountType.BACK_OFFICE);
+        AppContext.isPermittedAccountTypes(AccountType.BACK_OFFICE);
         Wallet wallet = walletRepository.findDefaultWallet().orElseThrow(() ->
                 new BadRequestException(String.format(ErrorMessages.ENTITY_DOES_NOT_EXISTS, "Default Wallet", "ID")));
         List<WalletCharge> walletCharges = walletChargeRepository.findAllById(applyWalletChargeDto.getWalletChargeIds());

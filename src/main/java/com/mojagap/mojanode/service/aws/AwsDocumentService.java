@@ -52,7 +52,7 @@ public class AwsDocumentService implements AwsDocumentHandler {
     @SneakyThrows
     public RecordHolder<S3DocumentDto> uploadDocuments(MultipartFile[] multipartFiles, String uploadType) {
         PowerValidator.isTrue(AwsUtil.isAwsEnabled(), ErrorMessages.AWS_IS_DISABLED);
-        AppContext.isPermittedAccountTyp(AccountType.INDIVIDUAL, AccountType.COMPANY);
+        AppContext.isPermittedAccountTypes(AccountType.INDIVIDUAL, AccountType.COMPANY);
         Account account = AppContext.getLoggedInUser().getAccount();
         List<S3DocumentDto> s3DocumentDtos = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
